@@ -53,3 +53,4 @@ database.Sequelize = Sequelize;
 export {database, sequelize};
 
 export * from './Produto.js'
+export * from './Pessoa.js'
