@@ -3,6 +3,7 @@ import produto from "./produtoRoutes.js";
 import pessoa from './pessoaRoutes.js';
 import fornecedor from './fornecedorRoutes.js';
 import contato from './contatoRoutes.js'
+import listaGenerica from './listaGenericaRoutes.js'
 
 export function routes(app: Express) {
   app.use(
@@ -10,6 +11,7 @@ export function routes(app: Express) {
     produto,
     pessoa,
     contato,
-    fornecedor
+    fornecedor,
+    listaGenerica
   );
 }
