@@ -1,11 +1,13 @@
 import sequelize from "../config/connection.js";
 import { Model, DataTypes } from "sequelize";
 import Contato from "./Contato.js";
+import Fornecedor from "./Fornecedor.js";
 
 export default class Pessoa extends Model {
   static associate() {
     // define association here
     Pessoa.hasMany(Contato, { foreignKey: "id_pessoa" });
+    Pessoa.hasOne(Fornecedor, { foreignKey: "id_pessoa" })
   }
 }
 Pessoa.init(
@@ -37,11 +39,11 @@ Pessoa.init(
     uf: DataTypes.STRING(2),
     cep: DataTypes.INTEGER,
     ie_rg: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       unique: true,
     },
     cnpj_cpf: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT,
       unique: true,
     },
     data_nasc: DataTypes.DATE,
