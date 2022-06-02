@@ -3,10 +3,10 @@ import ListaGenericaController from '../controllers/listaGenericaController.js';
 
 const router = Router();
 router
-    .get('/listaGenerica', ListaGenericaController.findAllListaGenerica)
-    .get('/listaGenerica/:id', ListaGenericaController.findOneListaGenerica)
-    .post('/listaGenerica', ListaGenericaController.createListaGenerica)
-    .put('/listaGenerica/:id', ListaGenericaController.updateListaGenerica)
-    .delete('/listaGenerica/:id', ListaGenericaController.destroyListaGenerica);
+    .get('/listagenerica', ListaGenericaController.findAllListaGenerica)
+    .get('/listagenerica/:id', ListaGenericaController.findOneListaGenerica)
+    .post('/listagenerica', ListaGenericaController.createListaGenerica)
+    .put('/listagenerica/:id', ListaGenericaController.updateListaGenerica)
+    .delete('/listagenerica/:id', ListaGenericaController.destroyListaGenerica);
 
 export default router;

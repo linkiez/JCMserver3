@@ -1,11 +1,13 @@
 import sequelize from "../config/connection.js";
 import { Model, DataTypes } from "sequelize";
 import Pessoa from "./Pessoa.js";
+import PedidoCompra from "./PedidoCompra.js";
 
 export default class Fornecedor extends Model {
   static associate() {
     // define association here
     Fornecedor.belongsTo(Pessoa, { foreignKey: "id_pessoa" })
+    Fornecedor.hasMany(PedidoCompra, { foreignKey: "id_fornecedor" })
   }
 }
 Fornecedor.init(

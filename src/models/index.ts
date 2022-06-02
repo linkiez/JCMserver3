@@ -4,7 +4,8 @@ import Produto from './Produto.js'
 import Fornecedor from './Fornecedor.js'
 import ListaGenerica from "./ListaGenerica.js";
 import ListaGenericaItem from "./ListaGenericaItem.js";
-
+import PedidoCompra from "./PedidoCompra.js";
+import PedidoCompraItem from "./PedidoCompraItem.js";
 
 
 export function models(): void {
@@ -14,4 +15,6 @@ export function models(): void {
   Fornecedor.associate()
   ListaGenerica.associate()
   ListaGenericaItem.associate()
+  PedidoCompra.associate()
+  PedidoCompraItem.associate()
 }

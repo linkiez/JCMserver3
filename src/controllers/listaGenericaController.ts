@@ -46,10 +46,12 @@ export default class ListaGenericaController {
 
       listaGenericaCreated = await ListaGenerica.create(listaGenerica);
 
-      listaGenericaItem!.forEach((item) => {
-        item.id_lista = listaGenericaCreated.id;
-        ListaGenericaItem.create(item);
-      });
+      if(listaGenericaItem){
+        listaGenericaItem.forEach((item) => {
+          item.id_lista = listaGenericaCreated.id;
+          ListaGenericaItem.create(item);
+        });
+      }
 
       await t.commit();
 

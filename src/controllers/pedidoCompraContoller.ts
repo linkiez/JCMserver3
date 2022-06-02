@@ -1,0 +1,249 @@
+import sequelize from "../config/connection.js";
+import { Request, Response } from "express";
+import Fornecedor from "../models/Fornecedor.js";
+import Produto from "../models/Produto.js";
+import PedidoCompra from "../models/PedidoCompra.js";
+import PedidoCompraItem from "../models/PedidoCompraItem.js";
+import {
+  PedidoCompraType,
+  PedidoCompraItemType,
+  FornecedorType,
+  ProdutoType,
+} from "../types/index.js";
+
+export default class PedidoCompraController {
+  static async importPedidoCompra(req: Request, res: Response) {
+    let pedidoCompra: PedidoCompraType = req.body;
+    let pedidoCompraCreated: PedidoCompraType;
+    const t = await sequelize.transaction();
+
+    try {
+      let itens = pedidoCompra.PedidoCompraItem;
+      delete pedidoCompra.PedidoCompraItem;
+
+      let fornecedor: FornecedorType = (await Fornecedor.findOne({
+        where: { nome: pedidoCompra.Fornecedor },
+      })) as FornecedorType;
+      delete pedidoCompra.Fornecedor;
+      pedidoCompra.id_fornecedor = fornecedor.id;
+
+      pedidoCompraCreated = (await PedidoCompra.create(
+        pedidoCompra
+      )) as PedidoCompraType;
+
+      if (itens) {
+        itens.forEach(async (item) => {
+          let produto = (await Produto.findOne({
+            where: { nome: item.Produto },
+          })) as ProdutoType;
+          delete item.Produto;
+          item.id_produto = produto.id;
+          item.id_pedido = pedidoCompraCreated.id;
+
+          let itemCreated = await PedidoCompraItem.create(item);
+          return itemCreated;
+        });
+      }
+
+      pedidoCompraCreated = (await PedidoCompra.findOne({
+        where: { id: pedidoCompraCreated.id },
+        include: [Fornecedor, PedidoCompraItem],
+      })) as PedidoCompraType;
+
+      await t.commit();
+
+      return res.status(201).json(pedidoCompraCreated);
+    } catch (error: any) {
+      await t.rollback();
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async findAllPedidoCompra(req: Request, res: Response) {
+    try {
+      let pedidosCompra = (await PedidoCompra.findAll({
+        include: [Fornecedor],
+        order: [["id", "DESC"]],
+      })) as Array<PedidoCompraType>;
+
+      let pedidosCompraTotal = await Promise.all(
+        pedidosCompra.map(async (item) => {
+          let pedidoCompraItem = (await PedidoCompraItem.findAll({
+            where: { PedidoCompraId: Number(item.id) },
+          })) as Array<PedidoCompraItemType>;
+
+          let total = 0;
+
+          pedidoCompraItem.forEach(async (pedidoItem) => {
+            total =
+              total +
+              Number(pedidoItem.peso) *
+                Number(pedidoItem.preco) *
+                (1 + Number(pedidoItem.ipi));
+          });
+
+          item.total = total;
+
+          return item;
+        })
+      );
+
+      return res.status(200).json(pedidosCompraTotal);
+    } catch (error: any) {
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async findOnePedidoCompra(req: Request, res: Response) {
+    const { id } = req.params;
+    try {
+      let pedidoCompra = (await PedidoCompra.findOne({
+        where: { id: Number(id) },
+        include: [Fornecedor, { model: PedidoCompraItem, include: [Produto] }],
+      })) as PedidoCompraType;
+
+      let pedidoCompraItem = (await PedidoCompraItem.findAll({
+        where: { PedidoCompraId: Number(id) },
+      })) as Array<PedidoCompraItemType>;
+
+      let total = 0;
+
+      pedidoCompraItem.forEach((pedidoItem) => {
+        total =
+          total +
+          Number(pedidoItem.peso) *
+            Number(pedidoItem.preco) *
+            (1 + Number(pedidoItem.ipi));
+      });
+
+      pedidoCompra.total = total;
+
+      return res.status(200).json(pedidoCompra);
+    } catch (error: any) {
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async createPedidoCompra(req: Request, res: Response) {
+    const t = await sequelize.transaction();
+
+    try {
+      let pedidoCompra: PedidoCompraType = req.body;
+
+      if (pedidoCompra.Fornecedor) {
+        pedidoCompra.id_fornecedor = pedidoCompra.Fornecedor.id;
+        delete pedidoCompra.Fornecedor;
+      }
+
+      let pedidoCompraItem = pedidoCompra.PedidoCompraItem;
+      delete pedidoCompra.PedidoCompraItem;
+
+      pedidoCompra.data_emissao = new Date();
+
+      let pedidoCompraCreated: PedidoCompraType = (await PedidoCompra.create(
+        pedidoCompra
+      )) as PedidoCompraType;
+
+      if (pedidoCompraItem) {
+        pedidoCompraItem.map(async (item) => {
+          item.id_pedido = pedidoCompraCreated.id;
+
+          item.id_produto = item.Produto!.id;
+          delete item.Produto;
+
+          let itemCreated = (await PedidoCompraItem.create(
+            item
+          )) as PedidoCompraItemType;
+          return itemCreated;
+        });
+      }
+
+      await t.commit();
+
+      pedidoCompraCreated = (await PedidoCompra.findOne({
+        where: { id: pedidoCompraCreated.id },
+        include: [Fornecedor, { model: PedidoCompraItem, include: [Produto] }],
+      })) as PedidoCompraType;
+
+      return res.status(201).json(pedidoCompraCreated);
+    } catch (error: any) {
+      await t.rollback();
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async destroyPedidoCompra(req: Request, res: Response) {
+    const { id } = req.params;
+    const t = await sequelize.transaction();
+
+    try {
+      await PedidoCompraItem.destroy({
+        where: { id_pedido: Number(id) },
+      });
+      await PedidoCompra.destroy({ where: { id: Number(id) } });
+
+      await t.commit();
+
+      return res.status(202).json({ message: `Pedido de compra apagado` });
+    } catch (error: any) {
+      await t.rollback();
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async updatePedidoCompra(req: Request, res: Response) {
+    let pedidoCompraUpdated;
+
+    const { id } = req.params;
+
+    const t = await sequelize.transaction();
+
+    try {
+      let pedidoCompra: PedidoCompraType = req.body;
+
+      let pedidoCompraItem = pedidoCompra.PedidoCompraItem;
+      delete pedidoCompra.PedidoCompraItem;
+
+      if (pedidoCompra.Fornecedor) {
+        pedidoCompra.id_fornecedor = pedidoCompra.Fornecedor.id;
+        delete pedidoCompra.Fornecedor;
+      }
+
+      await PedidoCompra.update(pedidoCompra, {
+        where: { id: Number(id) },
+      });
+
+      await PedidoCompraItem.destroy({
+        where: { id_pedido: Number(id) },
+      });
+      if (pedidoCompraItem) {
+        pedidoCompraItem.forEach(async (item) => {
+          item.id_pedido = Number(id);
+          item.id_produto = item.Produto!.id;
+          delete item.Produto;
+          delete item.id;
+
+          await PedidoCompraItem.create(item);
+        });
+      }
+
+      await t.commit();
+
+      pedidoCompraUpdated = (await PedidoCompra.findOne({
+        where: { id: id },
+        include: [Fornecedor, { model: PedidoCompraItem, include: [Produto] }],
+      })) as PedidoCompraType;
+
+      return res.status(202).json(pedidoCompraUpdated);
+    } catch (error: any) {
+      await t.rollback();
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
+}
