@@ -1,5 +1,5 @@
-import { Produto } from "../models/index.js";
-import { ProdutoType } from "../types";
+import Produto from "../models/Produto.js";
+import { ProdutoType } from "../types/index.js";
 import { Request, Response } from "express";
 
 export default class ProdutosController {

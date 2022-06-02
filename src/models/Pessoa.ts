@@ -1,9 +1,12 @@
-import { sequelize } from "./index";
+import sequelize from "../config/connection.js";
+import { Model, DataTypes } from "sequelize";
+import Contato from "./Contato.js";
 
-const { Model, DataTypes } = require("sequelize");
-
-export class Pessoa extends Model {
-  static associate(models: any) {}
+export default class Pessoa extends Model {
+  static associate() {
+    // define association here
+    Pessoa.hasMany(Contato, { foreignKey: "id_pessoa" });
+  }
 }
 Pessoa.init(
   {
@@ -20,19 +23,13 @@ Pessoa.init(
     email: {
       type: DataTypes.STRING,
       validate: {
-        isEmail: {
-          args: true,
-          msg: "email inválido",
-        },
+        isEmail: true,
       },
     },
     email_nfe: {
       type: DataTypes.STRING,
       validate: {
-        isEmail: {
-          args: true,
-          msg: "email inválido",
-        },
+        isEmail: true,
       },
     },
     endereco: DataTypes.STRING,
@@ -53,7 +50,7 @@ Pessoa.init(
   },
   {
     sequelize,
-    modelName: "Pessoa",
+    modelName: "pessoa",
     paranoid: true,
     timestamps: true,
     freezeTableName: true,

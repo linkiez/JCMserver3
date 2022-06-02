@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { Pessoa } from "../models"
-import { PessoaType } from "../types";
+import Pessoa from "../models/Pessoa.js"
+import { PessoaType } from "../types/index.js";
 
 export default class PessoaController{
     static async findAllPessoas(req: Request, res: Response) {

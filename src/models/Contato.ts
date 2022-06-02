@@ -1,13 +1,15 @@
 import sequelize from "../config/connection.js";
 
 import { Model, DataTypes } from "sequelize";
+import Pessoa from './Pessoa.js' 
 
-export default class Produto extends Model {
+export default class Contato extends Model {
   static associate() {
     // define association here
+    Contato.belongsTo(Pessoa, { foreignKey: "id_pessoa" })
   }
 }
-Produto.init(
+Contato.init(
   {
     id: {
       allowNull: false,
@@ -16,14 +18,13 @@ Produto.init(
       type: DataTypes.BIGINT,
     },
     nome: DataTypes.STRING,
-    categoria: DataTypes.STRING,
-    espessura: DataTypes.STRING,
-    peso: DataTypes.STRING,
+    tipo: DataTypes.STRING,
+    valor: DataTypes.STRING,
     deletedAt: DataTypes.DATE,
   },
   {
     sequelize,
-    modelName: "produto",
+    modelName: "contato",
     freezeTableName: true,
     paranoid: true,
     timestamps: true,
@@ -32,3 +33,4 @@ Produto.init(
     },
   }
 );
+
