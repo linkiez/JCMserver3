@@ -1,5 +1,5 @@
 import sequelize from "../config/connection.js";
-import { Model, DataTypes } from "sequelize";
+import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa.js";
 import PedidoCompra from "./PedidoCompra.js";
 
@@ -29,5 +29,12 @@ Fornecedor.init(
     paranoid: true,
     timestamps: true,
     freezeTableName: true,
+    scopes: {
+      deleted: {
+        where: {
+          deletedAt: {[Op.not]: null},
+        },
+      },
+    },
   }
 );

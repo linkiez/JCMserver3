@@ -1,3 +1,5 @@
+import { PessoaType } from "./pessoaType";
+
 export type FornecedorType = {
   id?: number;
   data_aprov?: Date;
@@ -6,4 +8,6 @@ export type FornecedorType = {
   deletedAt?: Date;
   updateAt?: Date;
   createAt?: Date;
+  id_pessoa?: number;
+  pessoa?: PessoaType
 };
