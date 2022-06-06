@@ -29,8 +29,5 @@ Fornecedor.init(
     paranoid: true,
     timestamps: true,
     freezeTableName: true,
-    defaultScope: {
-      where: { deletedAt: null },
-    },
   }
 );

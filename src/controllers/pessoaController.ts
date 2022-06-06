@@ -12,6 +12,16 @@ export default class PessoaController{
           return res.status(500).json(error.message);
         }
       }
+
+      static async findAllPessoasDeleted(req: Request, res: Response) {
+        try {
+          const pessoas = await Pessoa.scope('deleted').findAll({paranoid: false});
+          return res.status(200).json(pessoas);
+        } catch (error: any) {
+          console.log(error);
+          return res.status(500).json(error.message);
+        }
+      }
     
       static async findOnePessoa(req: Request, res: Response) {
         const { id } = req.params;
@@ -75,5 +85,19 @@ export default class PessoaController{
             return res.status(500).json(error.message);
         }
     }
+
+    static async restorePessoa(req: Request, res: Response){
+      const { id } = req.params;
+        const pessoaUpdate: PessoaType = req.body;
+        try{
+            await Pessoa.restore({where:{ id: Number(id) }});
+            const pessoaUpdated = await Pessoa.findOne({where:{ id: Number(id) }});
+            return res.status(202).json(pessoaUpdated);
+        }catch(error:any){
+            console.log(error);
+            return res.status(500).json(error.message);
+        }
+    }
+
     
 }

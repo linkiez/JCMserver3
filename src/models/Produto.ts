@@ -28,8 +28,5 @@ Produto.init(
     freezeTableName: true,
     paranoid: true,
     timestamps: true,
-    defaultScope: {
-      where: { deletedAt: null },
-    },
   }
 );

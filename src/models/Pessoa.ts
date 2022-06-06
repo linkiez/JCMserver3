@@ -1,5 +1,5 @@
 import sequelize from "../config/connection.js";
-import { Model, DataTypes } from "sequelize";
+import { Model, DataTypes, Op } from "sequelize";
 import Contato from "./Contato.js";
 import Fornecedor from "./Fornecedor.js";
 
@@ -7,7 +7,7 @@ export default class Pessoa extends Model {
   static associate() {
     // define association here
     Pessoa.hasMany(Contato, { foreignKey: "id_pessoa" });
-    Pessoa.hasOne(Fornecedor, { foreignKey: "id_pessoa" })
+    Pessoa.hasOne(Fornecedor, { foreignKey: "id_pessoa" });
   }
 }
 Pessoa.init(
@@ -56,8 +56,12 @@ Pessoa.init(
     paranoid: true,
     timestamps: true,
     freezeTableName: true,
-    defaultScope: {
-      where: { deletedAt: null },
+    scopes: {
+      deleted: {
+        where: {
+          deletedAt: {[Op.not]: null},
+        },
+      },
     },
   }
 );

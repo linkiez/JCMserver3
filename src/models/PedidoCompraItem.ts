@@ -31,9 +31,6 @@ PedidoCompraItem.init(
     modelName: "pedido_compra_item",
     freezeTableName: true,
     paranoid: true,
-    timestamps: true,
-    defaultScope: {
-      where: { deletedAt: null },
-    },
+    timestamps: true
   }
 );
