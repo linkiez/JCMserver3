@@ -88,7 +88,6 @@ export default class PessoaController{
 
     static async restorePessoa(req: Request, res: Response){
       const { id } = req.params;
-        const pessoaUpdate: PessoaType = req.body;
         try{
             await Pessoa.restore({where:{ id: Number(id) }});
             const pessoaUpdated = await Pessoa.findOne({where:{ id: Number(id) }});
