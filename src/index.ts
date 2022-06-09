@@ -11,7 +11,7 @@ dotenv.config();
 const PORT = process.env.PORT || 3000;
 const app: Express = express();
 
-var corsOptions = {
+const corsOptions = {
   origin: process.env.CORS || "*",
 };
 
@@ -21,6 +21,6 @@ app.use(express.json(), express.urlencoded({ extended: true }));
 
 models();
 routes(app);
-sequelize.sync({ alter: false, force: false });
+sequelize.sync({ alter: false, force: true });
 
 app.listen(PORT, () => console.log(`servidor está rodando na porta ${PORT}`));

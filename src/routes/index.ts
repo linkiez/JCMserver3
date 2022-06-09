@@ -4,6 +4,7 @@ import pessoa from './pessoaRoutes.js';
 import fornecedor from './fornecedorRoutes.js';
 import contato from './contatoRoutes.js'
 import listaGenerica from './listaGenericaRoutes.js'
+import file from './fileRoutes.js'
 
 export function routes(app: Express) {
   app.use(
@@ -12,6 +13,7 @@ export function routes(app: Express) {
     pessoa,
     contato,
     fornecedor,
-    listaGenerica
+    listaGenerica,
+    file
   );
 }

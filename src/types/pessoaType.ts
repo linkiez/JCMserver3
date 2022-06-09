@@ -4,7 +4,7 @@ export type PessoaType = {
   id?: number;
   nome?: string;
   razao_social?: string;
-  pessoa_juridica?: Boolean;
+  pessoa_juridica?: boolean;
   telefone?: number;
   email?: string;
   email_nfe?: string;
