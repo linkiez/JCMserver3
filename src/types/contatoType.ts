@@ -6,4 +6,5 @@ export type ContatoType = {
   deletedAt?: Date;
   updateAt?: Date;
   createAt?: Date;
+  id_pessoa?: number;
 };

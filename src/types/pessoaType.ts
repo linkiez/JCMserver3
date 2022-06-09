@@ -1,3 +1,5 @@
+import { ContatoType } from "./contatoType";
+
 export type PessoaType = {
   id?: number;
   nome?: string;
@@ -17,4 +19,5 @@ export type PessoaType = {
   deletedAt?: Date;
   updateAt?: Date;
   createAt?: Date;
+  contato?: Array<ContatoType>;
 };

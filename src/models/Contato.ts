@@ -19,7 +19,10 @@ Contato.init(
     },
     nome: DataTypes.STRING,
     tipo: DataTypes.STRING,
-    valor: DataTypes.STRING,
+    valor: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
     deletedAt: DataTypes.DATE,
   },
   {

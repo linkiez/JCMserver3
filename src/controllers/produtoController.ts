@@ -53,6 +53,7 @@ export default class ProdutosController {
   static async updateProduto(req: Request, res: Response) {
     const { id } = req.params;
     const produtoUpdate: ProdutoType = req.body;
+    delete produtoUpdate.id
     try {
       await Produto.update(produtoUpdate, { where: { id: Number(id) } });
       const produtoUpdated = await Produto.findOne({
