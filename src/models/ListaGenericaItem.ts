@@ -1,5 +1,5 @@
 import sequelize from "../config/connection.js";
-import { Model, DataTypes } from "sequelize";
+import { Model, DataTypes, Op } from "sequelize";
 import ListaGenerica from "./ListaGenerica.js";
 
 export default class ListaGenericaItem extends Model {
@@ -25,6 +25,13 @@ ListaGenericaItem.init(
     freezeTableName: true,
     paranoid: true,
     timestamps: true,
+    scopes: {
+      deleted: {
+        where: {
+          deletedAt: {[Op.not]: null},
+        },
+      },
+    },
   }
 );
 

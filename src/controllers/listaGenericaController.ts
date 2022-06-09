@@ -18,6 +18,19 @@ export default class ListaGenericaController {
     }
   }
 
+  static async findAllListaGenericaDeleted(req: Request, res: Response) {
+    try {
+      let listaGenericas = (await ListaGenerica.scope("deleted").findAll({
+        paranoid: false,
+      })) as Array<ListaGenericaType>;
+
+      return res.status(200).json(listaGenericas);
+    } catch (error: any) {
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
+
   static async findOneListaGenerica(req: Request, res: Response) {
     const { id } = req.params;
     try {
@@ -84,17 +97,19 @@ export default class ListaGenericaController {
       await ListaGenerica.update(listaGenerica, {
         where: { id: Number(id) },
       });
-      await ListaGenericaItem.destroy({
-        where: { id_lista: Number(id) },
-      });
 
-      if (listaGenericaItem)
+      if (listaGenericaItem) {
+        await ListaGenericaItem.destroy({
+          where: { id_lista: Number(id) },
+        });
+
         listaGenericaItem.forEach(async (item: ListaGenericaItemType) => {
           item.id_lista = Number(id);
           delete item.id;
 
           await ListaGenericaItem.create(item);
         });
+      }
 
       await t.commit();
 
@@ -116,9 +131,7 @@ export default class ListaGenericaController {
     const t = await sequelize.transaction();
 
     try {
-      await ListaGenericaItem.destroy({
-        where: { id_lista: Number(id) },
-      });
+      
       await ListaGenerica.destroy({ where: { id: Number(id) } });
 
       await t.commit();
@@ -126,6 +139,21 @@ export default class ListaGenericaController {
       return res.status(202).json({ message: `Lista apagada` });
     } catch (error: any) {
       await t.rollback();
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async restoreListaGenerica(req: Request, res: Response) {
+    const { id } = req.params;
+    try {
+      await ListaGenerica.restore({ where: { id: Number(id) } });
+
+      const listaGenericaUpdated = (await ListaGenerica.findOne({
+        where: { id: Number(id) },
+      })) as ListaGenericaType;
+      return res.status(202).json(listaGenericaUpdated);
+    } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);
     }
