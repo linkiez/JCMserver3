@@ -1,11 +1,10 @@
 import Produto from "../models/Produto.js";
-import { ProdutoType } from "../types/index.js";
 import { Request, Response } from "express";
 
 export default class ProdutosController {
   static async findAllProdutos(req: Request, res: Response) {
     try {
-      const produtos = await Produto.findAll() as Array<ProdutoType>;
+      const produtos = await Produto.findAll() as Array<Produto>;
       return res.status(200).json(produtos);
     } catch (error: any) {
       console.log(error);
@@ -18,7 +17,7 @@ export default class ProdutosController {
     try {
       const produto = await Produto.findOne({
         where: { id: Number(id) },
-      }) as ProdutoType;
+      });
       return res.status(200).json(produto);
     } catch (error: any) {
       console.log(error);
@@ -31,7 +30,7 @@ export default class ProdutosController {
     try {
       const produto = await Produto.findOne({
         where: { nome: nome },
-      }) as ProdutoType;
+      });
       return res.status(200).json(produto);
     } catch (error: any) {
       console.log(error);
@@ -40,9 +39,9 @@ export default class ProdutosController {
   }
 
   static async createProduto(req: Request, res: Response) {
-    const produto: ProdutoType = req.body;
+    const produto= req.body;
     try {
-      const produtoCreated = await Produto.create(produto) as ProdutoType;
+      const produtoCreated = await Produto.create(produto);
       return res.status(201).json(produtoCreated);
     } catch (error: any) {
       console.log(error);
@@ -52,13 +51,13 @@ export default class ProdutosController {
 
   static async updateProduto(req: Request, res: Response) {
     const { id } = req.params;
-    const produtoUpdate: ProdutoType = req.body;
+    const produtoUpdate = req.body;
     delete produtoUpdate.id
     try {
       await Produto.update(produtoUpdate, { where: { id: Number(id) } });
       const produtoUpdated = await Produto.findOne({
         where: { id: Number(id) },
-      }) as ProdutoType;
+      });
       return res.status(202).json(produtoUpdated);
     } catch (error: any) {
       console.log(error);
@@ -79,7 +78,7 @@ export default class ProdutosController {
 
   static async findAllProdutoDeleted(req: Request, res: Response) {
     try {
-      const produtos = await Produto.scope('deleted').findAll({paranoid: false}) as Array<ProdutoType>;
+      const produtos = await Produto.scope('deleted').findAll({paranoid: false}) as Array<Produto>;
       return res.status(200).json(produtos);
     } catch (error: any) {
       console.log(error);
@@ -91,7 +90,7 @@ export default class ProdutosController {
     const { id } = req.params;
       try{
           await Produto.restore({where:{ id: Number(id) }});
-          const produtoUpdated = await Produto.findOne({where:{ id: Number(id) }}) as ProdutoType;
+          const produtoUpdated = await Produto.findOne({where:{ id: Number(id) }});
           return res.status(202).json(produtoUpdated);
       }catch(error:any){
           console.log(error);

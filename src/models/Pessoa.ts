@@ -1,13 +1,37 @@
 import sequelize from "../config/connection.js";
-import { Model, DataTypes, Op } from "sequelize";
+import { Model, DataTypes, Op, Identifier } from "sequelize";
 import Contato from "./Contato.js";
 import Fornecedor from "./Fornecedor.js";
+import File from "./File.js";
 
 export default class Pessoa extends Model {
+  id?: number;
+  nome?: string;
+  razao_social?: string;
+  pessoa_juridica?: boolean;
+  telefone?: number;
+  email?: string;
+  email_nfe?: string;
+  endereco?: string;
+  municipio?: string;
+  uf?: string;
+  cep?: number;
+  ie_rg?: number;
+  cnpj_cpf?: number;
+  data_nasc?: Date;
+  descricao?: Text;
+  deletedAt?: Date;
+  updateAt?: Date;
+  createAt?: Date;
+  contatos?: Array<Contato>;
+  files?: Array<File>
+
+
   static associate() {
     // define association here
     Pessoa.hasMany(Contato, { foreignKey: "id_pessoa" });
     Pessoa.hasOne(Fornecedor, { foreignKey: "id_pessoa" });
+    Pessoa.belongsToMany(File, {through: 'pessoa_file'});
   }
 }
 Pessoa.init(

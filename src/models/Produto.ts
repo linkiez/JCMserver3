@@ -3,6 +3,15 @@ import { Model, DataTypes, Op } from "sequelize";
 import PedidoCompraItem from "./PedidoCompraItem.js";
 
 export default class Produto extends Model {
+  id?: number;
+  nome?: string;
+  categoria?: string;
+  espessura?: number;
+  peso?: number;
+  updateAt?: Date;
+  createAt?: Date;
+  deletedAt?: Date;
+  
   static associate() {
     // define association here
     Produto.hasOne(PedidoCompraItem,  { foreignKey: "id_produto" })

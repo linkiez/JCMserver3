@@ -4,6 +4,20 @@ import PedidoCompraItem from "./PedidoCompraItem.js";
 import Fornecedor from "./Fornecedor.js";
 
 export default class PedidoCompra extends Model {
+  id?: number;
+  pedido?: string;
+  data_emissao?: Date;
+  cond_pagamento?: string;
+  frete?: number;
+  transporte?: string;
+  deletedAt?: Date;
+  updateAt?: Date;
+  createAt?: Date;
+  PedidoCompraItem?: Array<PedidoCompraItem>;
+  id_fornecedor?: number;
+  Fornecedor?: Fornecedor;
+  total?: number;
+
   static associate() {
     // define association here
     PedidoCompra.hasMany(PedidoCompraItem, {

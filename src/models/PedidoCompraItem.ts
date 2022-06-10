@@ -4,6 +4,20 @@ import PedidoCompra from "./PedidoCompra.js";
 import Produto from "./Produto.js";
 
 export default class PedidoCompraItem extends Model {
+  id?: number;
+  dimensao?: string;
+  quantidade?: number;
+  peso?: number;
+  preco?: number;
+  ipi?: number;
+  prazo?: Date;
+  deletedAt?: Date;
+  updateAt?: Date;
+  createAt?: Date;
+  id_pedido?: number;
+  id_produto?: number;
+  Produto?: Produto;
+
   static associate() {
     // define association here
     PedidoCompraItem.belongsTo(PedidoCompra, { foreignKey: "id_pedido" });

@@ -4,6 +4,16 @@ import Pessoa from "./Pessoa.js";
 import PedidoCompra from "./PedidoCompra.js";
 
 export default class Fornecedor extends Model {
+  id?: number;
+  data_aprov?: Date;
+  data_venc?: Date;
+  observacao?: string;
+  deletedAt?: Date;
+  updateAt?: Date;
+  createAt?: Date;
+  id_pessoa?: number;
+  pessoa?: Pessoa;
+
   static associate() {
     // define association here
     Fornecedor.belongsTo(Pessoa, { foreignKey: "id_pessoa" })

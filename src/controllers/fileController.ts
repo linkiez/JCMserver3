@@ -2,13 +2,12 @@ import { Request, Response } from "express";
 import FileDb from "../models/File.js";
 import { S3Client } from "../services/AWS-S3.js";
 import { IncomingForm } from "formidable";
-import { FileType } from "../types/fileType.js";
 
 export default class FileController {
 
   static async findAllFiles(req: Request, res: Response) {
     try {
-      const files = await FileDb.findAll() as unknown as Array<FileType>;
+      const files = await FileDb.findAll();
       return res.status(200).json(files);
     } catch (error: any) {
       console.log(error);
@@ -21,7 +20,7 @@ export default class FileController {
     try {
       const file = await FileDb.findOne({
         where: { id: Number(id) },
-      }) as unknown as FileType;
+      });
       return res.status(200).json(file);
     } catch (error: any) {
       console.log(error);
@@ -68,7 +67,7 @@ export default class FileController {
 
   static async findAllFileDeleted(req: Request, res: Response) {
     try {
-      const files = await FileDb.scope('deleted').findAll({ paranoid: false }) as unknown as Array<FileType>;
+      const files = await FileDb.scope('deleted').findAll({ paranoid: false });
       return res.status(200).json(files);
     } catch (error: any) {
       console.log(error);
@@ -80,7 +79,7 @@ export default class FileController {
     const { id } = req.params;
       try{
           await FileDb.restore({where:{ id: Number(id) }});
-          const fileUpdated = await FileDb.findOne({ where: { id: Number(id) } }) as unknown as FileType;
+          const fileUpdated = await FileDb.findOne({ where: { id: Number(id) } });
           return res.status(202).json(fileUpdated);
       }catch(error:any){
           console.log(error);

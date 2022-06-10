@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import Fornecedor from "../models/Fornecedor.js";
 import Pessoa from "../models/Pessoa.js";
-import { FornecedorType } from "../types/index.js";
 
 export default class FornecedorController {
   static async findAllFornecedors(req: Request, res: Response) {
@@ -9,7 +8,7 @@ export default class FornecedorController {
       const fornecedores = (await Fornecedor.findAll({
         include: [Pessoa],
         attributes: { exclude: ["id_pessoa"] },
-      })) as Array<FornecedorType>;
+      }));
       return res.status(200).json(fornecedores);
     } catch (error: any) {
       console.log(error);
@@ -24,7 +23,7 @@ export default class FornecedorController {
         where: { id: Number(id) },
         include: [Pessoa],
         attributes: { exclude: ["id_pessoa"] },
-      })) as FornecedorType;
+      }));
       return res.status(200).json(fornecedor);
     } catch (error: any) {
       console.log(error);
@@ -33,7 +32,7 @@ export default class FornecedorController {
   }
 
   static async createFornecedor(req: Request, res: Response) {
-    let fornecedor: FornecedorType = req.body;
+    let fornecedor = req.body;
     if (fornecedor.pessoa) {
       fornecedor.id_pessoa = fornecedor.pessoa.id;
       delete fornecedor.pessoa;
@@ -41,7 +40,7 @@ export default class FornecedorController {
     try {
       const fornecedorCreated = (await Fornecedor.create(
         fornecedor
-      )) as FornecedorType;
+      ));
       return res.status(201).json(fornecedorCreated);
     } catch (error: any) {
       console.log(error);
@@ -51,7 +50,7 @@ export default class FornecedorController {
 
   static async updateFornecedor(req: Request, res: Response) {
     const { id } = req.params;
-    let fornecedor: FornecedorType = req.body;
+    let fornecedor = req.body;
     if (fornecedor.pessoa) {
       fornecedor.id_pessoa = fornecedor.pessoa.id;
       delete fornecedor.pessoa;
@@ -61,7 +60,7 @@ export default class FornecedorController {
       await Fornecedor.update(fornecedor, { where: { id: Number(id) } });
       const fornecedorUpdated = (await Fornecedor.findOne({
         where: { id: Number(id) },
-      })) as FornecedorType;
+      }));
       return res.status(202).json(fornecedorUpdated);
     } catch (error: any) {
       console.log(error);
@@ -82,11 +81,11 @@ export default class FornecedorController {
 
   static async findAllFornecedorDeleted(req: Request, res: Response) {
     try {
-      const fornecedores = (await Fornecedor.scope("deleted").findAll({
+      const fornecedores = await Fornecedor.scope("deleted").findAll({
         paranoid: false,
         include: [Pessoa],
         attributes: { exclude: ["id_pessoa"] },
-      })) as Array<FornecedorType>;
+      });
       return res.status(200).json(fornecedores);
     } catch (error: any) {
       console.log(error);
@@ -98,9 +97,9 @@ export default class FornecedorController {
     const { id } = req.params;
     try {
       await Fornecedor.restore({ where: { id: Number(id) } });
-      const fornecedorUpdated = (await Fornecedor.findOne({
+      const fornecedorUpdated = await Fornecedor.findOne({
         where: { id: Number(id) },
-      })) as FornecedorType;
+      });
       return res.status(202).json(fornecedorUpdated);
     } catch (error: any) {
       console.log(error);

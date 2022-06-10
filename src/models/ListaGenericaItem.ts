@@ -3,6 +3,13 @@ import { Model, DataTypes, Op } from "sequelize";
 import ListaGenerica from "./ListaGenerica.js";
 
 export default class ListaGenericaItem extends Model {
+  id?: number;
+  valor?: string;
+  deletedAt?: Date;
+  updateAt?: Date;
+  createAt?: Date;
+  id_lista?: number;
+  
   static associate() {
     // define association here
     ListaGenericaItem.belongsTo(ListaGenerica, { foreignKey: "id_lista" })

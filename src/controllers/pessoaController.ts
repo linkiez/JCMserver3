@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import Contato from "../models/Contato.js";
 import Pessoa from "../models/Pessoa.js";
-import { ContatoType, PessoaType } from "../types/index.js";
 
 export default class PessoaController {
   static async findAllPessoas(req: Request, res: Response) {
@@ -54,16 +53,16 @@ export default class PessoaController {
   }
 
   static async createPessoa(req: Request, res: Response) {
-    const pessoa: PessoaType = req.body;
-    let contatos = pessoa.contato;
-    delete pessoa.contato;
+    const pessoa = req.body;
+    let contatos = pessoa.contatos;
+    delete pessoa.contatos;
 
     try {
-      let pessoaCreated = (await Pessoa.create(pessoa)) as PessoaType;
+      let pessoaCreated = (await Pessoa.create(pessoa));
 
       if (contatos) {
-        contatos.forEach(async (contato) => {
-          let contatoCreatedOrUpdated: Array<ContatoType> = [];
+        contatos.forEach(async (contato: any) => {
+          let contatoCreatedOrUpdated: Array<Contato> = [];
           if (contato.id) {
             contato.id_pessoa = pessoaCreated.id;
             let id_contato = contato.id;
@@ -74,10 +73,10 @@ export default class PessoaController {
             contatoCreatedOrUpdated.push(contato);
           } else {
             contatoCreatedOrUpdated.push(
-              (await Contato.create(contato)) as ContatoType
+              (await Contato.create(contato))
             );
           }
-          pessoaCreated.contato = contatoCreatedOrUpdated;
+          pessoaCreated.contatos = contatoCreatedOrUpdated;
         });
       }
 
@@ -90,15 +89,15 @@ export default class PessoaController {
 
   static async updatePessoa(req: Request, res: Response) {
     const { id } = req.params;
-    const pessoaUpdate: PessoaType = req.body;
-    let contatos = pessoaUpdate.contato;
-    delete pessoaUpdate.contato;
+    const pessoaUpdate = req.body;
+    let contatos = pessoaUpdate.contatos;
+    delete pessoaUpdate.contatos;
     delete pessoaUpdate.id;
     try {
       await Pessoa.update(pessoaUpdate, { where: { id: Number(id) } });
 
       if (contatos) {
-        contatos.forEach(async (contato) => {
+        contatos.forEach(async (contato: any) => {
           if (contato.id && contato.id_pessoa != Number(id)) {
             let id_contato = contato.id;
             delete contato.id;

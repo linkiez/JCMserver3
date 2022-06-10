@@ -4,6 +4,15 @@ import { Model, DataTypes } from "sequelize";
 import Pessoa from './Pessoa.js' 
 
 export default class Contato extends Model {
+  id?: number;
+  nome?: string;
+  tipo?: string;
+  valor?: number;
+  deletedAt?: Date;
+  updateAt?: Date;
+  createAt?: Date;
+  id_pessoa?: number;
+  
   static associate() {
     // define association here
     Contato.belongsTo(Pessoa, { foreignKey: "id_pessoa" })

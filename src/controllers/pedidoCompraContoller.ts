@@ -4,12 +4,6 @@ import Fornecedor from "../models/Fornecedor.js";
 import Produto from "../models/Produto.js";
 import PedidoCompra from "../models/PedidoCompra.js";
 import PedidoCompraItem from "../models/PedidoCompraItem.js";
-import {
-  PedidoCompraType,
-  PedidoCompraItemType,
-  FornecedorType,
-  ProdutoType,
-} from "../types/index.js";
 
 export default class PedidoCompraController {
   static async importPedidoCompra(req: Request, res: Response) {
@@ -62,16 +56,16 @@ export default class PedidoCompraController {
 
   static async findAllPedidoCompra(req: Request, res: Response) {
     try {
-      let pedidosCompra = (await PedidoCompra.findAll({
+      let pedidosCompra = await PedidoCompra.findAll({
         include: [Fornecedor],
         order: [["id", "DESC"]],
-      })) as Array<PedidoCompraType>;
+      });
 
       let pedidosCompraTotal = await Promise.all(
         pedidosCompra.map(async (item) => {
-          let pedidoCompraItem = (await PedidoCompraItem.findAll({
+          let pedidoCompraItem = await PedidoCompraItem.findAll({
             where: { PedidoCompraId: Number(item.id) },
-          })) as Array<PedidoCompraItemType>;
+          });
 
           let total = 0;
 
@@ -99,14 +93,14 @@ export default class PedidoCompraController {
   static async findOnePedidoCompra(req: Request, res: Response) {
     const { id } = req.params;
     try {
-      let pedidoCompra = (await PedidoCompra.findOne({
+      let pedidoCompra = await PedidoCompra.findOne({
         where: { id: Number(id) },
         include: [Fornecedor, { model: PedidoCompraItem, include: [Produto] }],
-      })) as PedidoCompraType;
+      });
 
-      let pedidoCompraItem = (await PedidoCompraItem.findAll({
+      let pedidoCompraItem = await PedidoCompraItem.findAll({
         where: { PedidoCompraId: Number(id) },
-      })) as Array<PedidoCompraItemType>;
+      });
 
       let total = 0;
 
@@ -118,7 +112,7 @@ export default class PedidoCompraController {
             (1 + Number(pedidoItem.ipi));
       });
 
-      pedidoCompra.total = total;
+      pedidoCompra!.total = total;
 
       return res.status(200).json(pedidoCompra);
     } catch (error: any) {
@@ -131,7 +125,7 @@ export default class PedidoCompraController {
     const t = await sequelize.transaction();
 
     try {
-      let pedidoCompra: PedidoCompraType = req.body;
+      let pedidoCompra = req.body;
 
       if (pedidoCompra.Fornecedor) {
         pedidoCompra.id_fornecedor = pedidoCompra.Fornecedor.id;
@@ -143,32 +137,28 @@ export default class PedidoCompraController {
 
       pedidoCompra.data_emissao = new Date();
 
-      let pedidoCompraCreated: PedidoCompraType = (await PedidoCompra.create(
-        pedidoCompra
-      )) as PedidoCompraType;
+      let pedidoCompraCreated = await PedidoCompra.create(pedidoCompra);
 
       if (pedidoCompraItem) {
-        pedidoCompraItem.map(async (item) => {
+        pedidoCompraItem.map(async (item: any) => {
           item.id_pedido = pedidoCompraCreated.id;
 
           item.id_produto = item.Produto!.id;
           delete item.Produto;
 
-          let itemCreated = (await PedidoCompraItem.create(
-            item
-          )) as PedidoCompraItemType;
+          let itemCreated = await PedidoCompraItem.create(item);
           return itemCreated;
         });
       }
 
       await t.commit();
 
-      pedidoCompraCreated = (await PedidoCompra.findOne({
+      const pedidoCompraCreated2 = await PedidoCompra.findOne({
         where: { id: pedidoCompraCreated.id },
         include: [Fornecedor, { model: PedidoCompraItem, include: [Produto] }],
-      })) as PedidoCompraType;
+      });
 
-      return res.status(201).json(pedidoCompraCreated);
+      return res.status(201).json(pedidoCompraCreated2);
     } catch (error: any) {
       await t.rollback();
       console.log(error);
@@ -204,7 +194,7 @@ export default class PedidoCompraController {
     const t = await sequelize.transaction();
 
     try {
-      let pedidoCompra: PedidoCompraType = req.body;
+      let pedidoCompra = req.body;
 
       let pedidoCompraItem = pedidoCompra.PedidoCompraItem;
       delete pedidoCompra.PedidoCompraItem;
@@ -222,7 +212,7 @@ export default class PedidoCompraController {
         where: { id_pedido: Number(id) },
       });
       if (pedidoCompraItem) {
-        pedidoCompraItem.forEach(async (item) => {
+        pedidoCompraItem.forEach(async (item: any) => {
           item.id_pedido = Number(id);
           item.id_produto = item.Produto!.id;
           delete item.Produto;
@@ -234,10 +224,10 @@ export default class PedidoCompraController {
 
       await t.commit();
 
-      pedidoCompraUpdated = (await PedidoCompra.findOne({
+      pedidoCompraUpdated = await PedidoCompra.findOne({
         where: { id: id },
         include: [Fornecedor, { model: PedidoCompraItem, include: [Produto] }],
-      })) as PedidoCompraType;
+      });
 
       return res.status(202).json(pedidoCompraUpdated);
     } catch (error: any) {
