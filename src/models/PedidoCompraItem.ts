@@ -4,19 +4,19 @@ import PedidoCompra from "./PedidoCompra.js";
 import Produto from "./Produto.js";
 
 export default class PedidoCompraItem extends Model {
-  id?: number;
-  dimensao?: string;
-  quantidade?: number;
-  peso?: number;
-  preco?: number;
-  ipi?: number;
-  prazo?: Date;
-  deletedAt?: Date;
-  updateAt?: Date;
-  createAt?: Date;
-  id_pedido?: number;
-  id_produto?: number;
-  Produto?: Produto;
+  declare id: number;
+  declare dimensao: string;
+  declare quantidade: number;
+  declare peso: number;
+  declare preco: number;
+  declare ipi: number;
+  declare prazo: Date;
+  declare deletedAt: Date;
+  declare updateAt: Date;
+  declare createAt: Date;
+  declare id_pedido: number;
+  declare id_produto: number;
+  declare Produto: Produto;
 
   static associate() {
     // define association here

@@ -3,12 +3,12 @@ import { Model, DataTypes, Op } from "sequelize";
 import ListaGenerica from "./ListaGenerica.js";
 
 export default class ListaGenericaItem extends Model {
-  id?: number;
-  valor?: string;
-  deletedAt?: Date;
-  updateAt?: Date;
-  createAt?: Date;
-  id_lista?: number;
+  declare id: number;
+  declare valor: string;
+  declare deletedAt: Date;
+  declare updateAt: Date;
+  declare createAt: Date;
+  declare id_lista: number;
   
   static associate() {
     // define association here

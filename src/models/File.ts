@@ -3,11 +3,13 @@ import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa.js";
 
 export default class file extends Model {
-  url?: string
-  originalFilename?: string
-  newFilename?: string
-  bucket?: string
-  region?: string
+  declare id: number
+  declare url: string
+  declare originalFilename: string
+  declare newFilename: string
+  declare mimeType: string
+  declare bucket: string
+  declare region: string
 
   static associate() {
     // define association here
@@ -16,9 +18,16 @@ export default class file extends Model {
 }
 file.init(
   {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.BIGINT,
+    },
     url: DataTypes.STRING,
     originalFilename: DataTypes.STRING,
     newFilename: DataTypes.STRING,
+    mimeType: DataTypes.STRING,
     bucket: DataTypes.STRING,
     region: DataTypes.STRING,
     deletedAt: DataTypes.DATE,

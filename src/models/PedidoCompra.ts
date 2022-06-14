@@ -4,19 +4,19 @@ import PedidoCompraItem from "./PedidoCompraItem.js";
 import Fornecedor from "./Fornecedor.js";
 
 export default class PedidoCompra extends Model {
-  id?: number;
-  pedido?: string;
-  data_emissao?: Date;
-  cond_pagamento?: string;
-  frete?: number;
-  transporte?: string;
-  deletedAt?: Date;
-  updateAt?: Date;
-  createAt?: Date;
-  PedidoCompraItem?: Array<PedidoCompraItem>;
-  id_fornecedor?: number;
-  Fornecedor?: Fornecedor;
-  total?: number;
+  declare id: number;
+  declare pedido: string;
+  declare data_emissao: Date;
+  declare cond_pagamento: string;
+  declare frete: number;
+  declare transporte: string;
+  declare deletedAt: Date;
+  declare updateAt: Date;
+  declare createAt: Date;
+  declare PedidoCompraItem: Array<PedidoCompraItem>;
+  declare id_fornecedor: number;
+  declare Fornecedor: Fornecedor;
+  declare total: number;
 
   static associate() {
     // define association here

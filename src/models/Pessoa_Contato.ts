@@ -1,18 +1,18 @@
 import sequelize from "../config/connection.js";
 import { Model } from "sequelize";
 
-export default class Pessoa_File extends Model {
+export default class Pessoa_Contato extends Model {
   static associate() {
     // define association here
   }
 }
-Pessoa_File.init(
+Pessoa_Contato.init(
   {},
   {
     sequelize,
-    modelName: "pessoa_file",
+    modelName: "pessoa_contato",
     paranoid: false,
     timestamps: true,
     freezeTableName: true,
-  }
+  } 
 );

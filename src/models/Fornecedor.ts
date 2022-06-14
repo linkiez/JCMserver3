@@ -4,15 +4,15 @@ import Pessoa from "./Pessoa.js";
 import PedidoCompra from "./PedidoCompra.js";
 
 export default class Fornecedor extends Model {
-  id?: number;
-  data_aprov?: Date;
-  data_venc?: Date;
-  observacao?: string;
-  deletedAt?: Date;
-  updateAt?: Date;
-  createAt?: Date;
-  id_pessoa?: number;
-  pessoa?: Pessoa;
+  declare id: number;
+  declare data_aprov: Date;
+  declare data_venc: Date;
+  declare observacao: string;
+  declare deletedAt: Date;
+  declare updateAt: Date;
+  declare createAt: Date;
+  declare id_pessoa: number;
+  declare pessoa: Pessoa;
 
   static associate() {
     // define association here

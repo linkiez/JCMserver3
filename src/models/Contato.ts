@@ -4,18 +4,17 @@ import { Model, DataTypes } from "sequelize";
 import Pessoa from './Pessoa.js' 
 
 export default class Contato extends Model {
-  id?: number;
-  nome?: string;
-  tipo?: string;
-  valor?: number;
-  deletedAt?: Date;
-  updateAt?: Date;
-  createAt?: Date;
-  id_pessoa?: number;
+  declare id: number;
+  declare nome: string;
+  declare tipo: string;
+  declare valor: number;
+  declare deletedAt: Date;
+  declare updateAt: Date;
+  declare createAt: Date;
   
   static associate() {
     // define association here
-    Contato.belongsTo(Pessoa, { foreignKey: "id_pessoa" })
+    Contato.belongsToMany(Pessoa, { through: "pessoa_contato" });
   }
 }
 Contato.init(

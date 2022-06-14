@@ -3,14 +3,14 @@ import { Model, DataTypes, Op } from "sequelize";
 import PedidoCompraItem from "./PedidoCompraItem.js";
 
 export default class Produto extends Model {
-  id?: number;
-  nome?: string;
-  categoria?: string;
-  espessura?: number;
-  peso?: number;
-  updateAt?: Date;
-  createAt?: Date;
-  deletedAt?: Date;
+  declare id: number;
+  declare nome: string;
+  declare categoria: string;
+  declare espessura: number;
+  declare peso: number;
+  declare updateAt: Date;
+  declare createAt: Date;
+  declare deletedAt: Date;
   
   static associate() {
     // define association here

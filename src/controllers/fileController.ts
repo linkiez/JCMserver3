@@ -42,6 +42,7 @@ export default class FileController {
           url: url,
           originalFilename: files.filetoupload[0].originalFilename,
           newFilename: files.filetoupload[0].newFilename,
+          mimeType: files.filetoupload[0].mimeType,
           bucket: process.env.AWS_S3_BUCKET,
           region: process.env.AWS_REGION,
         };

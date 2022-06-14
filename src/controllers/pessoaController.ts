@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import Contato from "../models/Contato.js";
 import Pessoa from "../models/Pessoa.js";
+import Pessoa_File from "../models/Pessoa_File.js";
+import FileDb from "../models/File.js";
+import Pessoa_Contato from "../models/Pessoa_Contato.js";
+import sequelize from "../config/connection.js";
 
 export default class PessoaController {
   static async findAllPessoas(req: Request, res: Response) {
@@ -30,7 +34,7 @@ export default class PessoaController {
     try {
       const pessoa = await Pessoa.findOne({
         where: { id: Number(id) },
-        include: [Contato],
+        include: [Contato, FileDb],
       });
       return res.status(200).json(pessoa);
     } catch (error: any) {
@@ -53,35 +57,39 @@ export default class PessoaController {
   }
 
   static async createPessoa(req: Request, res: Response) {
-    const pessoa = req.body;
-    let contatos = pessoa.contatos;
+    let pessoa = req.body;
+    let contatos: Array<Contato> = pessoa.contatos;
     delete pessoa.contatos;
+    let files: Array<FileDb> = pessoa.files;
+    delete pessoa.files;
+
+    const transaction = sequelize.transaction();
 
     try {
-      let pessoaCreated = (await Pessoa.create(pessoa));
+      let pessoaCreated = await Pessoa.create(pessoa);
 
-      if (contatos) {
-        contatos.forEach(async (contato: any) => {
-          let contatoCreatedOrUpdated: Array<Contato> = [];
-          if (contato.id) {
-            contato.id_pessoa = pessoaCreated.id;
-            let id_contato = contato.id;
-            delete contato.id;
-            await Contato.update(contato, {
-              where: { id: Number(id_contato) },
-            });
-            contatoCreatedOrUpdated.push(contato);
-          } else {
-            contatoCreatedOrUpdated.push(
-              (await Contato.create(contato))
-            );
-          }
-          pessoaCreated.contatos = contatoCreatedOrUpdated;
+      let contatosCreated = contatos.map(async (contato: any) => {
+        if (contato.id) {
+          return contato;
+        } else {
+          return Contato.create(contato);
+        }
+      });
+
+      Promise.all(contatosCreated).then(async (values) => {
+        Promise.all([
+          pessoaCreated.setContatos(values),
+          pessoaCreated.setFiles(files.map((item) => item.id)),
+        ]).then(async (item) => {
+          let pessoaCreated2 = await Pessoa.findByPk(pessoaCreated.id, {
+            include: [Contato, FileDb],
+          });
+          (await transaction).commit();
+          return res.status(201).json(pessoaCreated2);
         });
-      }
-
-      return res.status(201).json(pessoaCreated);
+      });
     } catch (error: any) {
+      (await transaction).rollback()
       console.log(error);
       return res.status(500).json(error.message);
     }
@@ -89,35 +97,59 @@ export default class PessoaController {
 
   static async updatePessoa(req: Request, res: Response) {
     const { id } = req.params;
-    const pessoaUpdate = req.body;
-    let contatos = pessoaUpdate.contatos;
-    delete pessoaUpdate.contatos;
-    delete pessoaUpdate.id;
+    let pessoa = req.body;
+    let contatos = pessoa.contatos;
+    delete pessoa.contatos;
+    let files = pessoa.files;
+    delete pessoa.files;
+    delete pessoa.id;
+
+    const transaction = sequelize.transaction();
+
     try {
-      await Pessoa.update(pessoaUpdate, { where: { id: Number(id) } });
+      await Pessoa.update(pessoa, { where: { id: Number(id) } });
 
-      if (contatos) {
-        contatos.forEach(async (contato: any) => {
-          if (contato.id && contato.id_pessoa != Number(id)) {
-            let id_contato = contato.id;
-            delete contato.id;
-            await Contato.update(contato, {
-              where: { id: Number(id_contato) },
-            });
-          } else {
-            contato.id_pessoa = Number(id);
-            await Contato.create(contato);
-          }
-        });
-      }
-
-      const pessoaUpdated = await Pessoa.findOne({
-        where: { id: Number(id) },
-        include: [Contato],
+      let contatosCreated = contatos.map(async (contato: any) => {
+        if (contato.id) {
+          let contatoId = contato.id;
+          delete contato.id;
+          await Contato.update(contato, { where: { id: Number(contatoId) } });
+          return Contato.findOne({ where: { id: Number(contatoId) } });
+        } else {
+          return Contato.create(contato);
+        }
       });
 
-      return res.status(202).json(pessoaUpdated);
+      Promise.all(contatosCreated).then(async (contatos) => {
+        let promises: Array<any> = [];
+        contatos.forEach(async (item: Contato) => {
+          promises.push(
+            Pessoa_Contato.findOrCreate({
+              where: { pessoaId: id, contatoId: item.id },
+            })
+          );
+        });
+
+        files.forEach(async (item: FileDb) => {
+          promises.push(
+            Pessoa_File.findOrCreate({
+              where: { pessoaId: id, fileId: item.id },
+            })
+          );
+        });
+
+        Promise.all(promises).then(async (listaDePromisse) => {
+          (await transaction).commit();
+          const pessoaUpdated = await Pessoa.findOne({
+            where: { id: Number(id) },
+            include: [Contato],
+          });
+
+          return res.status(202).json(pessoaUpdated);
+        });
+      });
     } catch (error: any) {
+      (await transaction).rollback()
       console.log(error);
       return res.status(500).json(error.message);
     }

@@ -7,31 +7,28 @@ import PedidoCompraItem from "../models/PedidoCompraItem.js";
 
 export default class PedidoCompraController {
   static async importPedidoCompra(req: Request, res: Response) {
-    let pedidoCompra: PedidoCompraType = req.body;
-    let pedidoCompraCreated: PedidoCompraType;
+    let pedidoCompra = req.body;
     const t = await sequelize.transaction();
 
     try {
       let itens = pedidoCompra.PedidoCompraItem;
       delete pedidoCompra.PedidoCompraItem;
 
-      let fornecedor: FornecedorType = (await Fornecedor.findOne({
+      let fornecedor = await Fornecedor.findOne({
         where: { nome: pedidoCompra.Fornecedor },
-      })) as FornecedorType;
+      });
       delete pedidoCompra.Fornecedor;
-      pedidoCompra.id_fornecedor = fornecedor.id;
+      pedidoCompra.id_fornecedor = fornecedor!.id;
 
-      pedidoCompraCreated = (await PedidoCompra.create(
-        pedidoCompra
-      )) as PedidoCompraType;
+      let pedidoCompraCreated = await PedidoCompra.create(pedidoCompra);
 
       if (itens) {
-        itens.forEach(async (item) => {
-          let produto = (await Produto.findOne({
+        itens.forEach(async (item: any) => {
+          let produto = await Produto.findOne({
             where: { nome: item.Produto },
-          })) as ProdutoType;
+          });
           delete item.Produto;
-          item.id_produto = produto.id;
+          item.id_produto = produto!.id;
           item.id_pedido = pedidoCompraCreated.id;
 
           let itemCreated = await PedidoCompraItem.create(item);
@@ -39,14 +36,14 @@ export default class PedidoCompraController {
         });
       }
 
-      pedidoCompraCreated = (await PedidoCompra.findOne({
+      const pedidoCompraCreated2 = await PedidoCompra.findOne({
         where: { id: pedidoCompraCreated.id },
         include: [Fornecedor, PedidoCompraItem],
-      })) as PedidoCompraType;
+      });
 
       await t.commit();
 
-      return res.status(201).json(pedidoCompraCreated);
+      return res.status(201).json(pedidoCompraCreated2);
     } catch (error: any) {
       await t.rollback();
       console.log(error);
