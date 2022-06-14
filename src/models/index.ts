@@ -7,6 +7,7 @@ import ListaGenericaItem from "./ListaGenericaItem.js";
 import PedidoCompra from "./PedidoCompra.js";
 import PedidoCompraItem from "./PedidoCompraItem.js";
 import Usuario from './Usuario.js';
+import Vendedor from './Vendedor.js';
 
 
 export function models(): void {
@@ -19,4 +20,5 @@ export function models(): void {
   PedidoCompra.associate()
   PedidoCompraItem.associate()
   Usuario.associate()
+  Vendedor.associate()
 }

@@ -6,6 +6,7 @@ import FileDb from "../models/File.js";
 import Pessoa_Contato from "../models/Pessoa_Contato.js";
 import sequelize from "../config/connection.js";
 import Fornecedor from "../models/Fornecedor.js";
+import Vendedor from "../models/Vendedor.js";
 
 export default class PessoaController {
   static async findAllPessoas(req: Request, res: Response) {
@@ -35,7 +36,7 @@ export default class PessoaController {
     try {
       const pessoa = await Pessoa.findOne({
         where: { id: Number(id) },
-        include: [Contato, FileDb, Fornecedor],
+        include: [Contato, FileDb, Fornecedor, Vendedor],
       });
       return res.status(200).json(pessoa);
     } catch (error: any) {
@@ -83,7 +84,7 @@ export default class PessoaController {
           pessoaCreated.setFiles(files.map((item) => item.id)),
         ]).then(async (item) => {
           let pessoaCreated2 = await Pessoa.findByPk(pessoaCreated.id, {
-            include: [Contato, FileDb, Fornecedor],
+            include: [Contato, FileDb, Fornecedor, Vendedor],
           });
           (await transaction).commit();
           return res.status(201).json(pessoaCreated2);
@@ -143,7 +144,7 @@ export default class PessoaController {
           (await transaction).commit();
           const pessoaUpdated = await Pessoa.findOne({
             where: { id: Number(id) },
-            include: [Contato, FileDb, Fornecedor],
+            include: [Contato, FileDb, Fornecedor, Vendedor],
           });
 
           return res.status(202).json(pessoaUpdated);
