@@ -24,6 +24,12 @@ Usuario.init(
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
+    email: {
+      type: DataTypes.STRING,
+      validate: {
+        isEmail: true,
+      },
+    },
     senha: DataTypes.STRING,
     deletedAt: DataTypes.DATE,
   },
