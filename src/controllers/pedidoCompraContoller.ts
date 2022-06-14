@@ -35,14 +35,14 @@ export default class PedidoCompraController {
           return itemCreated;
         });
       }
+      await t.commit();
 
       const pedidoCompraCreated2 = await PedidoCompra.findOne({
         where: { id: pedidoCompraCreated.id },
         include: [Fornecedor, PedidoCompraItem],
       });
 
-      await t.commit();
-
+      
       return res.status(201).json(pedidoCompraCreated2);
     } catch (error: any) {
       await t.rollback();

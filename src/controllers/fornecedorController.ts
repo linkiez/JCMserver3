@@ -81,12 +81,12 @@ export default class FornecedorController {
 
   static async findAllFornecedorDeleted(req: Request, res: Response) {
     try {
-      const fornecedores = await Fornecedor.scope("deleted").findAll({
+      const fornecedor = await Fornecedor.scope("deleted").findAll({
         paranoid: false,
         include: [Pessoa],
         attributes: { exclude: ["id_pessoa"] },
       });
-      return res.status(200).json(fornecedores);
+      return res.status(200).json(fornecedor);
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);
