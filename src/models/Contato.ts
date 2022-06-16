@@ -2,6 +2,7 @@ import sequelize from "../config/connection.js";
 
 import { Model, DataTypes } from "sequelize";
 import Pessoa from './Pessoa.js' 
+import Orcamento from "./Orcamento.js";
 
 export default class Contato extends Model {
   declare id: number;
@@ -15,6 +16,7 @@ export default class Contato extends Model {
   static associate() {
     // define association here
     Contato.belongsToMany(Pessoa, { through: "pessoa_contato" });
+    Contato.hasMany(Orcamento, { foreignKey: "id_contato" })
   }
 }
 Contato.init(

@@ -4,6 +4,7 @@ import Pessoa from "./Pessoa.js";
 
 export default class Usuario extends Model {
   declare id: number;
+  declare email: string;
   declare senha: string;
   declare deletedAt: Date;
   declare updateAt: Date;

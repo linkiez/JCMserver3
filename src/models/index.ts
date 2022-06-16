@@ -8,6 +8,7 @@ import PedidoCompra from "./PedidoCompra.js";
 import PedidoCompraItem from "./PedidoCompraItem.js";
 import Usuario from './Usuario.js';
 import Vendedor from './Vendedor.js';
+import Orcamento from './Orcamento.js';
 
 
 export function models(): void {
@@ -21,4 +22,5 @@ export function models(): void {
   PedidoCompraItem.associate()
   Usuario.associate()
   Vendedor.associate()
+  Orcamento.associate()
 }

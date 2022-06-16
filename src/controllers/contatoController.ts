@@ -75,4 +75,30 @@ export default class ContatoController {
       return res.status(500).json(error.message);
     }
   }
+
+  static async findAllContatoDeleted(req: Request, res: Response) {
+    try {
+      const contato = await Contato.scope("deleted").findAll({
+        paranoid: false,
+      });
+      return res.status(200).json(contato);
+    } catch (error: any) {
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async restoreContato(req: Request, res: Response) {
+    const { id } = req.params;
+    try {
+      await Contato.restore({ where: { id: Number(id) } });
+      const contatoUpdated = await Contato.findOne({
+        where: { id: Number(id) },
+      });
+      return res.status(202).json(contatoUpdated);
+    } catch (error: any) {
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
 }

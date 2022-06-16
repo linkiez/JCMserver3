@@ -38,7 +38,7 @@ PedidoCompra.init(
     pedido: DataTypes.STRING,
     data_emissao: DataTypes.DATE,
     cond_pagamento: DataTypes.STRING,
-    frete: DataTypes.DECIMAL(10, 2),
+    frete: DataTypes.DECIMAL(13, 2),
     transporte: DataTypes.STRING,
     deletedAt: DataTypes.DATE,
   },

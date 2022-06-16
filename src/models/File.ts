@@ -1,6 +1,7 @@
 import sequelize from "../config/connection.js";
 import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa.js";
+import OrcamentoItem from "./OrcamentoItem.js";
 
 export default class file extends Model {
   declare id: number
@@ -14,6 +15,7 @@ export default class file extends Model {
   static associate() {
     // define association here
     file.belongsToMany(Pessoa, {through: 'pessoa_file'});
+    file.belongsToMany(OrcamentoItem, {through: 'orcamento_file'});
   }
 }
 file.init(
