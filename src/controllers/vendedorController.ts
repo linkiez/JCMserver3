@@ -5,7 +5,10 @@ import Pessoa from "../models/Pessoa.js";
 export default class VendedorController {
   static async findAllVendedors(req: Request, res: Response) {
     try {
-      const vendedor = await Vendedor.findAll({});
+      const vendedor = (await Vendedor.findAll({
+        include: [Pessoa],
+        attributes: { exclude: ["id_pessoa"] },
+      }));
       return res.status(200).json(vendedor);
     } catch (error: any) {
       console.log(error);
@@ -16,9 +19,11 @@ export default class VendedorController {
   static async findOneVendedor(req: Request, res: Response) {
     const { id } = req.params;
     try {
-      const vendedor = await Vendedor.findOne({
+      const vendedor = (await Vendedor.findOne({
         where: { id: Number(id) },
-      });
+        include: [Pessoa],
+        attributes: { exclude: ["id_pessoa"] },
+      }));
       return res.status(200).json(vendedor);
     } catch (error: any) {
       console.log(error);
@@ -33,7 +38,9 @@ export default class VendedorController {
       delete vendedor.pessoa;
     }
     try {
-      const vendedorCreated = await Vendedor.create(vendedor);
+      const vendedorCreated = (await Vendedor.create(
+        vendedor
+      ));
       return res.status(201).json(vendedorCreated);
     } catch (error: any) {
       console.log(error);
@@ -51,9 +58,9 @@ export default class VendedorController {
     delete vendedor.id;
     try {
       await Vendedor.update(vendedor, { where: { id: Number(id) } });
-      const vendedorUpdated = await Vendedor.findOne({
+      const vendedorUpdated = (await Vendedor.findOne({
         where: { id: Number(id) },
-      });
+      }));
       return res.status(202).json(vendedorUpdated);
     } catch (error: any) {
       console.log(error);
@@ -76,6 +83,8 @@ export default class VendedorController {
     try {
       const vendedor = await Vendedor.scope("deleted").findAll({
         paranoid: false,
+        include: [Pessoa],
+        attributes: { exclude: ["id_pessoa"] },
       });
       return res.status(200).json(vendedor);
     } catch (error: any) {

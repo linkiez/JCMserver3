@@ -7,6 +7,7 @@ import listaGenerica from './listaGenericaRoutes.js'
 import file from './fileRoutes.js'
 import usuario from './usuarioRoutes.js'
 import vendedor from './vendedorRoutes.js'
+import orcamento from './orcamentoRoutes.js'
 
 export function routes(app: Express) {
   app.use(
@@ -18,6 +19,7 @@ export function routes(app: Express) {
     listaGenerica,
     file,
     usuario,
-    vendedor
+    vendedor,
+    orcamento
   );
 }

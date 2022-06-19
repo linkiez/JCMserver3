@@ -21,6 +21,6 @@ app.use(express.json(), express.urlencoded({ extended: true }));
 
 models();
 routes(app);
-sequelize.sync({ alter: false, force: true });
+sequelize.sync({ alter: false, force: false });
 
 app.listen(PORT, () => console.log(`servidor está rodando na porta ${PORT}`));
