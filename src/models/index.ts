@@ -10,6 +10,7 @@ import Usuario from './Usuario.js';
 import Vendedor from './Vendedor.js';
 import Orcamento from './Orcamento.js';
 import OrcamentoItem from './OrcamentoItem.js';
+import Operador from './Operador.js';
 
 
 export function models(): void {
@@ -25,4 +26,5 @@ export function models(): void {
   Vendedor.associate()
   Orcamento.associate()
   OrcamentoItem.associate()
+  Operador.associate()
 }

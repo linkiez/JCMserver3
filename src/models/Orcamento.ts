@@ -21,7 +21,6 @@ import OrcamentoItem from "./OrcamentoItem.js";
 
 export default class Orcamento extends Model {
   declare id: number;
-  declare ordem_producao: number;
   declare contato: Contato;
   declare id_contato: number;
   declare pessoa: Pessoa;
@@ -77,7 +76,6 @@ Orcamento.init(
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
-    ordem_producao: DataTypes.BIGINT,
     prazo_emdias: DataTypes.INTEGER,
     prazo_data: DataTypes.DATE,
     aprovado: DataTypes.BOOLEAN,

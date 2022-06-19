@@ -8,6 +8,7 @@ import file from './fileRoutes.js'
 import usuario from './usuarioRoutes.js'
 import vendedor from './vendedorRoutes.js'
 import orcamento from './orcamentoRoutes.js'
+import operador from './operadorRoutes.js'
 
 export function routes(app: Express) {
   app.use(
@@ -20,6 +21,7 @@ export function routes(app: Express) {
     file,
     usuario,
     vendedor,
-    orcamento
+    orcamento,
+    operador
   );
 }
