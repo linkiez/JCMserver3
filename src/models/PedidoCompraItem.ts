@@ -2,6 +2,7 @@ import sequelize from "../config/connection.js";
 import { Model, DataTypes } from "sequelize";
 import PedidoCompra from "./PedidoCompra.js";
 import Produto from "./Produto.js";
+import RegistroInspecaoRecebimento from "./RegistroInspecaoRecebimento.js";
 
 export default class PedidoCompraItem extends Model {
   declare id: number;
@@ -21,7 +22,10 @@ export default class PedidoCompraItem extends Model {
   static associate() {
     // define association here
     PedidoCompraItem.belongsTo(PedidoCompra, { foreignKey: "id_pedido" });
-    PedidoCompraItem.belongsTo(Produto, { foreignKey: "id_produto" })
+    PedidoCompraItem.belongsTo(Produto, { foreignKey: "id_produto" });
+    PedidoCompraItem.hasOne(RegistroInspecaoRecebimento, {
+      foreignKey: "id_pedido_compra_item",
+    });
   }
 }
 PedidoCompraItem.init(
@@ -45,6 +49,6 @@ PedidoCompraItem.init(
     modelName: "pedido_compra_item",
     freezeTableName: true,
     paranoid: true,
-    timestamps: true
+    timestamps: true,
   }
 );

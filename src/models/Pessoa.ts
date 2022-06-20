@@ -20,6 +20,7 @@ import File from "./File.js";
 import Usuario from "./Usuario.js";
 import Vendedor from "./Vendedor.js";
 import Orcamento from "./Orcamento.js";
+import RegistroInspecaoRecebimento from "./RegistroInspecaoRecebimento.js";
 
 export default class Pessoa extends Model {
   declare id: number;
@@ -69,6 +70,7 @@ export default class Pessoa extends Model {
     Pessoa.hasOne(Fornecedor, { foreignKey: "id_pessoa" });
     Pessoa.hasOne(Usuario, { foreignKey: "id_pessoa" });
     Pessoa.hasOne(Vendedor, { foreignKey: "id_pessoa" });
+    Pessoa.hasOne(RegistroInspecaoRecebimento, { foreignKey: "id_pessoa" })
     Pessoa.hasMany(Orcamento, { foreignKey: "id_pessoa" })
     Pessoa.belongsToMany(File, { through: "pessoa_file" });
     Pessoa.belongsToMany(Contato, { through: "pessoa_contato" });

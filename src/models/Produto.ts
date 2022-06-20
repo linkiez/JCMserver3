@@ -1,6 +1,7 @@
 import sequelize from "../config/connection.js";
 import { Model, DataTypes, Op } from "sequelize";
 import PedidoCompraItem from "./PedidoCompraItem.js";
+import RegistroInspecaoRecebimento from "./RegistroInspecaoRecebimento.js";
 
 export default class Produto extends Model {
   declare id: number;
@@ -11,10 +12,11 @@ export default class Produto extends Model {
   declare updateAt: Date;
   declare createAt: Date;
   declare deletedAt: Date;
-  
+
   static associate() {
     // define association here
-    Produto.hasOne(PedidoCompraItem,  { foreignKey: "id_produto" })
+    Produto.hasOne(PedidoCompraItem, { foreignKey: "id_produto" });
+    Produto.hasOne(RegistroInspecaoRecebimento, { foreignKey: "id_produto" });
   }
 }
 Produto.init(
@@ -40,7 +42,7 @@ Produto.init(
     scopes: {
       deleted: {
         where: {
-          deletedAt: {[Op.not]: null},
+          deletedAt: { [Op.not]: null },
         },
       },
     },
