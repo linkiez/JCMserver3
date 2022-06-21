@@ -24,7 +24,6 @@ export default class RegistroInspecaoRecebimento extends Model {
   declare conferido: boolean;
   declare pedido_compra_item: PedidoCompraItem;
   declare id_pedido_compra_item: number;
-  declare ordem_producao: number;
   declare observacoes: string;
   declare file: FileDb;
   declare id_file: number;

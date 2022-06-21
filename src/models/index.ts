@@ -11,7 +11,7 @@ import Vendedor from './Vendedor.js';
 import Orcamento from './Orcamento.js';
 import OrcamentoItem from './OrcamentoItem.js';
 import Operador from './Operador.js';
-import RegistroInspecaoRecebimento from './RegistroInspecaoRecebimento.js'
+import RegistroInspecaoRecebimento from './RIR.js'
 
 export function models(): void {
   Pessoa.associate()

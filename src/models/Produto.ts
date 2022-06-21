@@ -1,7 +1,7 @@
 import sequelize from "../config/connection.js";
 import { Model, DataTypes, Op } from "sequelize";
 import PedidoCompraItem from "./PedidoCompraItem.js";
-import RegistroInspecaoRecebimento from "./RegistroInspecaoRecebimento.js";
+import RegistroInspecaoRecebimento from "./RIR.js";
 
 export default class Produto extends Model {
   declare id: number;

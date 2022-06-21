@@ -2,7 +2,7 @@ import sequelize from "../config/connection.js";
 import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa.js";
 import Orcamento from "./Orcamento.js";
-import RegistroInspecaoRecebimento from "./RegistroInspecaoRecebimento.js";
+import RegistroInspecaoRecebimento from "./RIR.js";
 
 export default class Operador extends Model {
   declare id: number;
@@ -16,7 +16,7 @@ export default class Operador extends Model {
   static associate() {
     // define association here
     Operador.belongsTo(Pessoa, { foreignKey: "id_pessoa" })
-    Operador.hasOne(RegistroInspecaoRecebimento, { foreignKey: 'id_operador'})
+    Operador.hasMany(RegistroInspecaoRecebimento, { foreignKey: 'id_operador'})
   }
 }
 Operador.init(

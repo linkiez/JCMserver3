@@ -2,7 +2,7 @@ import sequelize from "../config/connection.js";
 import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa.js";
 import OrcamentoItem from "./OrcamentoItem.js";
-import RegistroInspecaoRecebimento from "./RegistroInspecaoRecebimento.js";
+import RegistroInspecaoRecebimento from "./RIR.js";
 
 export default class file extends Model {
   declare id: number
@@ -17,7 +17,7 @@ export default class file extends Model {
     // define association here
     file.belongsToMany(Pessoa, {through: 'pessoa_file'});
     file.belongsToMany(OrcamentoItem, {through: 'orcamento_file'});
-    file.hasOne(RegistroInspecaoRecebimento, { foreignKey: 'id_file'})
+    file.hasMany(RegistroInspecaoRecebimento, { foreignKey: 'id_file'})
   }
 }
 file.init(
