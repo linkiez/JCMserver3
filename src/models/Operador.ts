@@ -3,6 +3,7 @@ import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa.js";
 import Orcamento from "./Orcamento.js";
 import RegistroInspecaoRecebimento from "./RIR.js";
+import OrdemProducaoItemProcesso from "./OrdemProducaoItemProcesso.js";
 
 export default class Operador extends Model {
   declare id: number;
@@ -17,6 +18,7 @@ export default class Operador extends Model {
     // define association here
     Operador.belongsTo(Pessoa, { foreignKey: "id_pessoa" })
     Operador.hasMany(RegistroInspecaoRecebimento, { foreignKey: 'id_operador'})
+    Operador.hasMany(OrdemProducaoItemProcesso, { foreignKey: 'id_operador'})
   }
 }
 Operador.init(

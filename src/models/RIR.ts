@@ -5,6 +5,7 @@ import Produto from "./Produto.js";
 import Pessoa from "./Pessoa.js";
 import Operador from "./Operador.js";
 import FileDb from "./File.js";
+import OrdemProducaoItem from "./OrdemProducaoItem.js";
 
 export default class RegistroInspecaoRecebimento extends Model {
   declare id: number;
@@ -34,6 +35,7 @@ export default class RegistroInspecaoRecebimento extends Model {
     RegistroInspecaoRecebimento.belongsTo(Operador, { foreignKey: 'id_operador'})
     RegistroInspecaoRecebimento.belongsTo(PedidoCompraItem, { foreignKey: 'id_pedido_compra_item'})
     RegistroInspecaoRecebimento.belongsTo(FileDb, { foreignKey: 'id_file'})
+    RegistroInspecaoRecebimento.hasOne(OrdemProducaoItem, { foreignKey: 'id_rir'})
   }
 }
 RegistroInspecaoRecebimento.init(

@@ -2,6 +2,7 @@ import sequelize from "../config/connection.js";
 import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa.js";
 import Orcamento from "./Orcamento.js";
+import OrdemProducao from "./OrdemProducao.js";
 
 export default class Vendedor extends Model {
   declare id: number;
@@ -16,6 +17,7 @@ export default class Vendedor extends Model {
     // define association here
     Vendedor.belongsTo(Pessoa, { foreignKey: "id_pessoa" })
     Vendedor.hasMany(Orcamento, { foreignKey: "id_vendedor" })
+    Vendedor.hasMany(OrdemProducao, { foreignKey: "id_vendedor"})
   }
 }
 Vendedor.init(

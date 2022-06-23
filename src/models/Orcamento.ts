@@ -18,6 +18,7 @@ import Pessoa from "./Pessoa.js";
 import Contato from "./Contato.js";
 import Vendedor from "./Vendedor.js";
 import OrcamentoItem from "./OrcamentoItem.js";
+import OrdemProducao from "./OrdemProducao.js";
 
 export default class Orcamento extends Model {
   declare id: number;
@@ -66,6 +67,8 @@ export default class Orcamento extends Model {
         foreignKey: "id_orcamento",
         onDelete: "cascade",
       });
+
+    Orcamento.hasMany(OrdemProducao, { foreignKey: 'id_orcamento'})
   }
 }
 Orcamento.init(
