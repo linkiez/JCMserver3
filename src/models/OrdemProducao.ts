@@ -10,8 +10,11 @@ export default class OrdemProducao extends Model {
   declare id_orcamento: number;
   declare vendedor: Vendedor;
   declare id_vendedor: number;
-  declare prazo: Date;
+  declare data_prazo: Date;
+  declare data_finalizacao: Date;
+  declare data_entregue: Date;
   declare venda: number;
+  declare status: string;
   declare deletedAt: Date;
   declare updateAt: Date;
   declare createAt: Date;
@@ -30,8 +33,11 @@ OrdemProducao.init(
         primaryKey: true,
         type: DataTypes.BIGINT,
       },
-      prazo: DataTypes.DATE,
+      data_prazo: DataTypes.DATE,
+      data_finalizacao: DataTypes.DATE,
+      data_entregue: DataTypes.DATE,
       venda: DataTypes.INTEGER,
+      status: DataTypes.STRING
     },
     {
       sequelize,

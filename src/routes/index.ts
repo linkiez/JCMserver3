@@ -10,6 +10,7 @@ import vendedor from './vendedorRoutes.js'
 import orcamento from './orcamentoRoutes.js'
 import operador from './operadorRoutes.js'
 import rir from './RIRRoutes.js'
+import auth from './authRoutes.js'
 
 export function routes(app: Express) {
   app.use(
@@ -24,6 +25,7 @@ export function routes(app: Express) {
     vendedor,
     orcamento,
     operador,
-    rir
+    rir,
+    auth
   );
 }

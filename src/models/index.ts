@@ -12,6 +12,9 @@ import Orcamento from './Orcamento.js';
 import OrcamentoItem from './OrcamentoItem.js';
 import Operador from './Operador.js';
 import RegistroInspecaoRecebimento from './RIR.js'
+import OrdemProducao from './OrdemProducao.js';
+import OrdemProducaoItem from './OrdemProducaoItem.js';
+import OrdemProducaoItemProcesso from './OrdemProducaoItemProcesso.js';
 
 export function models(): void {
   Pessoa.associate()
@@ -28,4 +31,7 @@ export function models(): void {
   OrcamentoItem.associate()
   Operador.associate()
   RegistroInspecaoRecebimento.associate()
+  OrdemProducao.associate()
+  OrdemProducaoItem.associate()
+  OrdemProducaoItemProcesso.associate()
 }
