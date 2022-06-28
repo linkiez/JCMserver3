@@ -3,7 +3,7 @@ import helmet from "helmet";
 import dotenv from "dotenv";
 import { routes } from "./routes/index.js";
 import { models } from "./models/index.js";
-import sequelize from "./config/connection.js";
+import sequelize from "./config/connMySql.js";
 import cors from "cors";
 
 dotenv.config();

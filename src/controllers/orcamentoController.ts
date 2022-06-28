@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import sequelize from "../config/connection.js";
+import sequelize from "../config/connMySql.js";
 import Orcamento from "../models/Orcamento.js";
 import OrcamentoItem from "../models/OrcamentoItem.js";
 import Orcamento_File from "../models/Orcamento_File.js";

@@ -1,4 +1,4 @@
-import sequelize from "../config/connection.js";
+import sequelize from "../config/connMySql.js";
 import { Request, Response } from "express";
 import Fornecedor from "../models/Fornecedor.js";
 import Produto from "../models/Produto.js";

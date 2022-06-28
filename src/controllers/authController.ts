@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import passwordValidator from "password-validator";
 import jwt from "jsonwebtoken";
 import { InvalidArgumentError } from "../config/errors";
-import { Request, Response, Next } from "express";
+import { Request, Response } from "express";
 import dotenv from "dotenv";
 import Usuario from "../models/Usuario";
 dotenv.config();
@@ -31,7 +31,7 @@ export class Authentication {
 
     const resultado = schema.validate(senha, { details: true }) as Array<any>;
     if (resultado.length !== 0)
-      throw new InvalidArgumentError(resultado[0].message);
+      throw new InvalidArgumentError(resultado.map(item => item.message));
 
     return true;
   }
@@ -54,22 +54,26 @@ export class Authentication {
     }
   }
 
-  static async verifyJWT(req: any, res: any, next:any) {
+  static async verifyJWT(req: any, res: any, next: any) {
     const token = req.headers["x-access-token"];
     if (!token)
       return res
         .status(401)
         .json({ auth: false, message: "Token não fornecido." });
 
-    jwt.verify(token, process.env.CHAVE_JWT || 'secret', function (error: any, decoded: any) {
-      if (error)
-        return res
-          .status(500)
-          .json({ auth: false, message: "Falha em autenticar token." });
+    jwt.verify(
+      token,
+      process.env.CHAVE_JWT || "secret",
+      function (error: any, decoded: any) {
+        if (error)
+          return res
+            .status(500)
+            .json({ auth: false, message: "Falha em autenticar token." });
 
-      // se tudo estiver ok, salva no request para uso posterior
-      req.user = decoded;
-      next();
-    });
+        // se tudo estiver ok, salva no request para uso posterior
+        req.user = decoded;
+        next();
+      }
+    );
   }
 }

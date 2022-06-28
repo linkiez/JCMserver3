@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import ListaGenericaItem from "../models/ListaGenericaItem.js";
 import ListaGenerica from "../models/ListaGenerica.js";
-import sequelize from "../config/connection.js";
+import sequelize from "../config/connMySql.js";
 
 export default class ListaGenericaController {
   static async findAllListaGenerica(req: Request, res: Response) {

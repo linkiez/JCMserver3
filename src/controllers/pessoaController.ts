@@ -4,7 +4,7 @@ import Pessoa from "../models/Pessoa.js";
 import Pessoa_File from "../models/Pessoa_File.js";
 import FileDb from "../models/File.js";
 import Pessoa_Contato from "../models/Pessoa_Contato.js";
-import sequelize from "../config/connection.js";
+import sequelize from "../config/connMySql.js";
 import Fornecedor from "../models/Fornecedor.js";
 import Vendedor from "../models/Vendedor.js";
 

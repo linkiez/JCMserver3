@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
 import Usuario from "../models/Usuario.js";
 import Pessoa from "../models/Pessoa.js";
+import { Authentication } from "../controllers/authController.js";
 
 export default class UsuarioController {
   static async findAllUsuarios(req: Request, res: Response) {
     try {
-      const usuario = (await Usuario.findAll({
+      const usuario = await Usuario.findAll({
         include: [Pessoa],
-        attributes: { exclude: ["id_pessoa"] },
-      }));
+        attributes: { exclude: ["id_pessoa", "senha"] },
+      });
       return res.status(200).json(usuario);
     } catch (error: any) {
       console.log(error);
@@ -19,11 +20,11 @@ export default class UsuarioController {
   static async findOneUsuario(req: Request, res: Response) {
     const { id } = req.params;
     try {
-      const usuario = (await Usuario.findOne({
+      const usuario = await Usuario.findOne({
         where: { id: Number(id) },
         include: [Pessoa],
-        attributes: { exclude: ["id_pessoa"] },
-      }));
+        attributes: { exclude: ["id_pessoa", "senha"] },
+      });
       return res.status(200).json(usuario);
     } catch (error: any) {
       console.log(error);
@@ -38,10 +39,11 @@ export default class UsuarioController {
       delete usuario.pessoa;
     }
     try {
-      const usuarioCreated = (await Usuario.create(
-        usuario
-      ));
-      return res.status(201).json(usuarioCreated);
+      if (Authentication.validaSenhaNova(usuario.senha)) {
+        usuario.senha = await Authentication.gerarSenhaHash(usuario.senha);
+        const usuarioCreated = await Usuario.create(usuario);
+        return res.status(201).json(usuarioCreated);
+      }
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);
@@ -57,10 +59,15 @@ export default class UsuarioController {
     }
     delete usuario.id;
     try {
+      if (usuario.senha) {
+        Authentication.validaSenhaNova(usuario.senha);
+        usuario.senha = await Authentication.gerarSenhaHash(usuario.senha);
+      }
       await Usuario.update(usuario, { where: { id: Number(id) } });
-      const usuarioUpdated = (await Usuario.findOne({
+      const usuarioUpdated = await Usuario.findOne({
         where: { id: Number(id) },
-      }));
+        attributes: { exclude: ["id_pessoa", "senha"] },
+      });
       return res.status(202).json(usuarioUpdated);
     } catch (error: any) {
       console.log(error);

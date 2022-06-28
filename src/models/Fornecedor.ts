@@ -1,4 +1,4 @@
-import sequelize from "../config/connection.js";
+import sequelize from "../config/connMySql.js";
 import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa.js";
 import PedidoCompra from "./PedidoCompra.js";

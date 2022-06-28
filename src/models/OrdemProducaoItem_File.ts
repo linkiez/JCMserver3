@@ -1,4 +1,4 @@
-import sequelize from "../config/connection.js";
+import sequelize from "../config/connMySql.js";
 import { Model } from "sequelize";
 
 export default class OrdemProducaoItem_File extends Model {
