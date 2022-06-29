@@ -12,4 +12,10 @@ export class InvalidArgumentError extends Error {
     }
   }
   
+  export class InvalidTokenError extends Error {
+    constructor(mensagem:any) {
+      super(mensagem);
+      this.name = 'InvalidTokenError';
+    }
+  }
 

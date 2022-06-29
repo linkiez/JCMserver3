@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import UsuarioController from '../controllers/usuarioController.js';
+import { Authentication } from "../controllers/authController.js";
 
 const router = Router();
 router
-    .get('/usuario', UsuarioController.findAllUsuarios)
+    .get('/usuario', Authentication.verificaLogin, UsuarioController.findAllUsuarios)
     .get('/usuario/deleted', UsuarioController.findAllUsuarioDeleted)
     .get('/usuario/:id', UsuarioController.findOneUsuario)
     .post('/usuario', UsuarioController.createUsuario)

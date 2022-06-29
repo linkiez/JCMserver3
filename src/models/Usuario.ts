@@ -5,7 +5,7 @@ import Pessoa from "./Pessoa.js";
 export default class Usuario extends Model {
   declare id: number;
   declare email: string;
-  declare senha: string;
+  senha?: string;
   declare deletedAt: Date;
   declare updateAt: Date;
   declare createAt: Date;
@@ -32,7 +32,6 @@ Usuario.init(
       },
     },
     senha: DataTypes.STRING,
-    acesso: DataTypes.JSON
   },
   {
     sequelize,

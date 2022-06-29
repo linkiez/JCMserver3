@@ -1,10 +1,12 @@
 import bcrypt from "bcrypt";
 import passwordValidator from "password-validator";
 import jwt from "jsonwebtoken";
-import { InvalidArgumentError } from "../config/errors";
+import { InvalidArgumentError } from "../config/errors.js";
 import { Request, Response } from "express";
 import dotenv from "dotenv";
-import Usuario from "../models/Usuario";
+import Usuario from "../models/Usuario.js";
+import TokenAccess from "../models/TokenAccess.js";
+import TokenRefresh from "../models/TokenRefresh.js";
 dotenv.config();
 
 export class Authentication {
@@ -31,49 +33,80 @@ export class Authentication {
 
     const resultado = schema.validate(senha, { details: true }) as Array<any>;
     if (resultado.length !== 0)
-      throw new InvalidArgumentError(resultado.map(item => item.message));
+      throw new InvalidArgumentError(resultado.map((item) => item.message));
 
     return true;
   }
 
   static async login(req: Request, res: Response) {
     const { email, senha } = req.body;
-    const usuario = await Usuario.findOne({ where: { email: email } });
+    let usuario = await Usuario.findOne({ where: { email: email } });
 
     if (usuario) {
-      const verificaSenha = await bcrypt.compare(senha, usuario.senha);
-
+      const verificaSenha = await bcrypt.compare(senha, usuario.senha!);
+      usuario.senha = '';
       if (verificaSenha) {
-        const token = jwt.sign(usuario, process.env.CHAVE_JWT || "secret", {
-          expiresIn: 300, // expires in 5min
-        });
-        return res.json({ auth: true, token: token });
+        const refreshToken = await TokenRefresh.cria(usuario.id)
+        const accessToken = await TokenAccess.cria(usuario);
+        return res.json({ auth: true, accessToken: accessToken, refreshToken: refreshToken });
       }
     } else {
       res.status(500).json({ message: "Login inválido!" });
     }
   }
 
-  static async verifyJWT(req: any, res: any, next: any) {
+  static async verificaLogin(req: any, res: any, next: any) {
     const token = req.headers["x-access-token"];
-    if (!token)
+    if (!token) {
       return res
         .status(401)
-        .json({ auth: false, message: "Token não fornecido." });
+        .json({ auth: false, message: "Access token não fornecido." });
+    }
+    try {
+      req.user = await TokenAccess.verifica(token);
+      next();
+    } catch (error: any) {
+      return res.status(401).json(error.message);
+    }
+  }
 
-    jwt.verify(
-      token,
-      process.env.CHAVE_JWT || "secret",
-      function (error: any, decoded: any) {
-        if (error)
-          return res
-            .status(500)
-            .json({ auth: false, message: "Falha em autenticar token." });
+  static async logout(req: Request, res: Response) {
+    const accessToken = req.headers["x-access-token"];
+    const refreshToken = req.headers["x-refresh-token"]
+    if (!accessToken) {
+      return res
+        .status(401)
+        .json({ auth: false, message: "Access token não fornecido." });
+    }
+    if (!refreshToken) {
+      return res
+        .status(401)
+        .json({ auth: false, message: "Refresh token não fornecido." });
+    }
+    try {
+      TokenAccess.salva(accessToken);
+      TokenRefresh.apaga(refreshToken as string);
+      return res.status(200).json({ message: "Logout realizado com sucesso."})
+    } catch (error: any) {
+      return res.status(500).json(error.message);
+    }
+  }
 
-        // se tudo estiver ok, salva no request para uso posterior
-        req.user = decoded;
-        next();
-      }
-    );
+  static async refresh(req: Request, res: Response){
+    const refreshToken = req.headers["x-refresh-token"];
+
+    if(!refreshToken){
+      return res
+        .status(401)
+        .json({ auth: false, message: "Refresh token não fornecido." });
+    }
+
+    const id = await TokenRefresh.id(refreshToken as string)
+    const usuario = await Usuario.findByPk(Number(id))
+
+    const newAccessToken = await TokenAccess.cria(usuario!)
+    const newRefreshToken = await TokenRefresh.renova(refreshToken as string)
+
+    return res.json({ auth: true, accessToken: newAccessToken, refreshToken: newRefreshToken });
   }
 }
