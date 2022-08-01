@@ -28,6 +28,25 @@ export default class FileController {
     }
   }
 
+  static async getUrlFile(req: Request, res: Response){
+    const { id } = req.params;
+    try {
+      const file = await FileDb.findOne({
+        where: { id: Number(id) },
+      });
+
+      if (file){
+        const url = await S3Client.getSignedUrl(file.newFilename)
+        return res.status(200).json(url);
+      }else{
+        return res.status(404);
+      }
+    } catch (error: any) {
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
+
   static async createFile(req: Request, res: Response) {
     const form = new IncomingForm();
     try {

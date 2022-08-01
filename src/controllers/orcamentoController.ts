@@ -9,12 +9,11 @@ import Pessoa from "../models/Pessoa.js";
 import Vendedor from "../models/Vendedor.js";
 
 export default class OrcamentoController {
-  static async findAllOrcamento(req: Request, res: Response){
-    try{ 
-      let orcamento = await Orcamento.findAll()
-      return res.status(200).json(orcamento)
-
-    }catch(error: any){
+  static async findAllOrcamento(req: Request, res: Response) {
+    try {
+      let orcamento = await Orcamento.findAll();
+      return res.status(200).json(orcamento);
+    } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);
     }
@@ -34,7 +33,7 @@ export default class OrcamentoController {
 
   static async findOneOrcamento(req: Request, res: Response) {
     const { id } = req.params;
-    try{ 
+    try {
       let orcamento = await Orcamento.findByPk(id, {
         include: [
           {
@@ -47,16 +46,16 @@ export default class OrcamentoController {
           Vendedor,
         ],
         attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
-      })
-      return res.status(200).json(orcamento)
-    }catch (error: any) {
+      });
+      return res.status(200).json(orcamento);
+    } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);
     }
   }
 
   static async createOrcamento(req: Request, res: Response) {
-    const transaction = sequelize.transaction();
+    const transaction = await sequelize.transaction();
     try {
       let orcamento = req.body;
       let orcamentoItens: Array<OrcamentoItem> | Array<Promise<OrcamentoItem>> =
@@ -71,7 +70,9 @@ export default class OrcamentoController {
       delete orcamento.contato;
       delete orcamento.vendedor;
 
-      let orcamentoCreated: Orcamento = await Orcamento.create(orcamento);
+      let orcamentoCreated: Orcamento = await Orcamento.create(orcamento, {
+        transaction: transaction,
+      });
 
       orcamentoItens = orcamentoItens.map(async (orcamentoItem: any) => {
         let files = orcamentoItem.files;
@@ -84,16 +85,23 @@ export default class OrcamentoController {
 
         orcamentoItem.id_orcamento = orcamentoCreated.id;
 
-        let orcamentoItemCreated = await OrcamentoItem.create(orcamentoItem);
+        let orcamentoItemCreated = await OrcamentoItem.create(orcamentoItem, {
+          transaction: transaction,
+        });
 
         if (files) {
-          await orcamentoItemCreated.setFiles(files.map((item: any) => item.id));
+          await orcamentoItemCreated.setFiles(
+            files.map((item: any) => item.id),
+            { transaction: transaction }
+          );
         }
 
         return orcamentoItemCreated;
       });
 
-      Promise.all(orcamentoItens).then(async (orcamentoItem) => {
+      Promise.all(orcamentoItens).then(async () => {
+        await transaction.commit();
+
         let orcamentoCreated2 = await Orcamento.findByPk(orcamentoCreated!.id, {
           include: [
             {
@@ -108,18 +116,17 @@ export default class OrcamentoController {
           attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
         });
 
-        (await transaction).commit();
         return res.status(201).json(orcamentoCreated2);
       });
     } catch (error: any) {
-      (await transaction).rollback;
+      await transaction.rollback;
       console.log(error);
       return res.status(500).json(error.message);
     }
   }
 
   static async updateOrcamento(req: Request, res: Response) {
-    const transaction = sequelize.transaction();
+    const transaction = await sequelize.transaction();
     try {
       const { id } = req.params;
       let orcamento = req.body;
@@ -136,9 +143,15 @@ export default class OrcamentoController {
       delete orcamento.vendedor;
       delete orcamento.id;
 
-      await Orcamento.update(orcamento, {where: { id: Number(id) }})
+      await Orcamento.update(orcamento, {
+        where: { id: Number(id) },
+        transaction: transaction,
+      });
 
-      await OrcamentoItem.destroy({ where: { id_orcamento: Number(id) } })
+      await OrcamentoItem.destroy({
+        where: { id_orcamento: Number(id) },
+        transaction: transaction,
+      });
 
       orcamentoItens = orcamentoItens.map(async (orcamentoItem: any) => {
         let files = orcamentoItem.files;
@@ -151,16 +164,23 @@ export default class OrcamentoController {
 
         orcamentoItem.id_orcamento = id;
 
-        let orcamentoItemCreated = await OrcamentoItem.create(orcamentoItem);
+        let orcamentoItemCreated = await OrcamentoItem.create(orcamentoItem, {
+          transaction: transaction,
+        });
 
         if (files) {
-          await orcamentoItemCreated.setFiles(files.map((item: any) => item.id));
+          await orcamentoItemCreated.setFiles(
+            files.map((item: any) => item.id),
+            { transaction: transaction }
+          );
         }
 
         return orcamentoItemCreated;
       });
 
       Promise.all(orcamentoItens).then(async (orcamentoItem) => {
+        await transaction.commit();
+
         let orcamentoUpdated = await Orcamento.findByPk(id, {
           include: [
             {
@@ -175,13 +195,10 @@ export default class OrcamentoController {
           attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
         });
 
-        (await transaction).commit();
         return res.status(201).json(orcamentoUpdated);
       });
-
-
     } catch (error: any) {
-      (await transaction).rollback;
+      await transaction.rollback;
       console.log(error);
       return res.status(500).json(error.message);
     }
@@ -202,7 +219,9 @@ export default class OrcamentoController {
     const { id } = req.params;
     try {
       await Orcamento.restore({ where: { id: Number(id) } });
-      const orcamentoUpdated = await Orcamento.findOne({ where: { id: Number(id) } });
+      const orcamentoUpdated = await Orcamento.findOne({
+        where: { id: Number(id) },
+      });
       return res.status(202).json(orcamentoUpdated);
     } catch (error: any) {
       console.log(error);

@@ -5,6 +5,7 @@ const router = Router();
 router
     .get('/file', FileController.findAllFiles)
     .get('/file/:id', FileController.findOneFile)
+    .get('/file/url/:id', FileController.getUrlFile)
     .get('/file/deleted', FileController.findAllFileDeleted)
     .post('/file', FileController.createFile)
     .post('/file/restore/:id', FileController.restoreFile)

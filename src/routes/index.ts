@@ -11,6 +11,7 @@ import orcamento from './orcamentoRoutes.js'
 import operador from './operadorRoutes.js'
 import rir from './RIRRoutes.js'
 import auth from './authRoutes.js'
+import ordemProducao from './ordemProducaoRoutes.js'
 
 export function routes(app: Express) {
   app.use(
@@ -26,6 +27,7 @@ export function routes(app: Express) {
     orcamento,
     operador,
     rir,
-    auth
+    auth,
+    ordemProducao
   );
 }
