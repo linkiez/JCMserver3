@@ -8,7 +8,7 @@ export default class UsuarioController {
     try {
       const usuario = await Usuario.findAll({
         include: [Pessoa],
-        attributes: { exclude: ["id_pessoa", "senha"] },
+        attributes: { exclude: ["id_pessoa", "senha", "acesso"] },
       });
       return res.status(200).json(usuario);
     } catch (error: any) {
@@ -38,6 +38,10 @@ export default class UsuarioController {
       usuario.id_pessoa = usuario.pessoa.id;
       delete usuario.pessoa;
     }
+    let usuarioAuth: any = req.user;
+    if(!usuarioAuth.acesso.admin){
+      delete usuario.acesso
+    }
     try {
       if (Authentication.validaSenhaNova(usuario.senha)) {
         usuario.senha = await Authentication.gerarSenhaHash(usuario.senha);
@@ -56,6 +60,10 @@ export default class UsuarioController {
     if (usuario.pessoa) {
       usuario.id_pessoa = usuario.pessoa.id;
       delete usuario.pessoa;
+    }
+    let usuarioAuth: any = req.user;
+    if(!usuarioAuth.acesso.admin){
+      delete usuario.acesso
     }
     delete usuario.id;
     try {

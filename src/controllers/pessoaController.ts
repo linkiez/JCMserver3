@@ -65,33 +65,50 @@ export default class PessoaController {
     let files: Array<FileDb> = pessoa.files;
     delete pessoa.files;
 
-    const transaction = sequelize.transaction();
+    const transaction = await sequelize.transaction();
 
     try {
-      let pessoaCreated = await Pessoa.create(pessoa);
-
-      let contatosCreated = contatos.map(async (contato: any) => {
-        if (contato.id) {
-          return contato;
-        } else {
-          return Contato.create(contato);
-        }
+      let pessoaCreated = await Pessoa.create(pessoa, {
+        transaction: transaction,
       });
 
-      Promise.all(contatosCreated).then(async (values) => {
-        Promise.all([
-          pessoaCreated.setContatos(values),
-          pessoaCreated.setFiles(files.map((item) => item.id)),
-        ]).then(async (item) => {
-          let pessoaCreated2 = await Pessoa.findByPk(pessoaCreated.id, {
-            include: [Contato, FileDb, Fornecedor, Vendedor],
-          });
-          (await transaction).commit();
-          return res.status(201).json(pessoaCreated2);
+      let ArrayPromises: Array<any> = [];
+
+      if (contatos) {
+        let contatosCreated = contatos.map(async (contato: any) => {
+          if (contato.id) {
+            return contato;
+          } else {
+            return Contato.create(contato, { transaction: transaction });
+          }
         });
+
+        Promise.all(contatosCreated).then(async (values) => {
+          ArrayPromises.push(
+            pessoaCreated.setContatos(values, { transaction: transaction })
+          );
+        });
+      }
+
+      if (files) {
+        ArrayPromises.push(
+          pessoaCreated.setFiles(
+            files.map((item) => item.id),
+            { transaction: transaction }
+          )
+        );
+      }
+
+      Promise.all(ArrayPromises).then(async () => {
+        await transaction.commit();
+        let pessoaCreated2 = await Pessoa.findByPk(pessoaCreated.id, {
+          include: [Contato, FileDb, Fornecedor, Vendedor],
+        });
+
+        return res.status(201).json(pessoaCreated2);
       });
     } catch (error: any) {
-      (await transaction).rollback()
+      await transaction.rollback();
       console.log(error);
       return res.status(500).json(error.message);
     }
@@ -151,7 +168,7 @@ export default class PessoaController {
         });
       });
     } catch (error: any) {
-      (await transaction).rollback()
+      (await transaction).rollback();
       console.log(error);
       return res.status(500).json(error.message);
     }

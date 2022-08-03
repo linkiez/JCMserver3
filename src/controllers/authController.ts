@@ -40,15 +40,20 @@ export class Authentication {
 
   static async login(req: Request, res: Response) {
     const { email, senha } = req.body;
-    let usuario = await Usuario.findOne({ where: { email: email } });
+    let usuario = await Usuario.findOne({ where: { email: email },
+      attributes: { exclude: ["acesso"] } });
 
     if (usuario) {
       const verificaSenha = await bcrypt.compare(senha, usuario.senha!);
-      usuario.senha = '';
+      usuario.senha = "";
       if (verificaSenha) {
-        const refreshToken = await TokenRefresh.cria(usuario.id)
+        const refreshToken = await TokenRefresh.cria(usuario.id);
         const accessToken = await TokenAccess.cria(usuario);
-        return res.json({ auth: true, accessToken: accessToken, refreshToken: refreshToken });
+        return res.json({
+          auth: true,
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        });
       }
     } else {
       res.status(500).json({ message: "Login inválido!" });
@@ -70,9 +75,22 @@ export class Authentication {
     }
   }
 
+  static verificaAcesso = (acesso: any) => {
+    return (req: Request, res: Response, next: any) => {
+      let usuario: any = req.user;
+      if (usuario["acesso"][acesso[0]][acesso[1]]) {
+        next();
+      } else {
+        return res
+          .status(401)
+          .json({ auth: false, message: "Acesso não autorizado." });
+      }
+    };
+  };
+
   static async logout(req: Request, res: Response) {
     const accessToken = req.headers["x-access-token"];
-    const refreshToken = req.headers["x-refresh-token"]
+    const refreshToken = req.headers["x-refresh-token"];
     if (!accessToken) {
       return res
         .status(401)
@@ -86,27 +104,31 @@ export class Authentication {
     try {
       TokenAccess.salva(accessToken);
       TokenRefresh.apaga(refreshToken as string);
-      return res.status(200).json({ message: "Logout realizado com sucesso."})
+      return res.status(200).json({ message: "Logout realizado com sucesso." });
     } catch (error: any) {
       return res.status(500).json(error.message);
     }
   }
 
-  static async refresh(req: Request, res: Response){
+  static async refresh(req: Request, res: Response) {
     const refreshToken = req.headers["x-refresh-token"];
 
-    if(!refreshToken){
+    if (!refreshToken) {
       return res
         .status(401)
         .json({ auth: false, message: "Refresh token não fornecido." });
     }
 
-    const id = await TokenRefresh.id(refreshToken as string)
-    const usuario = await Usuario.findByPk(Number(id))
+    const id = await TokenRefresh.id(refreshToken as string);
+    const usuario = await Usuario.findByPk(Number(id));
 
-    const newAccessToken = await TokenAccess.cria(usuario!)
-    const newRefreshToken = await TokenRefresh.renova(refreshToken as string)
+    const newAccessToken = await TokenAccess.cria(usuario!);
+    const newRefreshToken = await TokenRefresh.renova(refreshToken as string);
 
-    return res.json({ auth: true, accessToken: newAccessToken, refreshToken: newRefreshToken });
+    return res.json({
+      auth: true,
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    });
   }
 }

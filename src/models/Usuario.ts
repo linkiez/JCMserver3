@@ -32,6 +32,7 @@ Usuario.init(
       },
     },
     senha: DataTypes.STRING,
+    acesso: DataTypes.JSON
   },
   {
     sequelize,

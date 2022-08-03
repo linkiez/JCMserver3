@@ -18,7 +18,7 @@ export default class TokenAccess {
   static async verifica(token: string) {
     if(await this.existe(token)) throw new InvalidTokenError("Access token inválido por logout!")
 
-    let decoded = jwt.verify(
+    let decoded: any = jwt.verify(
       token,
       process.env.CHAVE_JWT ||
         "40b5857f7689c9f542422f732e0aee5d49dccc2f50b7b0b1",
@@ -28,7 +28,8 @@ export default class TokenAccess {
         return decoded;
       }
     );
-    return decoded;
+    let user = await Usuario.findByPk(Number(decoded.id))
+    return user;
   }
 
   static async salva(token: any) {
