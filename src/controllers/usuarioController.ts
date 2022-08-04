@@ -38,7 +38,7 @@ export default class UsuarioController {
       usuario.id_pessoa = usuario.pessoa.id;
       delete usuario.pessoa;
     }
-    let usuarioAuth: any = req.user;
+    let usuarioAuth = req.user;
     if(!usuarioAuth.acesso.admin){
       delete usuario.acesso
     }

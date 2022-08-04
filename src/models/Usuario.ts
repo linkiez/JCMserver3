@@ -11,6 +11,7 @@ export default class Usuario extends Model {
   declare createAt: Date;
   declare id_pessoa: number;
   declare pessoa: Pessoa;
+  declare acesso: any
 
   static associate() {
     // define association here

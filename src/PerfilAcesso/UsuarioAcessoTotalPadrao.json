@@ -1,0 +1,122 @@
+{
+  "admin": false,
+  "contato": {
+    "findAll": true,
+    "findAllDeleted": true,
+    "findAllContatoPessoa": true,
+    "findOne": true,
+    "create": true,
+    "update": true,
+    "destroy": true,
+    "restore": true
+  },
+  "file": {
+    "findAll": true,
+    "findAllDeleted": true,
+    "findOne": true,
+    "create": true,
+    "destroy": true,
+    "restore": true
+  },
+  "fornecedor": {
+    "findAll": true,
+    "findAllDeleted": false,
+    "findOne": true,
+    "create": false,
+    "update": false,
+    "destroy": false,
+    "restore": false
+  },
+  "listaGenerica": {
+    "findAll": false,
+    "findAllDeleted": false,
+    "findOne": false,
+    "create": false,
+    "update": false,
+    "destroy": false,
+    "restore": false
+  },
+  "operador": {
+    "findAll": true,
+    "findAllDeleted": false,
+    "findOne": true,
+    "create": false,
+    "update": false,
+    "destroy": false,
+    "restore": false
+  },
+  "orcamento": {
+    "findAll": true,
+    "findAllDeleted": true,
+    "findOne": true,
+    "create": true,
+    "update": true,
+    "destroy": true,
+    "restore": true
+  },
+  "ordemProducao": {
+    "findAll": true,
+    "findAllDeleted": false,
+    "findOne": true,
+    "create": true,
+    "update": true,
+    "destroy": false,
+    "restore": false
+  },
+  "pedidoCompra": {
+    "findAll": false,
+    "findAllDeleted": false,
+    "findOne": false,
+    "create": false,
+    "update": false,
+    "destroy": false,
+    "restore": false
+  },
+  "pessoa": {
+    "findAll": true,
+    "findAllDeleted": false,
+    "findOne": true,
+    "findByName": true,
+    "create": false,
+    "update": false,
+    "destroy": false,
+    "restore": false
+  },
+  "produto": {
+    "findAll": true,
+    "findAllDeleted": false,
+    "findOne": true,
+    "findByName": true,
+    "create": false,
+    "update": false,
+    "destroy": false,
+    "restore": false
+  },
+  "rir": {
+    "findAll": false,
+    "findAllDeleted": false,
+    "findOne": false,
+    "create": false,
+    "update": false,
+    "destroy": false,
+    "restore": false
+  },
+  "usuario": {
+    "findAll": true,
+    "findAllDeleted": false,
+    "findOne": true,
+    "create": false,
+    "update": false,
+    "destroy": false,
+    "restore": false
+  },
+  "vendedor": {
+    "findAll": true,
+    "findAllDeleted": false,
+    "findOne": true,
+    "create": false,
+    "update": false,
+    "destroy": false,
+    "restore": false
+  }
+}

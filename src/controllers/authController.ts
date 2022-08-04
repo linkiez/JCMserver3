@@ -78,7 +78,7 @@ export class Authentication {
   static verificaAcesso = (acesso: any) => {
     return (req: Request, res: Response, next: any) => {
       let usuario: any = req.user;
-      if (usuario["acesso"][acesso[0]][acesso[1]]) {
+      if (usuario["acesso"] != null && usuario["acesso"][acesso[0]][acesso[1]]) {
         next();
       } else {
         return res
