@@ -12,6 +12,7 @@ import operador from './operadorRoutes.js'
 import rir from './RIRRoutes.js'
 import auth from './authRoutes.js'
 import ordemProducao from './ordemProducaoRoutes.js'
+import pedidoCompra from './pedidoCompraRoutes.js';
 
 export function routes(app: Express) {
   app.use(
@@ -28,6 +29,7 @@ export function routes(app: Express) {
     operador,
     rir,
     auth,
-    ordemProducao
+    ordemProducao,
+    pedidoCompra
   );
 }

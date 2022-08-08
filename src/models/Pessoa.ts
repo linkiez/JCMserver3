@@ -63,6 +63,7 @@ export default class Pessoa extends Model {
   declare hasContato: HasManyHasAssociationMixin<Contato, number>;
   declare hasContatos: HasManyHasAssociationsMixin<Contato, number>;
   declare countContatos: HasManyCountAssociationsMixin;
+  fornecedor: any;
 
 
   static associate() {

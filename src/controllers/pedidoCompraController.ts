@@ -4,6 +4,7 @@ import Fornecedor from "../models/Fornecedor.js";
 import Produto from "../models/Produto.js";
 import PedidoCompra from "../models/PedidoCompra.js";
 import PedidoCompraItem from "../models/PedidoCompraItem.js";
+import Pessoa from "../models/Pessoa.js";
 
 export default class PedidoCompraController {
   static async importPedidoCompra(req: Request, res: Response) {
@@ -11,23 +12,24 @@ export default class PedidoCompraController {
     const t = await sequelize.transaction();
 
     try {
-      let itens = pedidoCompra.PedidoCompraItem;
-      delete pedidoCompra.PedidoCompraItem;
+      let itens = pedidoCompra.itens;
+      delete pedidoCompra.itens;
 
-      let fornecedor = await Fornecedor.findOne({
+      let pessoa = await Pessoa.findOne({
         where: { nome: pedidoCompra.Fornecedor },
+        include: [Fornecedor]
       });
       delete pedidoCompra.Fornecedor;
-      pedidoCompra.id_fornecedor = fornecedor!.id;
+      pedidoCompra.id_fornecedor = pessoa!.fornecedor.id;
 
       let pedidoCompraCreated = await PedidoCompra.create(pedidoCompra);
 
       if (itens) {
-        itens.forEach(async (item: any) => {
+        itens.forEach(async (item: any) => { 
           let produto = await Produto.findOne({
-            where: { nome: item.Produto },
+            where: { nome: item.produto },
           });
-          delete item.Produto;
+          delete item.produto;
           item.id_produto = produto!.id;
           item.id_pedido = pedidoCompraCreated.id;
 
@@ -96,7 +98,7 @@ export default class PedidoCompraController {
       });
 
       let pedidoCompraItem = await PedidoCompraItem.findAll({
-        where: { PedidoCompraId: Number(id) },
+        where: { id_pedido: Number(id) },
       });
 
       let total = 0;

@@ -23,7 +23,7 @@ router
     FornecedorController.findOneFornecedor
   )
   .post(
-    "/fornecedor",
+    "/fornecedor", 
     Authentication.verificaLogin,
     Authentication.verificaAcesso(["fornecedor", "create"]),
     FornecedorController.createFornecedor

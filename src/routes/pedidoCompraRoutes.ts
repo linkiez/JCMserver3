@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { Authentication } from "../controllers/authController";
-import PedidoCompraController from "../controllers/pedidoCompraController";
+import { Authentication } from "../controllers/authController.js";
+import PedidoCompraController from "../controllers/pedidoCompraController.js";
 
 const router = Router();
 router
