@@ -44,7 +44,7 @@ export default class ListaGenericaController {
   }
 
   static async createListaGenerica(req: Request, res: Response) {
-    const t = await sequelize.transaction();
+    const transaction = await sequelize.transaction();
     let listaGenerica;
 
     try {
@@ -53,16 +53,16 @@ export default class ListaGenericaController {
       let listaGenericaItem = listaGenerica.ListaGenericaItem;
       delete listaGenerica.ListaGenericaItem;
 
-      let listaGenericaCreated = await ListaGenerica.create(listaGenerica);
+      let listaGenericaCreated = await ListaGenerica.create(listaGenerica, { transaction: transaction});
 
       if (listaGenericaItem) {
-        listaGenericaItem.forEach((item: any) => {
+        listaGenericaItem.forEach(async (item: any) => {
           item.id_lista = listaGenericaCreated.id;
-          ListaGenericaItem.create(item);
+          await ListaGenericaItem.create(item, { transaction: transaction});
         });
       }
 
-      await t.commit();
+      await transaction.commit();
 
       let listaGenericaCreated2 = await ListaGenerica.findOne({
         where: { id: listaGenericaCreated.id },
@@ -71,7 +71,7 @@ export default class ListaGenericaController {
 
       return res.status(201).json(listaGenericaCreated2);
     } catch (error: any) {
-      await t.rollback();
+      await transaction.rollback();
       console.log(error);
       return res.status(500).json(error.message);
     }
@@ -79,7 +79,7 @@ export default class ListaGenericaController {
 
   static async updateListaGenerica(req: Request, res: Response) {
     const { id } = req.params;
-    const t = await sequelize.transaction();
+    const transaction = await sequelize.transaction();
 
     try {
       let listaGenerica = req.body;
@@ -90,23 +90,23 @@ export default class ListaGenericaController {
       delete listaGenerica.ListaGenericaItem;
 
       await ListaGenerica.update(listaGenerica, {
-        where: { id: Number(id) },
+        where: { id: Number(id) }, transaction: transaction
       });
 
       if (listaGenericaItem) {
         await ListaGenericaItem.destroy({
-          where: { id_lista: Number(id) },
+          where: { id_lista: Number(id) }, transaction: transaction
         });
 
         listaGenericaItem.forEach(async (item: any) => {
           item.id_lista = Number(id);
           delete item.id;
 
-          await ListaGenericaItem.create(item);
+          await ListaGenericaItem.create(item, { transaction: transaction});
         });
       }
 
-      await t.commit();
+      await transaction.commit();
 
       let listaGenericaUpdated = await ListaGenerica.findOne({
         where: { id: Number(id) },
@@ -115,7 +115,7 @@ export default class ListaGenericaController {
 
       return res.status(202).json(listaGenericaUpdated);
     } catch (error: any) {
-      await t.rollback();
+      await transaction.rollback();
       console.log(error);
       return res.status(500).json(error.message);
     }
@@ -123,16 +123,13 @@ export default class ListaGenericaController {
 
   static async destroyListaGenerica(req: Request, res: Response) {
     const { id } = req.params;
-    const t = await sequelize.transaction();
 
     try {
       await ListaGenerica.destroy({ where: { id: Number(id) } });
 
-      await t.commit();
 
       return res.status(202).json({ message: `Lista apagada` });
     } catch (error: any) {
-      await t.rollback();
       console.log(error);
       return res.status(500).json(error.message);
     }

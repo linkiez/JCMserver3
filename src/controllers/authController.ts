@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import Usuario from "../models/Usuario.js";
 import TokenAccess from "../models/TokenAccess.js";
 import TokenRefresh from "../models/TokenRefresh.js";
+import Pessoa from "../models/Pessoa.js";
 dotenv.config();
 
 export class Authentication {
@@ -41,7 +42,8 @@ export class Authentication {
   static async login(req: Request, res: Response) {
     const { email, senha } = req.body;
     let usuario = await Usuario.findOne({ where: { email: email },
-      attributes: { exclude: ["acesso"] } });
+      include: [Pessoa],
+      attributes: { exclude: ["acesso", "id_pessoa"] } });
 
     if (usuario) {
       const verificaSenha = await bcrypt.compare(senha, usuario.senha!);
@@ -54,6 +56,8 @@ export class Authentication {
           accessToken: accessToken,
           refreshToken: refreshToken,
         });
+      }else {
+        res.status(401).json({ message: "Email ou senha incorreto!" });
       }
     } else {
       res.status(500).json({ message: "Login inválido!" });
