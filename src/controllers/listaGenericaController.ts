@@ -6,7 +6,9 @@ import sequelize from "../config/connMySql.js";
 export default class ListaGenericaController {
   static async findAllListaGenerica(req: Request, res: Response) {
     try {
-      let listaGenericas = await ListaGenerica.findAll();
+      let listaGenericas = await ListaGenerica.findAll({
+        include: [ListaGenericaItem],
+      });
 
       return res.status(200).json(listaGenericas);
     } catch (error: any) {
@@ -50,15 +52,17 @@ export default class ListaGenericaController {
     try {
       listaGenerica = req.body;
 
-      let listaGenericaItem = listaGenerica.ListaGenericaItem;
-      delete listaGenerica.ListaGenericaItem;
+      let listaGenericaItem = listaGenerica.lista_generica_items;
+      delete listaGenerica.lista_generica_items;
 
-      let listaGenericaCreated = await ListaGenerica.create(listaGenerica, { transaction: transaction});
+      let listaGenericaCreated = await ListaGenerica.create(listaGenerica, {
+        transaction: transaction,
+      });
 
       if (listaGenericaItem) {
         listaGenericaItem.forEach(async (item: any) => {
           item.id_lista = listaGenericaCreated.id;
-          await ListaGenericaItem.create(item, { transaction: transaction});
+          await ListaGenericaItem.create(item, { transaction: transaction });
         });
       }
 
@@ -86,34 +90,49 @@ export default class ListaGenericaController {
 
       delete listaGenerica.id;
 
-      let listaGenericaItem = listaGenerica.ListaGenericaItem;
-      delete listaGenerica.ListaGenericaItem;
+      let listaGenericaItem = listaGenerica.lista_generica_items;
+      delete listaGenerica.lista_generica_items;
 
       await ListaGenerica.update(listaGenerica, {
-        where: { id: Number(id) }, transaction: transaction
+        where: { id: Number(id) },
+        transaction: transaction,
       });
 
       if (listaGenericaItem) {
         await ListaGenericaItem.destroy({
-          where: { id_lista: Number(id) }, transaction: transaction
+          where: { id_lista: Number(id) },
+          transaction: transaction,
         });
 
-        listaGenericaItem.forEach(async (item: any) => {
+        let listaPromises = listaGenericaItem.map(async (item: any) => {
           item.id_lista = Number(id);
           delete item.id;
 
-          await ListaGenericaItem.create(item, { transaction: transaction});
+          return ListaGenericaItem.create(item, { transaction: transaction });
         });
+
+        Promise.all(listaPromises).then(async () => {
+          await transaction.commit();
+
+          let listaGenericaUpdated = await ListaGenerica.findOne({
+            where: { id: Number(id) },
+            include: ListaGenericaItem,
+          });
+
+          return res.status(202).json(listaGenericaUpdated);
+        });
+      }else{
+        await transaction.commit();
+
+        let listaGenericaUpdated = await ListaGenerica.findOne({
+          where: { id: Number(id) },
+          include: ListaGenericaItem,
+        });
+  
+        return res.status(202).json(listaGenericaUpdated);
       }
 
-      await transaction.commit();
-
-      let listaGenericaUpdated = await ListaGenerica.findOne({
-        where: { id: Number(id) },
-        include: ListaGenericaItem,
-      });
-
-      return res.status(202).json(listaGenericaUpdated);
+      
     } catch (error: any) {
       await transaction.rollback();
       console.log(error);
@@ -126,7 +145,6 @@ export default class ListaGenericaController {
 
     try {
       await ListaGenerica.destroy({ where: { id: Number(id) } });
-
 
       return res.status(202).json({ message: `Lista apagada` });
     } catch (error: any) {

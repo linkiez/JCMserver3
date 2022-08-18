@@ -10,7 +10,7 @@ export default class TokenAccess {
       process.env.CHAVE_JWT ||
         "40b5857f7689c9f542422f732e0aee5d49dccc2f50b7b0b1",
       {
-        expiresIn: 3600, // expires in 5min
+        expiresIn: 300, // expires in 5min
       }
     );
   }

@@ -126,11 +126,15 @@ export class Authentication {
     const id = await TokenRefresh.id(refreshToken as string);
     const usuario = await Usuario.findByPk(Number(id));
 
-    const newAccessToken = await TokenAccess.cria(usuario!);
+    if (!usuario) {
+      return res
+        .status(401)
+        .json({ auth: false, message: "Refresh token não reconhecido." });
+    }
+    const newAccessToken = await TokenAccess.cria(usuario);
     const newRefreshToken = await TokenRefresh.renova(refreshToken as string);
 
     return res.json({
-      auth: true,
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
     });
