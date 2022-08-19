@@ -45,6 +45,21 @@ export default class ListaGenericaController {
     }
   }
 
+  static async findByNameListaGenerica(req: Request, res: Response) {
+    const { nome } = req.params;
+    try {
+      let listaGenerica = await ListaGenerica.findOne({
+        where: { nome: nome },
+        include: [ListaGenericaItem],
+      });
+
+      return res.status(200).json(listaGenerica);
+    } catch (error: any) {
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
+
   static async createListaGenerica(req: Request, res: Response) {
     const transaction = await sequelize.transaction();
     let listaGenerica;

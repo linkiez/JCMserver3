@@ -22,6 +22,14 @@ router
     Authentication.verificaAcesso(["listaGenerica", "findOne"]),
     ListaGenericaController.findOneListaGenerica
   )
+
+  .get(
+    "/listagenerica/nome/:nome",
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["listaGenerica", "findOne"]),
+    ListaGenericaController.findByNameListaGenerica
+  )
+
   .post(
     "/listagenerica",
     Authentication.verificaLogin,
