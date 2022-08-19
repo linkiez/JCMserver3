@@ -13,8 +13,8 @@ export default class PedidoCompraItem extends Model {
   declare ipi: number;
   declare prazo: Date;
   declare deletedAt: Date;
-  declare updateAt: Date;
-  declare createAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
   declare id_pedido: number;
   declare id_produto: number;
   declare Produto: Produto;

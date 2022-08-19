@@ -11,8 +11,8 @@ export default class PedidoCompra extends Model {
   declare frete: number;
   declare transporte: string;
   declare deletedAt: Date;
-  declare updateAt: Date;
-  declare createAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
   declare PedidoCompraItem: Array<PedidoCompraItem>;
   declare id_fornecedor: number;
   declare Fornecedor: Fornecedor;

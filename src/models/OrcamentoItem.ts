@@ -35,8 +35,8 @@ export default class OrcamentoItem extends Model {
   declare preco_hora: number;
   declare total_manual: number;
   declare deletedAt: Date;
-  declare updateAt: Date;
-  declare createAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
   declare files: Array<File>;
   
   declare getFiles: HasManyGetAssociationsMixin<File>; //

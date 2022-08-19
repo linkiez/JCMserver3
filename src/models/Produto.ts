@@ -10,8 +10,8 @@ export default class Produto extends Model {
   declare categoria: string;
   declare espessura: number;
   declare peso: number;
-  declare updateAt: Date;
-  declare createAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
   declare deletedAt: Date;
 
   static associate() {

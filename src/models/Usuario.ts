@@ -7,8 +7,8 @@ export default class Usuario extends Model {
   declare email: string;
   senha?: string;
   declare deletedAt: Date;
-  declare updateAt: Date;
-  declare createAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
   declare id_pessoa: number;
   declare pessoa: Pessoa;
   declare acesso: any

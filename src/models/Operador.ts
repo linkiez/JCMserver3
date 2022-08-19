@@ -9,8 +9,8 @@ export default class Operador extends Model {
   declare id: number;
   declare senha: string;
   declare deletedAt: Date;
-  declare updateAt: Date;
-  declare createAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
   declare id_pessoa: number;
   declare pessoa: Pessoa;
 

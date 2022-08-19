@@ -16,8 +16,8 @@ export default class OrdemProducao extends Model {
   declare venda: number;
   declare status: string;
   declare deletedAt: Date;
-  declare updateAt: Date;
-  declare createAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
 
   static associate() {
     OrdemProducao.belongsTo(Orcamento, { foreignKey: 'id_orcamento'});

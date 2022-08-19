@@ -34,8 +34,8 @@ export default class Orcamento extends Model {
   declare aprovacao: string;
   declare pc_cliente: string;
   declare deletedAt: Date;
-  declare updateAt: Date;
-  declare createAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
   declare cond_pag: string;
   declare frete: number;
   declare transporte: string;

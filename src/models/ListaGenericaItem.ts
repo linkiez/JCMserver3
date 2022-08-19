@@ -6,8 +6,8 @@ export default class ListaGenericaItem extends Model {
   declare id: number;
   declare valor: string;
   declare deletedAt: Date;
-  declare updateAt: Date;
-  declare createAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
   declare id_lista: number;
   
   static associate() {

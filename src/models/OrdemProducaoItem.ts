@@ -29,8 +29,8 @@ export default class OrdemProducaoItem extends Model {
   declare id_rir: number;
   declare observacao: string;
   declare deletedAt: Date;
-  declare updateAt: Date;
-  declare createAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
   declare files: Array<FileDb>;
 
   declare getFiles: HasManyGetAssociationsMixin<File>; //

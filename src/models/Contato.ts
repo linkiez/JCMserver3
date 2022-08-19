@@ -10,8 +10,8 @@ export default class Contato extends Model {
   declare tipo: string;
   declare valor: number;
   declare deletedAt: Date;
-  declare updateAt: Date;
-  declare createAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
   
   static associate() {
     // define association here

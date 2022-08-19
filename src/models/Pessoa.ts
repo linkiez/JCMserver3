@@ -39,8 +39,8 @@ export default class Pessoa extends Model {
   declare data_nasc: Date;
   declare descricao: Text;
   declare deletedAt: Date;
-  declare updateAt: Date;
-  declare createAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
   declare contatos: Array<Contato>;
   declare files: Array<File>;
 

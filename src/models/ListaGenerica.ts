@@ -7,8 +7,8 @@ export default class ListaGenerica extends Model {
   declare nome: string;
   declare ListaGenericaItem: Array<ListaGenericaItem>;
   declare deletedAt: Date;
-  declare updateAt: Date;
-  declare createAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
   
   static associate() {
     // define association here
