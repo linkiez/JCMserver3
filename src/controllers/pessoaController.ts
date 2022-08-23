@@ -7,6 +7,7 @@ import Pessoa_Contato from "../models/Pessoa_Contato.js";
 import sequelize from "../config/connMySql.js";
 import Fornecedor from "../models/Fornecedor.js";
 import Vendedor from "../models/Vendedor.js";
+import Operador from "../models/Operador.js";
 
 export default class PessoaController {
   static async findAllPessoas(req: Request, res: Response) {
@@ -36,7 +37,7 @@ export default class PessoaController {
     try {
       const pessoa = await Pessoa.findOne({
         where: { id: Number(id) },
-        include: [Contato, FileDb, Fornecedor, Vendedor],
+        include: [Contato, FileDb, Fornecedor, Vendedor, Operador],
       });
       return res.status(200).json(pessoa);
     } catch (error: any) {
@@ -72,6 +73,24 @@ export default class PessoaController {
         transaction: transaction,
       });
 
+      if (pessoa.operador) {
+        let operador = pessoa.operador;
+        operador.id_pessoa = pessoaCreated.id;
+        await Operador.create(operador, { transaction: transaction });
+      }
+
+      if (pessoa.fornecedor) {
+        let fornecedor = pessoa.fornecedor;
+        fornecedor.id_pessoa = pessoaCreated.id;
+        await Fornecedor.create(fornecedor, { transaction: transaction });
+      }
+
+      if (pessoa.vendedor) {
+        let vendedor = pessoa.vendedor;
+        vendedor.id_pessoa = pessoaCreated.id;
+        await Vendedor.create(vendedor, { transaction: transaction });
+      }
+
       let ArrayPromises: Array<any> = [];
 
       if (contatos) {
@@ -79,7 +98,10 @@ export default class PessoaController {
           if (contato.id) {
             return contato;
           } else {
-            return Contato.create(contato, { transaction: transaction });
+            return Contato.findOrCreate({
+              where: { valor: contato.valor },
+              transaction: transaction,
+            });
           }
         });
 
@@ -102,7 +124,7 @@ export default class PessoaController {
       Promise.all(ArrayPromises).then(async () => {
         await transaction.commit();
         let pessoaCreated2 = await Pessoa.findByPk(pessoaCreated.id, {
-          include: [Contato, FileDb, Fornecedor, Vendedor],
+          include: [Contato, FileDb, Fornecedor, Vendedor, Operador],
         });
 
         return res.status(201).json(pessoaCreated2);
@@ -123,19 +145,65 @@ export default class PessoaController {
     delete pessoa.files;
     delete pessoa.id;
 
-    const transaction = sequelize.transaction();
+    const transaction = await sequelize.transaction();
 
     try {
-      await Pessoa.update(pessoa, { where: { id: Number(id) } });
+      await Pessoa.update(pessoa, {
+        where: { id: Number(id) },
+        transaction: transaction,
+      });
+
+      if (pessoa.fornecedor) {
+        if (pessoa.fornecedor.id) {
+          let fornecedor = pessoa.fornecedor;
+          let id_fornecedor = fornecedor.id;
+          delete fornecedor.id;
+          await Fornecedor.update(fornecedor, {
+            where: { id: Number(id_fornecedor) },
+            transaction: transaction,
+          });
+        } else {
+          let fornecedor = pessoa.fornecedor;
+          fornecedor.id_pessoa = id;
+          await Fornecedor.create(fornecedor, { transaction: transaction });
+        }
+      }
+
+      if (pessoa.operador && !pessoa.operador.id) {
+        let operador = pessoa.operador;
+        operador.id_pessoa = id;
+        await Operador.create(operador, { transaction: transaction });
+      }
+
+      if (pessoa.vendedor && !pessoa.vendedor.id) {
+        let vendedor = pessoa.vendedor;
+        vendedor.id_pessoa = id;
+        await Vendedor.create(vendedor, { transaction: transaction });
+      }
+
+      contatos = contatos.filter((contato: Contato)=> contato.valor!=undefined)
+
+      console.log(contatos);
 
       let contatosCreated = contatos.map(async (contato: any) => {
         if (contato.id) {
           let contatoId = contato.id;
           delete contato.id;
-          await Contato.update(contato, { where: { id: Number(contatoId) } });
+          await Contato.update(contato, {
+            where: { id: Number(contatoId) },
+            transaction: transaction,
+          });
           return Contato.findOne({ where: { id: Number(contatoId) } });
         } else {
-          return Contato.create(contato);
+            let contatoFind = await Contato.findOne({
+              where: { valor: contato.valor },
+            });
+
+            if (contatoFind) {
+              return contatoFind;
+            } else {
+              return Contato.create(contato, { transaction: transaction });
+            }
         }
       });
 
@@ -145,6 +213,7 @@ export default class PessoaController {
           promises.push(
             Pessoa_Contato.findOrCreate({
               where: { pessoaId: id, contatoId: item.id },
+              transaction: transaction,
             })
           );
         });
@@ -153,22 +222,23 @@ export default class PessoaController {
           promises.push(
             Pessoa_File.findOrCreate({
               where: { pessoaId: id, fileId: item.id },
+              transaction: transaction,
             })
           );
         });
 
-        Promise.all(promises).then(async (listaDePromisse) => {
-          (await transaction).commit();
+        Promise.all(promises).then(async () => {
+          await transaction.commit();
           const pessoaUpdated = await Pessoa.findOne({
             where: { id: Number(id) },
-            include: [Contato, FileDb, Fornecedor, Vendedor],
+            include: [Contato, FileDb, Fornecedor, Vendedor, Operador],
           });
 
           return res.status(202).json(pessoaUpdated);
         });
       });
     } catch (error: any) {
-      (await transaction).rollback();
+      await transaction.rollback();
       console.log(error);
       return res.status(500).json(error.message);
     }

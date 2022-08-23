@@ -36,7 +36,7 @@ export default class FileController {
       });
 
       if (file){
-        const url = await S3Client.getSignedUrl(file.newFilename)
+        const url = { url: await S3Client.getSignedUrl(file.newFilename)}
         return res.status(200).json(url);
       }else{
         return res.status(404);

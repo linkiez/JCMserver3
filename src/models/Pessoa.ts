@@ -21,6 +21,7 @@ import Usuario from "./Usuario.js";
 import Vendedor from "./Vendedor.js";
 import Orcamento from "./Orcamento.js";
 import RegistroInspecaoRecebimento from "./RIR.js";
+import Operador from "./Operador.js";
 
 export default class Pessoa extends Model {
   declare id: number;
@@ -43,6 +44,10 @@ export default class Pessoa extends Model {
   declare createdAt: Date;
   declare contatos: Array<Contato>;
   declare files: Array<File>;
+  declare fornecedor: Fornecedor
+  declare operador: Operador
+  declare usuario: Usuario
+  declare vendedor: Vendedor
 
   declare getFiles: HasManyGetAssociationsMixin<File>; //
   declare addFile: HasManyAddAssociationMixin<File, number>;
@@ -63,7 +68,6 @@ export default class Pessoa extends Model {
   declare hasContato: HasManyHasAssociationMixin<Contato, number>;
   declare hasContatos: HasManyHasAssociationsMixin<Contato, number>;
   declare countContatos: HasManyCountAssociationsMixin;
-  fornecedor: any;
 
 
   static associate() {
@@ -71,6 +75,7 @@ export default class Pessoa extends Model {
     Pessoa.hasOne(Fornecedor, { foreignKey: "id_pessoa" });
     Pessoa.hasOne(Usuario, { foreignKey: "id_pessoa" });
     Pessoa.hasOne(Vendedor, { foreignKey: "id_pessoa" });
+    Pessoa.hasOne(Operador, { foreignKey: "id_pessoa" });
     Pessoa.hasMany(RegistroInspecaoRecebimento, { foreignKey: "id_pessoa" })
     Pessoa.hasMany(Orcamento, { foreignKey: "id_pessoa" })
     Pessoa.belongsToMany(File, { through: "pessoa_file" });

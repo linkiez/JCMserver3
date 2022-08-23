@@ -12,6 +12,9 @@ export default class file extends Model {
   declare mimeType: string
   declare bucket: string
   declare region: string
+  declare deletedAt: Date;
+  declare updatedAt: Date;
+  declare createdAt: Date;
 
   static associate() {
     // define association here
