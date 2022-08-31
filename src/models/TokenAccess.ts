@@ -10,7 +10,7 @@ export default class TokenAccess {
       process.env.CHAVE_JWT ||
         "40b5857f7689c9f542422f732e0aee5d49dccc2f50b7b0b1",
       {
-        expiresIn: 300, // expires in 5min
+        expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRE_IN || 900),
       }
     );
   }
@@ -34,7 +34,7 @@ export default class TokenAccess {
 
   static async salva(token: any) {
     await redis.set(token, '')
-    redis.expire(token, 300)
+    redis.expire(token, Number(process.env.ACCESS_TOKEN_EXPIRE_IN || 900))
   }
 
   static async existe(token: string) {

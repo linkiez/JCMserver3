@@ -48,7 +48,7 @@ export class S3Client {
     }
   }
 
-  static async deleteFromS3(attachmentId: string) {
+  static async deleteFromS3(fileName: string) {
     const s3 = new AWS.S3({
       apiVersion: "2006-03-01",
       region: process.env.AWS_REGION,
@@ -60,7 +60,7 @@ export class S3Client {
     return s3
       .deleteObject({
         Bucket: process.env.AWS_S3_BUCKET ?? "",
-        Key: attachmentId,
+        Key: fileName,
       })
       .promise();
   }

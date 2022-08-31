@@ -93,15 +93,24 @@ export default class PessoaController {
 
       let ArrayPromises: Array<any> = [];
 
+      contatos = contatos.filter(
+        (contato: Contato) => contato.valor != undefined
+      );
+
       if (contatos) {
         let contatosCreated = contatos.map(async (contato: any) => {
           if (contato.id) {
             return contato;
           } else {
-            return Contato.findOrCreate({
+            let contatoFind = await Contato.findOne({
               where: { valor: contato.valor },
-              transaction: transaction,
             });
+
+            if (contatoFind) {
+              return contatoFind;
+            } else {
+              return Contato.create(contato, { transaction: transaction });
+            }
           }
         });
 
@@ -181,9 +190,9 @@ export default class PessoaController {
         await Vendedor.create(vendedor, { transaction: transaction });
       }
 
-      contatos = contatos.filter((contato: Contato)=> contato.valor!=undefined)
-
-      console.log(contatos);
+      contatos = contatos.filter(
+        (contato: Contato) => contato.valor != undefined
+      );
 
       let contatosCreated = contatos.map(async (contato: any) => {
         if (contato.id) {
@@ -195,33 +204,38 @@ export default class PessoaController {
           });
           return Contato.findOne({ where: { id: Number(contatoId) } });
         } else {
-            let contatoFind = await Contato.findOne({
-              where: { valor: contato.valor },
-            });
+          let contatoFind = await Contato.findOne({
+            where: { valor: contato.valor },
+          });
 
-            if (contatoFind) {
-              return contatoFind;
-            } else {
-              return Contato.create(contato, { transaction: transaction });
-            }
+          if (contatoFind) {
+            return contatoFind;
+          } else {
+            return Contato.create(contato, { transaction: transaction });
+          }
         }
+      });
+
+      await Pessoa_Contato.destroy({
+        where: { pessoaId: Number(id) },
+        transaction: transaction,
       });
 
       Promise.all(contatosCreated).then(async (contatos) => {
         let promises: Array<any> = [];
-        contatos.forEach(async (item: Contato) => {
+        contatos.forEach(async (contato: Contato) => {
           promises.push(
             Pessoa_Contato.findOrCreate({
-              where: { pessoaId: id, contatoId: item.id },
+              where: { pessoaId: id, contatoId: contato.id },
               transaction: transaction,
             })
           );
         });
 
-        files.forEach(async (item: FileDb) => {
+        files.forEach(async (file: FileDb) => {
           promises.push(
             Pessoa_File.findOrCreate({
-              where: { pessoaId: id, fileId: item.id },
+              where: { pessoaId: id, fileId: file.id },
               transaction: transaction,
             })
           );
@@ -248,7 +262,7 @@ export default class PessoaController {
     const { id } = req.params;
     try {
       await Pessoa.destroy({ where: { id: Number(id) } });
-      return res.status(202).json({ message: `Pessoa apagada` });
+      return res.status(202);
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);
