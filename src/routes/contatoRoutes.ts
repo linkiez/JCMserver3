@@ -19,7 +19,7 @@ router
   .get(
     "/contato/:id",
     Authentication.verificaLogin,
-    Authentication.verificaAcesso(["contato", "findAllOne"]),
+    Authentication.verificaAcesso(["contato", "findOne"]),
     ContatoController.findOneContato
   )
   .get(
