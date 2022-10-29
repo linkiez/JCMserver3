@@ -40,7 +40,7 @@ PedidoCompra.init(
     cond_pagamento: DataTypes.STRING,
     frete: DataTypes.DECIMAL(13, 2),
     transporte: DataTypes.STRING,
-    deletedAt: DataTypes.DATE,
+    total: DataTypes.DECIMAL(13, 2),
   },
   {
     sequelize,
