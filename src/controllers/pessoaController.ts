@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { Request, Response } from "express";
 import Contato from "../models/Contato.js";
 import Pessoa from "../models/Pessoa.js";
@@ -93,9 +94,11 @@ export default class PessoaController {
 
       let ArrayPromises: Array<any> = [];
 
-      contatos = contatos.filter(
-        (contato: Contato) => contato.valor != undefined
-      );
+      if (contatos) {
+        contatos = contatos.filter(
+          (contato: Contato) => contato.valor != undefined
+        );
+      }
 
       if (contatos) {
         let contatosCreated = contatos.map(async (contato: any) => {
@@ -275,6 +278,26 @@ export default class PessoaController {
       await Pessoa.restore({ where: { id: Number(id) } });
       const pessoaUpdated = await Pessoa.findOne({ where: { id: Number(id) } });
       return res.status(202).json(pessoaUpdated);
+    } catch (error: any) {
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async existeCnpjCpfPessoa(req: Request, res: Response) {
+    let pessoa: Pessoa = req.body;
+    let query: any = { where: { cnpj_cpf: pessoa.cnpj_cpf }, paranoid: false };
+    if (pessoa.id) {
+      query.where.id = { [Op.not]: pessoa.id }
+    }
+
+    try {
+      let pessoaChecked: Pessoa = await Pessoa.findOne(query);
+      if (pessoaChecked) {
+        return res.status(200).send(true);
+      } else {
+        return res.status(200).send(false);
+      }
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);

@@ -35,6 +35,12 @@ router
     PessoasController.createPessoa
   )
   .post(
+    "/pessoa/cnpj_cpf",
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["pessoa", "create"]),
+    PessoasController.existeCnpjCpfPessoa
+  )
+  .post(
     "/pessoa/restore/:id",
     Authentication.verificaLogin,
     Authentication.verificaAcesso(["pessoa", "restore"]),
