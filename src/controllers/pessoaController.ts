@@ -294,9 +294,9 @@ export default class PessoaController {
     try {
       let pessoaChecked: Pessoa = await Pessoa.findOne(query);
       if (pessoaChecked) {
-        return res.status(200).send(true);
-      } else {
         return res.status(200).send(false);
+      } else {
+        return res.status(200).send(true);
       }
     } catch (error: any) {
       console.log(error);
