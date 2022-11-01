@@ -5,7 +5,7 @@ import { routes } from "./routes/index.js";
 import { models } from "./models/index.js";
 import sequelize from "./config/connMySql.js";
 import cors from "cors";
-import { seed } from "./seed"
+import { seed } from "./seed/index.js"
 
 dotenv.config();
 
@@ -22,8 +22,9 @@ app.use(express.json(), express.urlencoded({ extended: true }));
 
 models();
 routes(app);
+seed();
+
 sequelize.sync({ alter: false, force: false });
 
-seed();
 
 app.listen(PORT, () => console.log(`servidor está rodando na porta ${PORT}`));

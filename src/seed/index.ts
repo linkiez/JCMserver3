@@ -1,5 +1,4 @@
-import { Options } from 'sequelize/types';
-import { listasGenericas } from "./listas";
+import { listasGenericas } from "./listas.js";
 import sequelize from "../config/connMySql.js";
 import ListaGenerica from "../models/ListaGenerica.js";
 import ListaGenericaItem from "../models/ListaGenericaItem.js";
@@ -19,14 +18,14 @@ export function seedListas(){
         delete lista.lista_generica_items
 
         try{
-            let listaGenericaCreated = await ListaGenerica.findOrCreate({where: lista, transaction: transaction})
+            let listaGenericaCreated = await ListaGenerica.findOrCreate({where: lista})
+            console.log(listaGenericaCreated)
 
             if (listaGenericaItem) {
                 listaGenericaItem.forEach(async (item: any) => {
                   item.id_lista = listaGenericaCreated[0].id;
                   await ListaGenericaItem.findOrCreate({
-                    where: item,
-                    transaction: transaction
+                    where: item
                   });
                 });
               }

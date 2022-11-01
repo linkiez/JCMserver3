@@ -1,5 +1,3 @@
-import sequelize from "../config/connMySql.js";
-
 export const listasGenericas = [
     {
     nome: 'categoriaProduto', 
