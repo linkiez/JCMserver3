@@ -24,8 +24,8 @@ router
   )
   .post(
     "/usuario",
-    Authentication.verificaLogin,
-    Authentication.verificaAcesso(["usuario", "create"]),
+    // Authentication.verificaLogin,
+    // Authentication.verificaAcesso(["usuario", "create"]),
     UsuarioController.createUsuario
   )
   .post(

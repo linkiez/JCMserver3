@@ -97,13 +97,13 @@ Pessoa.init(
     email: {
       type: DataTypes.STRING,
       validate: {
-        isEmail: true,
+        // isEmail: true,
       },
     },
     email_nfe: {
       type: DataTypes.STRING,
       validate: {
-        isEmail: true,
+        // isEmail: true,
       },
     },
     endereco: DataTypes.STRING,

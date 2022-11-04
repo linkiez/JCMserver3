@@ -31,8 +31,8 @@ Produto.init(
     },
     nome: DataTypes.STRING,
     categoria: DataTypes.STRING,
-    espessura: DataTypes.STRING,
-    peso: DataTypes.STRING,
+    espessura: DataTypes.FLOAT,
+    peso: DataTypes.FLOAT,
     deletedAt: DataTypes.DATE,
   },
   {
