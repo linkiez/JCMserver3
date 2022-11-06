@@ -75,6 +75,7 @@ export class Authentication {
       req.user = await TokenAccess.verifica(token);
       next();
     } catch (error: any) {
+      console.log(error);
       return res.status(401).json(error.message);
     }
   }

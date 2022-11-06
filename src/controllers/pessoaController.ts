@@ -12,9 +12,41 @@ import Operador from "../models/Operador.js";
 
 export default class PessoaController {
   static async findAllPessoas(req: Request, res: Response) {
+    let consulta: any = {
+      pageCount: Number(req.query.pageCount) || 10,
+      page: Number(req.query.page) || 0,
+      searchValue: req.query.searchValue,
+    };
     try {
-      const pessoas = await Pessoa.findAll();
-      return res.status(200).json(pessoas);
+      let resultado: { pessoas: Pessoa[]; totalRecords: Number } = {
+        pessoas: [],
+        totalRecords: 0,
+      };
+      let queryWhere = {
+        [Op.or]: [
+          { nome: { [Op.like]: "%" + consulta.searchValue + "%" } },
+          { cnpj_cpf: { [Op.like]: "%" + consulta.searchValue + "%" } },
+          { telefone: { [Op.like]: "%" + consulta.searchValue + "%" } }
+        ],
+      };
+
+      let queryIncludes = []
+      if(req.query.fornecedor==='true') queryIncludes.push({model: Fornecedor, required: true});
+      if(req.query.operador==='true') queryIncludes.push({model: Operador, required: true});
+      if(req.query.vendedor==='true') queryIncludes.push({model: Vendedor, required: true});
+
+      resultado.pessoas = await Pessoa.findAll({
+        limit: consulta.pageCount,
+        offset: consulta.pageCount * consulta.page,
+        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
+        include: queryIncludes
+      });
+      resultado.totalRecords = await Pessoa.count({
+        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
+        include: queryIncludes
+      });
+
+      return res.status(200).json(resultado);
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);
@@ -288,7 +320,7 @@ export default class PessoaController {
     let pessoa: Pessoa = req.body;
     let query: any = { where: { cnpj_cpf: pessoa.cnpj_cpf }, paranoid: false };
     if (pessoa.id) {
-      query.where.id = { [Op.not]: pessoa.id }
+      query.where.id = { [Op.not]: pessoa.id };
     }
 
     try {

@@ -97,13 +97,13 @@ Pessoa.init(
     email: {
       type: DataTypes.STRING,
       validate: {
-        // isEmail: true,
+         isEmail: true,
       },
     },
     email_nfe: {
       type: DataTypes.STRING,
       validate: {
-        // isEmail: true,
+         isEmail: true,
       },
     },
     endereco: DataTypes.STRING,
@@ -111,11 +111,11 @@ Pessoa.init(
     uf: DataTypes.STRING(2),
     cep: DataTypes.INTEGER,
     ie_rg: {
-      type: DataTypes.BIGINT,
-      unique: true,
+      type: DataTypes.STRING,
+      //unique: true,
     },
     cnpj_cpf: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.STRING,
       unique: true,
     },
     data_nasc: DataTypes.DATE,

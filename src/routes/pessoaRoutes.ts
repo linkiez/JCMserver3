@@ -30,8 +30,8 @@ router
   )
   .post(
     "/pessoa",
-    // Authentication.verificaLogin,
-    // Authentication.verificaAcesso(["pessoa", "create"]),
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["pessoa", "create"]),
     PessoasController.createPessoa
   )
   .post(

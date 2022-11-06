@@ -14,6 +14,7 @@ export const listasGenericas = [
             [
                 {valor: 'Telefone'},
                 {valor: 'Email'},
+                {valor: 'Email Nfe'},
                 {valor: 'WhatsApp'},
             ]
     },
