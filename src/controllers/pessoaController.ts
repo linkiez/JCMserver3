@@ -22,13 +22,15 @@ export default class PessoaController {
         pessoas: [],
         totalRecords: 0,
       };
-      let queryWhere = {
+      let queryWhere: any = {
         [Op.or]: [
           { nome: { [Op.like]: "%" + consulta.searchValue + "%" } },
           { cnpj_cpf: { [Op.like]: "%" + consulta.searchValue + "%" } },
           { telefone: { [Op.like]: "%" + consulta.searchValue + "%" } }
         ],
       };
+
+      if(req.query.deleted==='true') queryWhere = {...queryWhere, deletedAt: {[Op.not]: null}}
 
       let queryIncludes = []
       if(req.query.fornecedor==='true') queryIncludes.push({model: Fornecedor, required: true});
@@ -39,11 +41,13 @@ export default class PessoaController {
         limit: consulta.pageCount,
         offset: consulta.pageCount * consulta.page,
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
-        include: queryIncludes
+        include: queryIncludes,
+        paranoid: req.query.deleted==='true'?false:true
       });
       resultado.totalRecords = await Pessoa.count({
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
-        include: queryIncludes
+        include: queryIncludes,
+        paranoid: req.query.deleted==='true'?false:true
       });
 
       return res.status(200).json(resultado);
@@ -297,7 +301,7 @@ export default class PessoaController {
     const { id } = req.params;
     try {
       await Pessoa.destroy({ where: { id: Number(id) } });
-      return res.status(202);
+      return res.status(202).json("Pessoa apagada");
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);

@@ -19,7 +19,6 @@ export function seedListas(){
 
         try{
             let listaGenericaCreated = await ListaGenerica.findOrCreate({where: lista})
-            console.log(listaGenericaCreated)
 
             if (listaGenericaItem) {
                 listaGenericaItem.forEach(async (item: any) => {
