@@ -57,18 +57,6 @@ export default class PessoaController {
     }
   }
 
-  static async findAllPessoasDeleted(req: Request, res: Response) {
-    try {
-      const pessoas = await Pessoa.scope("deleted").findAll({
-        paranoid: false,
-      });
-      return res.status(200).json(pessoas);
-    } catch (error: any) {
-      console.log(error);
-      return res.status(500).json(error.message);
-    }
-  }
-
   static async findOnePessoa(req: Request, res: Response) {
     const { id } = req.params;
     try {
@@ -192,6 +180,8 @@ export default class PessoaController {
     let files = pessoa.files;
     delete pessoa.files;
     delete pessoa.id;
+
+    console.log(pessoa)
 
     const transaction = await sequelize.transaction();
 

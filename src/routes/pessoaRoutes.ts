@@ -11,12 +11,6 @@ router
     PessoasController.findAllPessoas
   )
   .get(
-    "/pessoa/deleted/",
-    Authentication.verificaLogin,
-    Authentication.verificaAcesso(["pessoa", "findAllDeleted"]),
-    PessoasController.findAllPessoasDeleted
-  )
-  .get(
     "/pessoa/:id",
     Authentication.verificaLogin,
     Authentication.verificaAcesso(["pessoa", "findOne"]),

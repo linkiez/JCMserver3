@@ -11,12 +11,6 @@ router
     ProdutosController.findAllProdutos
   )
   .get(
-    "/produto/deleted",
-    Authentication.verificaLogin,
-    Authentication.verificaAcesso(["produto", "findAllDeleted"]),
-    ProdutosController.findAllProdutoDeleted
-  )
-  .get(
     "/produto/:id",
     Authentication.verificaLogin,
     Authentication.verificaAcesso(["produto", "findOne"]),
@@ -30,8 +24,8 @@ router
   )
   .post(
     "/produto",
-    // Authentication.verificaLogin,
-    // Authentication.verificaAcesso(["produto", "create"]),
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["produto", "create"]),
     ProdutosController.createProduto
   )
   .post(

@@ -28,15 +28,15 @@ export default class Pessoa extends Model {
   declare nome: string;
   declare razao_social: string;
   declare pessoa_juridica: boolean;
-  declare telefone: number;
+  declare telefone: string;
   declare email: string;
   declare email_nfe: string;
   declare endereco: string;
   declare municipio: string;
   declare uf: string;
-  declare cep: number;
-  declare ie_rg: number;
-  declare cnpj_cpf: number;
+  declare cep: string;
+  declare ie_rg: string;
+  declare cnpj_cpf: string;
   declare data_nasc: Date;
   declare descricao: Text;
   declare deletedAt: Date;
@@ -93,7 +93,7 @@ Pessoa.init(
     nome: DataTypes.STRING,
     razao_social: DataTypes.STRING,
     pessoa_juridica: DataTypes.BOOLEAN,
-    telefone: DataTypes.BIGINT,
+    telefone: DataTypes.STRING,
     email: {
       type: DataTypes.STRING,
       validate: {
@@ -109,7 +109,7 @@ Pessoa.init(
     endereco: DataTypes.STRING,
     municipio: DataTypes.STRING,
     uf: DataTypes.STRING(2),
-    cep: DataTypes.INTEGER,
+    cep: DataTypes.STRING,
     ie_rg: {
       type: DataTypes.STRING,
       //unique: true,
