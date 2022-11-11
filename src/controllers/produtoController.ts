@@ -1,6 +1,6 @@
 import Produto from "../models/Produto.js";
 import { Request, Response } from "express";
-import Op from "sequelize/types/operators.js";
+import { Op } from "sequelize";
 
 export default class ProdutosController {
   static async findAllProdutos(req: Request, res: Response) {
@@ -16,7 +16,12 @@ export default class ProdutosController {
         totalRecords: 0,
       };
 
-      let queryWhere: any = {};
+      let queryWhere: any = {
+        [Op.or]: [
+          { nome: { [Op.like]: "%" + consulta.searchValue + "%" } },
+          { espessura: { [Op.like]: "%" + consulta.searchValue + "%" } },
+        ]
+      };
       if (req.query.deleted === "true")
         queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
 
