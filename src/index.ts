@@ -8,12 +8,14 @@ import cors from "cors";
 import { seed } from "./seed/index.js";
 import cluster from "cluster";
 import os from "os";
+import http from 'http'
 const numCPUs = os.cpus().length;
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 const app: Express = express();
+
 
 const corsOptions = {
   origin: process.env.CORS || "*",
@@ -26,10 +28,13 @@ app.use(express.json(), express.urlencoded({ extended: true }));
 models();
 routes(app);
 
+const server = http.createServer(app)
+server.keepAliveTimeout = (60 * 1000) + 1000;
+server.headersTimeout = (60 * 1000) + 2000;
 // For Master process
-if (cluster.isMaster) {
+if (cluster.isPrimary) {
   console.log(`Master ${process.pid} is running`);
-  sequelize.sync({ alter: false, force: false }).then(() => seed());
+  sequelize.sync({ alter: false, force: true }).then(() => seed());
   // Fork workers.
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
@@ -45,7 +50,7 @@ if (cluster.isMaster) {
 else {
   // Workers can share any TCP connection
   // In this case it is an HTTP server
-  app.listen(PORT, () => {
+  server.listen(PORT, () => {
     console.log(`Worker ${process.pid} started`);
   });
 }
