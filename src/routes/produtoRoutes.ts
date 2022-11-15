@@ -24,8 +24,8 @@ router
   )
   .post(
     "/produto",
-    Authentication.verificaLogin,
-    Authentication.verificaAcesso(["produto", "create"]),
+    // Authentication.verificaLogin,
+    // Authentication.verificaAcesso(["produto", "create"]),
     ProdutosController.createProduto
   )
   .post(

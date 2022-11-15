@@ -38,10 +38,10 @@ export default class UsuarioController {
       usuario.id_pessoa = usuario.pessoa.id;
       delete usuario.pessoa;
     }
-    let usuarioAuth = req.user;
-    if(!usuarioAuth.acesso.admin){
-      delete usuario.acesso
-    }
+    // let usuarioAuth = req.user;
+    // if(!usuarioAuth?.acesso?.admin){
+    //   delete usuario.acesso
+    // }
     try {
       if (Authentication.validaSenhaNova(usuario.senha)) {
         usuario.senha = await Authentication.gerarSenhaHash(usuario.senha);
