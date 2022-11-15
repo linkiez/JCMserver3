@@ -6,6 +6,7 @@ import Fornecedor from "./Fornecedor.js";
 export default class PedidoCompra extends Model {
   declare id: number;
   declare pedido: string;
+  declare status: string;
   declare data_emissao: Date;
   declare cond_pagamento: string;
   declare frete: number;
@@ -41,6 +42,7 @@ PedidoCompra.init(
     frete: DataTypes.DECIMAL(13, 2),
     transporte: DataTypes.STRING,
     total: DataTypes.DECIMAL(13, 2),
+    status: DataTypes.STRING
   },
   {
     sequelize,

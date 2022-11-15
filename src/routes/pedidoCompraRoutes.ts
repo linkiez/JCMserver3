@@ -6,7 +6,7 @@ const router = Router();
 router
   .post(
     "/pedidocompra/import",
-    Authentication.verificaLogin,
+    //Authentication.verificaLogin,
     PedidoCompraController.importPedidoCompra
   )
   .post(
@@ -17,14 +17,14 @@ router
   )
   .get(
     "/pedidocompra",
-    Authentication.verificaLogin,
-    Authentication.verificaAcesso(["pedidocompra", "findAll"]),
+    // Authentication.verificaLogin,
+    // Authentication.verificaAcesso(["pedidocompra", "findAll"]),
     PedidoCompraController.findAllPedidoCompra
   )
   .get(
     "/pedidocompra/:id",
-    Authentication.verificaLogin,
-    Authentication.verificaAcesso(["pedidocompra", "findOne"]),
+    // Authentication.verificaLogin,
+    // Authentication.verificaAcesso(["pedidocompra", "findOne"]),
     PedidoCompraController.findOnePedidoCompra
   )
   .delete(
