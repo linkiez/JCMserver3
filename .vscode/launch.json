@@ -12,7 +12,6 @@
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/src/index.ts",
       "outFiles": ["${workspaceFolder}/**/*.js"],
-      "runtimeExecutable": "/home/linkiez/.nvm/versions/node/v18.12.1/bin/node",
     }
   ]
 }

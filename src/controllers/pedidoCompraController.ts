@@ -6,6 +6,7 @@ import PedidoCompra from "../models/PedidoCompra.js";
 import PedidoCompraItem from "../models/PedidoCompraItem.js";
 import Pessoa from "../models/Pessoa.js";
 import { Op, where } from "sequelize";
+import Contato from "../models/Contato.js";
 
 export default class PedidoCompraController {
   static async importPedidoCompra(req: Request, res: Response) {
@@ -68,13 +69,13 @@ export default class PedidoCompraController {
       };
 
       let queryWherePessoa = {
-        nome: {[Op.like]: "%" + consulta.searchValue + "%",}
+        nome: { [Op.like]: "%" + consulta.searchValue + "%" },
       };
 
       if (req.query.deleted === "true")
         queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
 
-      console.log(consulta.searchValue)
+      console.log(consulta.searchValue);
 
       resultado.pedidosCompra = await PedidoCompra.findAll({
         limit: consulta.pageCount,
@@ -86,12 +87,12 @@ export default class PedidoCompraController {
             model: Fornecedor,
             include: [
               {
-                model: Pessoa
+                model: Pessoa,
               },
             ],
           },
         ],
-        order: [['id', 'DESC']]
+        order: [["id", "DESC"]],
       });
 
       resultado.totalRecords = await PedidoCompra.count({
@@ -111,7 +112,13 @@ export default class PedidoCompraController {
     try {
       let pedidoCompra = await PedidoCompra.findOne({
         where: { id: Number(id) },
-        include: [Fornecedor, { model: PedidoCompraItem, include: [Produto] }],
+        include: [
+          {
+            model: Fornecedor,
+            include: [{ model: Pessoa, include: [Contato] }],
+          },
+          { model: PedidoCompraItem, include: [Produto] },
+        ],
       });
 
       let pedidoCompraItem = await PedidoCompraItem.findAll({
