@@ -30,8 +30,10 @@ export default class PedidoCompraController {
           let produto = await Produto.findOne({
             where: { nome: item.produto },
           });
+          if(produto){
+            item.id_produto = produto.id;
+          }
           delete item.produto;
-          item.id_produto = produto!.id;
           item.id_pedido = pedidoCompraCreated.id;
 
           let itemCreated = await PedidoCompraItem.create(item);

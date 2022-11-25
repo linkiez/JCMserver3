@@ -54,5 +54,3 @@ else {
     console.log(`Worker ${process.pid} started`);
   });
 }
-
-//app.listen(PORT, () => console.log(`servidor está rodando na porta ${PORT}`));

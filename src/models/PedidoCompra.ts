@@ -18,6 +18,7 @@ export default class PedidoCompra extends Model {
   declare id_fornecedor: number;
   declare Fornecedor: Fornecedor;
   declare total: number;
+  declare observacao: string;
 
   static associate() {
     // define association here
@@ -42,7 +43,8 @@ PedidoCompra.init(
     frete: DataTypes.DECIMAL(13, 2),
     transporte: DataTypes.STRING,
     total: DataTypes.DECIMAL(13, 2),
-    status: DataTypes.STRING
+    status: DataTypes.STRING,
+    observacao: DataTypes.TEXT,
   },
   {
     sequelize,
