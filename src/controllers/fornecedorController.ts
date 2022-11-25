@@ -1,15 +1,42 @@
 import { Request, Response } from "express";
+import { Op } from "sequelize";
 import Fornecedor from "../models/Fornecedor.js";
 import Pessoa from "../models/Pessoa.js";
 
 export default class FornecedorController {
   static async findAllFornecedors(req: Request, res: Response) {
+    let consulta: any = {
+      pageCount: Number(req.query.pageCount) || 10,
+      page: Number(req.query.page) || 0,
+      searchValue: req.query.searchValue,
+    };
+
     try {
-      const fornecedores = (await Fornecedor.findAll({
-        include: [Pessoa],
+      let resultado: { fornecedores: Fornecedor[]; totalRecords: Number } = {
+        fornecedores: [],
+        totalRecords: 0,
+      };
+      let queryWhere: any = {
+        [Op.or]: [
+          { nome: { [Op.like]: "%" + consulta.searchValue + "%" } },
+          { cnpj_cpf: { [Op.like]: "%" + consulta.searchValue + "%" } },
+          { telefone: { [Op.like]: "%" + consulta.searchValue + "%" } },
+        ],
+      };
+
+      resultado.fornecedores = await Fornecedor.findAll({
+        limit: consulta.pageCount,
+        offset: consulta.pageCount * consulta.page,
+        include: [{ model: Pessoa, required: true, where: queryWhere }],
         attributes: { exclude: ["id_pessoa"] },
-      }));
-      return res.status(200).json(fornecedores);
+      });
+
+      resultado.totalRecords = await Fornecedor.count({
+        include: [{ model: Pessoa, required: true, where: queryWhere }],
+        attributes: { exclude: ["id_pessoa"] },
+      });
+      
+      return res.status(200).json(resultado);
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);
@@ -19,11 +46,11 @@ export default class FornecedorController {
   static async findOneFornecedor(req: Request, res: Response) {
     const { id } = req.params;
     try {
-      const fornecedor = (await Fornecedor.findOne({
+      const fornecedor = await Fornecedor.findOne({
         where: { id: Number(id) },
         include: [Pessoa],
         attributes: { exclude: ["id_pessoa"] },
-      }));
+      });
       return res.status(200).json(fornecedor);
     } catch (error: any) {
       console.log(error);
@@ -38,9 +65,7 @@ export default class FornecedorController {
       delete fornecedor.pessoa;
     }
     try {
-      const fornecedorCreated = (await Fornecedor.create(
-        fornecedor
-      ));
+      const fornecedorCreated = await Fornecedor.create(fornecedor);
       return res.status(201).json(fornecedorCreated);
     } catch (error: any) {
       console.log(error);
@@ -58,9 +83,9 @@ export default class FornecedorController {
     delete fornecedor.id;
     try {
       await Fornecedor.update(fornecedor, { where: { id: Number(id) } });
-      const fornecedorUpdated = (await Fornecedor.findOne({
+      const fornecedorUpdated = await Fornecedor.findOne({
         where: { id: Number(id) },
-      }));
+      });
       return res.status(202).json(fornecedorUpdated);
     } catch (error: any) {
       console.log(error);

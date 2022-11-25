@@ -39,7 +39,7 @@ export default class UsuarioController {
       delete usuario.pessoa;
     }
     // let usuarioAuth = req.user;
-    // if(!usuarioAuth?.acesso?.admin){
+    // if(usuarioAuth.acesso && !usuarioAuth?.acesso?.admin){
     //   delete usuario.acesso
     // }
     try {
@@ -62,9 +62,9 @@ export default class UsuarioController {
       delete usuario.pessoa;
     }
     let usuarioAuth: any = req.user;
-    if(!usuarioAuth.acesso.admin){
-      delete usuario.acesso
-    }
+    // if(usuarioAuth.acesso && !usuarioAuth.acesso.admin){
+    //   delete usuario.acesso
+    // }
     delete usuario.id;
     try {
       if (usuario.senha) {

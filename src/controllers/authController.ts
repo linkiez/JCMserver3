@@ -41,9 +41,11 @@ export class Authentication {
 
   static async login(req: Request, res: Response) {
     const { email, senha } = req.body;
-    let usuario = await Usuario.findOne({ where: { email: email },
+    let usuario = await Usuario.findOne({
+      where: { email: email },
       include: [Pessoa],
-      attributes: { exclude: ["acesso", "id_pessoa"] } });
+      attributes: { exclude: ["acesso", "id_pessoa"] },
+    });
 
     if (usuario) {
       const verificaSenha = await bcrypt.compare(senha, usuario.senha!);
@@ -56,7 +58,7 @@ export class Authentication {
           accessToken: accessToken,
           refreshToken: refreshToken,
         });
-      }else {
+      } else {
         res.status(401).json({ message: "Email ou senha incorreto!" });
       }
     } else {
@@ -83,7 +85,11 @@ export class Authentication {
   static verificaAcesso = (acesso: any) => {
     return (req: Request, res: Response, next: any) => {
       let usuario: any = req.user;
-      if (usuario["acesso"] != null && usuario["acesso"][acesso[0]][acesso[1]]) {
+      if (
+        usuario["acesso"] &&
+        usuario["acesso"][acesso[0]] &&
+        usuario["acesso"][acesso[0]][acesso[1]]
+      ) {
         next();
       } else {
         return res

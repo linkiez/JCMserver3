@@ -13,4 +13,4 @@ docker run -d -p 6379:6379 -v <data-dir>:/data --name redis dockerfile/redis
 Run redis-server with persistent data directory and password.
 docker run -d -p 6379:6379 -v <data-dir>:/data --name redis dockerfile/redis redis-server /etc/redis/redis.conf --requirepass <password>
 
-docker run -p 6379:6379 -v host:/data --name redis -d redis redis-server --appendonly yes  --requirepass "__@picker-redis"
+docker run -p 6379:6379 -v host:/data --name redis -d redis redis-server --appendonly yes  --requirepass "__@picker-redis" --restart unless-stopped

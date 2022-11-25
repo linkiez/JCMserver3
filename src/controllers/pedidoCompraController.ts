@@ -152,13 +152,13 @@ export default class PedidoCompraController {
     try {
       let pedidoCompra = req.body;
 
-      if (pedidoCompra.Fornecedor) {
-        pedidoCompra.id_fornecedor = pedidoCompra.Fornecedor.id;
-        delete pedidoCompra.Fornecedor;
+      if (pedidoCompra.fornecedor) {
+        pedidoCompra.id_fornecedor = pedidoCompra.fornecedor.id;
+        delete pedidoCompra.fornecedor;
       }
 
-      let pedidoCompraItem = pedidoCompra.PedidoCompraItem;
-      delete pedidoCompra.PedidoCompraItem;
+      let pedidoCompraItem = pedidoCompra.pedido_compra_items;
+      delete pedidoCompra.pedido_compra_items;
 
       pedidoCompra.data_emissao = new Date();
 
@@ -168,8 +168,8 @@ export default class PedidoCompraController {
         pedidoCompraItem.map(async (item: any) => {
           item.id_pedido = pedidoCompraCreated.id;
 
-          item.id_produto = item.Produto!.id;
-          delete item.Produto;
+          item.id_produto = item.produto!.id;
+          delete item.produto;
 
           let itemCreated = await PedidoCompraItem.create(item);
           return itemCreated;
@@ -221,12 +221,12 @@ export default class PedidoCompraController {
     try {
       let pedidoCompra = req.body;
 
-      let pedidoCompraItem = pedidoCompra.PedidoCompraItem;
-      delete pedidoCompra.PedidoCompraItem;
+      let pedidoCompraItem = pedidoCompra.pedido_compra_items;
+      delete pedidoCompra.pedido_compra_items;
 
-      if (pedidoCompra.Fornecedor) {
-        pedidoCompra.id_fornecedor = pedidoCompra.Fornecedor.id;
-        delete pedidoCompra.Fornecedor;
+      if (pedidoCompra.fornecedor) {
+        pedidoCompra.id_fornecedor = pedidoCompra.fornecedor.id;
+        delete pedidoCompra.fornecedor;
       }
 
       await PedidoCompra.update(pedidoCompra, {
@@ -239,8 +239,8 @@ export default class PedidoCompraController {
       if (pedidoCompraItem) {
         pedidoCompraItem.forEach(async (item: any) => {
           item.id_pedido = Number(id);
-          item.id_produto = item.Produto!.id;
-          delete item.Produto;
+          item.id_produto = item.produto!.id;
+          delete item.produto;
           delete item.id;
 
           await PedidoCompraItem.create(item);

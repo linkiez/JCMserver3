@@ -12,31 +12,31 @@ router
   .post(
     "/pedidocompra",
     Authentication.verificaLogin,
-    Authentication.verificaAcesso(["pedidocompra", "create"]),
+    Authentication.verificaAcesso(["pedidoCompra", "create"]),
     PedidoCompraController.createPedidoCompra
   )
   .get(
     "/pedidocompra",
     // Authentication.verificaLogin,
-    // Authentication.verificaAcesso(["pedidocompra", "findAll"]),
+    // Authentication.verificaAcesso(["pedidoCompra", "findAll"]),
     PedidoCompraController.findAllPedidoCompra
   )
   .get(
     "/pedidocompra/:id",
     // Authentication.verificaLogin,
-    // Authentication.verificaAcesso(["pedidocompra", "findOne"]),
+    // Authentication.verificaAcesso(["pedidoCompra", "findOne"]),
     PedidoCompraController.findOnePedidoCompra
   )
   .delete(
     "/pedidocompra/:id",
     Authentication.verificaLogin,
-    Authentication.verificaAcesso(["pedidocompra", "destroy"]),
+    Authentication.verificaAcesso(["pedidoCompra", "destroy"]),
     PedidoCompraController.destroyPedidoCompra
   )
   .put(
     "/pedidocompra/:id",
     Authentication.verificaLogin,
-    Authentication.verificaAcesso(["pedidocompra", "update"]),
+    Authentication.verificaAcesso(["pedidoCompra", "update"]),
     PedidoCompraController.updatePedidoCompra
   );
 
