@@ -27,7 +27,7 @@ export default class FornecedorController {
       resultado.fornecedores = await Fornecedor.findAll({
         limit: consulta.pageCount,
         offset: consulta.pageCount * consulta.page,
-        include: [{ model: Pessoa, required: true, where: queryWhere }],
+        include: [{ model: Pessoa, required: true, where: queryWhere, order: [['nome', 'ASC']] }],
         attributes: { exclude: ["id_pessoa"] },
       });
 

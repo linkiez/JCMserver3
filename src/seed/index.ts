@@ -11,8 +11,6 @@ export function seed(){
 
 export function seedListas(){
     listasGenericas.map(async(lista: any)=> {
-        const transaction = await sequelize.transaction();
-
         let listaGenericaItem = lista.lista_generica_items;
 
         delete lista.lista_generica_items
@@ -29,7 +27,6 @@ export function seedListas(){
                 });
               }
         } catch (error: any) {
-            await transaction.rollback();
             console.log(error);
         }
     })

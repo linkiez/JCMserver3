@@ -1,5 +1,15 @@
 export const listasGenericas = [
   {
+    nome: "statusPedidoCompra",
+    lista_generica_items: [
+      { valor: 'Orçamento'},
+      { valor: 'Aprovado'},
+      { valor: 'Cancelado'},
+      { valor: 'Entregue'},
+      { valor: 'Entregue Parcial'}
+    ]
+  },
+  {
     nome: "categoriaProduto",
     lista_generica_items: [
       { valor: "Chapa" },
@@ -55,4 +65,5 @@ export const listasGenericas = [
       { valor: "Cheques Terceiro" },
     ],
   },
+  
 ];
