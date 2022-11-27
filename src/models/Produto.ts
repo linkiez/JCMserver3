@@ -16,9 +16,9 @@ export default class Produto extends Model {
 
   static associate() {
     // define association here
-    Produto.hasOne(PedidoCompraItem, { foreignKey: "id_produto" });
-    Produto.hasOne(RegistroInspecaoRecebimento, { foreignKey: "id_produto" });
-    Produto.hasOne(OrdemProducaoItem, { foreignKey: "id_produto" })
+    Produto.hasMany(PedidoCompraItem, { foreignKey: "id_produto" });
+    Produto.hasMany(RegistroInspecaoRecebimento, { foreignKey: "id_produto" });
+    Produto.hasMany(OrdemProducaoItem, { foreignKey: "id_produto" })
   }
 }
 Produto.init(

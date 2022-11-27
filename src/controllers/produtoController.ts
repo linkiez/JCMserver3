@@ -1,6 +1,9 @@
 import Produto from "../models/Produto.js";
 import { Request, Response } from "express";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
+import PedidoCompraItem from "../models/PedidoCompraItem.js";
+import * as lodash from "lodash";
+import PedidoCompra from "../models/PedidoCompra.js";
 
 export default class ProdutosController {
   static async findAllProdutos(req: Request, res: Response) {
@@ -8,7 +11,7 @@ export default class ProdutosController {
       let consulta: any = {
         pageCount: Number(req.query.pageCount) || 10,
         page: Number(req.query.page) || 0,
-        searchValue: req.query.searchValue,
+        searchValue: req.query.searchValue || "",
       };
 
       let resultado: { produtos: Produto[]; totalRecords: Number } = {
@@ -20,7 +23,7 @@ export default class ProdutosController {
         [Op.or]: [
           { nome: { [Op.like]: "%" + consulta.searchValue + "%" } },
           { espessura: { [Op.like]: "%" + consulta.searchValue + "%" } },
-        ]
+        ],
       };
       if (req.query.deleted === "true")
         queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
@@ -29,15 +32,43 @@ export default class ProdutosController {
         limit: consulta.pageCount,
         offset: consulta.pageCount * consulta.page,
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
-        paranoid: req.query.deleted==='true'?false:true
+        paranoid: req.query.deleted === "true" ? false : true,
+        attributes: ["id", "nome"],
+        include: [
+          {
+            model: PedidoCompraItem,
+            attributes: {
+              include: [
+                [Sequelize.literal("(preco*(ipi+1))"), "precoComIpi"],
+                // [Sequelize.fn('max', Sequelize.col('pedido_compra_item.updatedAt')), 'atualizado']
+              ],
+            },
+            order: [["updatedAt", "DESC"]],
+            // limit: 1,
+            separate: true,
+            include: [
+              {
+                model: PedidoCompra,
+                required: true,
+                where: {
+                  status: {
+                    [Op.and]: [
+                      { [Op.not]: "Cancelado" },
+                      { [Op.not]: "Orçamento" },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        ],
       });
 
       resultado.totalRecords = await Produto.count({
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
-        paranoid: req.query.deleted==='true'?false:true
+        paranoid: req.query.deleted === "true" ? false : true,
       });
 
-     
       return res.status(200).json(resultado);
     } catch (error: any) {
       console.log(error);

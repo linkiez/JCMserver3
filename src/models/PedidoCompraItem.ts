@@ -17,7 +17,7 @@ export default class PedidoCompraItem extends Model {
   declare createdAt: Date;
   declare id_pedido: number;
   declare id_produto: number;
-  declare Produto: Produto;
+  declare produto: Produto;
 
   static associate() {
     // define association here
