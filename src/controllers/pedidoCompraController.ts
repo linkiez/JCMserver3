@@ -30,7 +30,7 @@ export default class PedidoCompraController {
           let produto = await Produto.findOne({
             where: { nome: item.produto },
           });
-          if(produto){
+          if (produto) {
             item.id_produto = produto.id;
           }
           delete item.produto;
@@ -123,22 +123,6 @@ export default class PedidoCompraController {
         ],
       });
 
-      let pedidoCompraItem = await PedidoCompraItem.findAll({
-        where: { id_pedido: Number(id) },
-      });
-
-      let total = 0;
-
-      pedidoCompraItem.forEach((pedidoItem) => {
-        total =
-          total +
-          Number(pedidoItem.peso) *
-            Number(pedidoItem.preco) *
-            (1 + Number(pedidoItem.ipi));
-      });
-
-      pedidoCompra!.total = total;
-
       return res.status(200).json(pedidoCompra);
     } catch (error: any) {
       console.log(error);
@@ -147,7 +131,7 @@ export default class PedidoCompraController {
   }
 
   static async createPedidoCompra(req: Request, res: Response) {
-    const t = await sequelize.transaction();
+    const transaction = await sequelize.transaction();
 
     try {
       let pedidoCompra = req.body;
@@ -162,7 +146,9 @@ export default class PedidoCompraController {
 
       pedidoCompra.data_emissao = new Date();
 
-      let pedidoCompraCreated = await PedidoCompra.create(pedidoCompra);
+      let pedidoCompraCreated = await PedidoCompra.create(pedidoCompra, {
+        transaction: transaction,
+      });
 
       if (pedidoCompraItem) {
         pedidoCompraItem.map(async (item: any) => {
@@ -171,21 +157,29 @@ export default class PedidoCompraController {
           item.id_produto = item.produto!.id;
           delete item.produto;
 
-          let itemCreated = await PedidoCompraItem.create(item);
+          let itemCreated = await PedidoCompraItem.create(item, {
+            transaction: transaction,
+          });
           return itemCreated;
         });
       }
 
-      await t.commit();
+      await transaction.commit();
 
       const pedidoCompraCreated2 = await PedidoCompra.findOne({
-        where: { id: pedidoCompraCreated.id },
-        include: [Fornecedor, { model: PedidoCompraItem, include: [Produto] }],
+        where: { id: Number(pedidoCompraCreated.id) },
+        include: [
+          {
+            model: Fornecedor,
+            include: [{ model: Pessoa, include: [Contato] }],
+          },
+          { model: PedidoCompraItem, include: [Produto] },
+        ],
       });
 
       return res.status(201).json(pedidoCompraCreated2);
     } catch (error: any) {
-      await t.rollback();
+      await transaction.rollback();
       console.log(error);
       return res.status(500).json(error.message);
     }
@@ -216,7 +210,7 @@ export default class PedidoCompraController {
 
     const { id } = req.params;
 
-    const t = await sequelize.transaction();
+    const transaction = await sequelize.transaction();
 
     try {
       let pedidoCompra = req.body;
@@ -230,11 +224,12 @@ export default class PedidoCompraController {
       }
 
       await PedidoCompra.update(pedidoCompra, {
-        where: { id: Number(id) },
+        where: { id: Number(id), transaction: transaction },
       });
 
       await PedidoCompraItem.destroy({
         where: { id_pedido: Number(id) },
+        transaction: transaction,
       });
       if (pedidoCompraItem) {
         pedidoCompraItem.forEach(async (item: any) => {
@@ -243,20 +238,26 @@ export default class PedidoCompraController {
           delete item.produto;
           delete item.id;
 
-          await PedidoCompraItem.create(item);
+          await PedidoCompraItem.create(item, { transaction: transaction });
         });
       }
 
-      await t.commit();
+      await transaction.commit();
 
       pedidoCompraUpdated = await PedidoCompra.findOne({
-        where: { id: id },
-        include: [Fornecedor, { model: PedidoCompraItem, include: [Produto] }],
+        where: { id: Number(id) },
+        include: [
+          {
+            model: Fornecedor,
+            include: [{ model: Pessoa, include: [Contato] }],
+          },
+          { model: PedidoCompraItem, include: [Produto] },
+        ],
       });
 
       return res.status(202).json(pedidoCompraUpdated);
     } catch (error: any) {
-      await t.rollback();
+      await transaction.rollback();
       console.log(error);
       return res.status(500).json(error.message);
     }
