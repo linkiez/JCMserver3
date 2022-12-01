@@ -7,6 +7,7 @@ import PedidoCompraItem from "../models/PedidoCompraItem.js";
 import Pessoa from "../models/Pessoa.js";
 import { Op, where } from "sequelize";
 import Contato from "../models/Contato.js";
+import File from "../models/File.js";
 
 export default class PedidoCompraController {
   static async importPedidoCompra(req: Request, res: Response) {
@@ -120,6 +121,7 @@ export default class PedidoCompraController {
             include: [{ model: Pessoa, include: [Contato] }],
           },
           { model: PedidoCompraItem, include: [Produto] },
+          File
         ],
       });
 

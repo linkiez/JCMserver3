@@ -2,6 +2,8 @@ import sequelize from "../config/connMySql.js";
 import { Model, DataTypes } from "sequelize";
 import PedidoCompraItem from "./PedidoCompraItem.js";
 import Fornecedor from "./Fornecedor.js";
+import File from "./File.js";
+
 
 export default class PedidoCompra extends Model {
   declare id: number;
@@ -19,6 +21,8 @@ export default class PedidoCompra extends Model {
   declare Fornecedor: Fornecedor;
   declare total: number;
   declare observacao: string;
+  declare files: Array<File>;
+
 
   static associate() {
     // define association here
@@ -27,6 +31,7 @@ export default class PedidoCompra extends Model {
       onDelete: "cascade",
     });
     PedidoCompra.belongsTo(Fornecedor, { foreignKey: "id_fornecedor" });
+    PedidoCompra.belongsToMany(File, { through: "pedido_compra_file" });
   }
 }
 PedidoCompra.init(

@@ -3,8 +3,9 @@ import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa.js";
 import OrcamentoItem from "./OrcamentoItem.js";
 import RegistroInspecaoRecebimento from "./RIR.js";
+import PedidoCompra from "./PedidoCompra.js";
 
-export default class file extends Model {
+export default class File extends Model {
   declare id: number
   declare url: string
   declare originalFilename: string
@@ -18,12 +19,13 @@ export default class file extends Model {
 
   static associate() {
     // define association here
-    file.belongsToMany(Pessoa, {through: 'pessoa_file'});
-    file.belongsToMany(OrcamentoItem, {through: 'orcamento_file'});
-    file.hasMany(RegistroInspecaoRecebimento, { foreignKey: 'id_file'})
+    File.belongsToMany(Pessoa, {through: 'pessoa_file'});
+    File.belongsToMany(OrcamentoItem, {through: 'orcamento_file'});
+    File.belongsToMany(RegistroInspecaoRecebimento, {through: 'registro_inspecao_recebimento_file'});
+    File.belongsToMany(PedidoCompra, {through: 'pedido_compra_file'});
   }
 }
-file.init(
+File.init(
   {
     id: {
       allowNull: false,

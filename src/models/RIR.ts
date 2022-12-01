@@ -26,15 +26,15 @@ export default class RegistroInspecaoRecebimento extends Model {
   declare pedido_compra_item: PedidoCompraItem;
   declare id_pedido_compra_item: number;
   declare observacoes: string;
-  declare file: FileDb;
-  declare id_file: number;
+  declare file: FileDb[];
 
   static associate() {
     RegistroInspecaoRecebimento.belongsTo(Produto, { foreignKey: 'id_produto'})
     RegistroInspecaoRecebimento.belongsTo(Pessoa, { foreignKey: "id_pessoa" })
     RegistroInspecaoRecebimento.belongsTo(Operador, { foreignKey: 'id_operador'})
     RegistroInspecaoRecebimento.belongsTo(PedidoCompraItem, { foreignKey: 'id_pedido_compra_item'})
-    RegistroInspecaoRecebimento.belongsTo(FileDb, { foreignKey: 'id_file'})
+    RegistroInspecaoRecebimento.belongsToMany(FileDb, { through: "registro_inspecao_recebimento_file" });
+
     RegistroInspecaoRecebimento.hasOne(OrdemProducaoItem, { foreignKey: 'id_rir'})
   }
 }

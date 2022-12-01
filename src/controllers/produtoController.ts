@@ -33,7 +33,6 @@ export default class ProdutosController {
         offset: consulta.pageCount * consulta.page,
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
         paranoid: req.query.deleted === "true" ? false : true,
-        attributes: ["id", "nome"],
         include: [
           {
             model: PedidoCompraItem,
