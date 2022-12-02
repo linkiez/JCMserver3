@@ -8,6 +8,7 @@ import Pessoa from "../models/Pessoa.js";
 import { Op, where } from "sequelize";
 import Contato from "../models/Contato.js";
 import File from "../models/File.js";
+import PedidoCompra_File from "../models/PedidoCompra_File.js";
 
 export default class PedidoCompraController {
   static async importPedidoCompra(req: Request, res: Response) {
@@ -225,39 +226,58 @@ export default class PedidoCompraController {
         delete pedidoCompra.fornecedor;
       }
 
-      await PedidoCompra.update(pedidoCompra, {
-        where: { id: Number(id), transaction: transaction },
-      });
+      let files: Array<File> = pedidoCompra.files;
+      delete pedidoCompra.files;
 
-      await PedidoCompraItem.destroy({
+      let fila: Promise<any>[] = [];
+
+      fila.push(PedidoCompra.update(pedidoCompra, {
+        where: { id: Number(id) },transaction: transaction
+      })) 
+
+      fila.push(PedidoCompraItem.destroy({
         where: { id_pedido: Number(id) },
         transaction: transaction,
+      }))
+      
+      files.forEach(async (file: File) => {
+        fila.push(
+          PedidoCompra_File.findOrCreate({
+            where: { pessoaId: id, fileId: file.id },
+            transaction: transaction,
+          })
+        );
       });
+
       if (pedidoCompraItem) {
-        pedidoCompraItem.forEach(async (item: any) => {
+        pedidoCompraItem.forEach((item: any) => {
           item.id_pedido = Number(id);
           item.id_produto = item.produto!.id;
           delete item.produto;
           delete item.id;
 
-          await PedidoCompraItem.create(item, { transaction: transaction });
+          fila.push(PedidoCompraItem.create(item, { transaction: transaction })) ;
         });
       }
 
-      await transaction.commit();
+      Promise.all(fila).then(async ()=> {
+        await transaction.commit();
+      
+        pedidoCompraUpdated = await PedidoCompra.findOne({
+          where: { id: Number(id) },
+          include: [
+            {
+              model: Fornecedor,
+              include: [{ model: Pessoa, include: [Contato] }],
+            },
+            { model: PedidoCompraItem, include: [Produto] },
+          ],
+        });
+  
+        return res.status(202).json(pedidoCompraUpdated);
+      
+      })
 
-      pedidoCompraUpdated = await PedidoCompra.findOne({
-        where: { id: Number(id) },
-        include: [
-          {
-            model: Fornecedor,
-            include: [{ model: Pessoa, include: [Contato] }],
-          },
-          { model: PedidoCompraItem, include: [Produto] },
-        ],
-      });
-
-      return res.status(202).json(pedidoCompraUpdated);
     } catch (error: any) {
       await transaction.rollback();
       console.log(error);
