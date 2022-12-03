@@ -1,8 +1,9 @@
 import sequelize from "../config/connMySql.js";
-import { Model, DataTypes, Op } from "sequelize";
+import { Model, DataTypes, Op, HasManySetAssociationsMixin } from "sequelize";
 import PedidoCompraItem from "./PedidoCompraItem.js";
 import RegistroInspecaoRecebimento from "./RIR.js";
 import OrdemProducaoItem from "./OrdemProducaoItem.js";
+import FileDb from "./File.js";
 
 export default class Produto extends Model {
   declare id: number;
@@ -13,12 +14,17 @@ export default class Produto extends Model {
   declare updatedAt: Date;
   declare createdAt: Date;
   declare deletedAt: Date;
+  declare files: Array<FileDb>;
+
+  declare setFiles: HasManySetAssociationsMixin<File, number>;
+
 
   static associate() {
     // define association here
     Produto.hasMany(PedidoCompraItem, { foreignKey: "id_produto" });
     Produto.hasMany(RegistroInspecaoRecebimento, { foreignKey: "id_produto" });
     Produto.hasMany(OrdemProducaoItem, { foreignKey: "id_produto" })
+    Produto.belongsToMany(FileDb, { through: "produto_file" });
   }
 }
 Produto.init(

@@ -44,7 +44,7 @@ export class Authentication {
     let usuario = await Usuario.findOne({
       where: { email: email },
       include: [Pessoa],
-      attributes: { exclude: ["acesso", "id_pessoa"] },
+      attributes: { exclude: ["id_pessoa"] },
     });
 
     if (usuario) {

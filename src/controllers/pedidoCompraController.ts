@@ -9,6 +9,8 @@ import { Op, where } from "sequelize";
 import Contato from "../models/Contato.js";
 import File from "../models/File.js";
 import PedidoCompra_File from "../models/PedidoCompra_File.js";
+import FileDb from "../models/File.js";
+
 
 export default class PedidoCompraController {
   static async importPedidoCompra(req: Request, res: Response) {
@@ -135,9 +137,13 @@ export default class PedidoCompraController {
 
   static async createPedidoCompra(req: Request, res: Response) {
     const transaction = await sequelize.transaction();
+    
 
     try {
       let pedidoCompra = req.body;
+
+      let files: Array<FileDb> = pedidoCompra.files;
+      delete pedidoCompra.files;
 
       if (pedidoCompra.fornecedor) {
         pedidoCompra.id_fornecedor = pedidoCompra.fornecedor.id;
@@ -165,6 +171,13 @@ export default class PedidoCompraController {
           });
           return itemCreated;
         });
+      }
+
+      if (files) {
+          await pedidoCompraCreated.setFiles(
+            files.map((item) => item.id),
+            { transaction: transaction }
+          )
       }
 
       await transaction.commit();
@@ -243,7 +256,7 @@ export default class PedidoCompraController {
       files.forEach(async (file: File) => {
         fila.push(
           PedidoCompra_File.findOrCreate({
-            where: { pessoaId: id, fileId: file.id },
+            where: { pedidoCompraId: id, fileId: file.id },
             transaction: transaction,
           })
         );

@@ -2,8 +2,11 @@ import Produto from "../models/Produto.js";
 import { Request, Response } from "express";
 import { Op, Sequelize } from "sequelize";
 import PedidoCompraItem from "../models/PedidoCompraItem.js";
-import * as lodash from "lodash";
 import PedidoCompra from "../models/PedidoCompra.js";
+import FileDb from "../models/File.js";
+import Produto_File from "../models/Produto_File.js";
+import sequelize from "../config/connMySql.js";
+
 
 export default class ProdutosController {
   static async findAllProdutos(req: Request, res: Response) {
@@ -80,6 +83,7 @@ export default class ProdutosController {
     try {
       const produto = await Produto.findOne({
         where: { id: Number(id) },
+        include: [FileDb]
       });
       return res.status(200).json(produto);
     } catch (error: any) {
@@ -103,8 +107,24 @@ export default class ProdutosController {
 
   static async createProduto(req: Request, res: Response) {
     const produto = req.body;
+    const transaction = await sequelize.transaction();
+
+
+    let files: Array<FileDb> = produto.files;
+    delete produto.files;
+
     try {
-      const produtoCreated = await Produto.create(produto);
+      const produtoCreated = await Produto.create(produto,  { transaction: transaction });
+
+      if (files) {
+        produtoCreated.setFiles(
+            files.map((item) => item.id),
+            { transaction: transaction }
+          )
+      }
+
+      await transaction.commit();
+
       return res.status(201).json(produtoCreated);
     } catch (error: any) {
       console.log(error);
@@ -114,10 +134,28 @@ export default class ProdutosController {
 
   static async updateProduto(req: Request, res: Response) {
     const { id } = req.params;
-    const produtoUpdate = req.body;
-    delete produtoUpdate.id;
+    const transaction = await sequelize.transaction();
+
+
+    const produto = req.body;
+    delete produto.id;
+
+    let files: Array<FileDb> = produto.files;
+    delete produto.files;
+  
+    if(files)
+    files.forEach(async (file: FileDb) => {
+        await Produto_File.findOrCreate({
+          where: { produtoId: id, fileId: file.id },
+          transaction: transaction,
+        })
+    });
+
     try {
-      await Produto.update(produtoUpdate, { where: { id: Number(id) } });
+      await Produto.update(produto, { where: { id: Number(id) },transaction: transaction, });
+
+      await transaction.commit();
+
       const produtoUpdated = await Produto.findOne({
         where: { id: Number(id) },
       });

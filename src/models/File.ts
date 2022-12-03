@@ -4,6 +4,7 @@ import Pessoa from "./Pessoa.js";
 import OrcamentoItem from "./OrcamentoItem.js";
 import RegistroInspecaoRecebimento from "./RIR.js";
 import PedidoCompra from "./PedidoCompra.js";
+import Produto from "./Produto.js";
 
 export default class File extends Model {
   declare id: number
@@ -23,6 +24,7 @@ export default class File extends Model {
     File.belongsToMany(OrcamentoItem, {through: 'orcamento_file'});
     File.belongsToMany(RegistroInspecaoRecebimento, {through: 'registro_inspecao_recebimento_file'});
     File.belongsToMany(PedidoCompra, {through: 'pedido_compra_file'});
+    File.belongsToMany(Produto, {through: 'produto_file'});
   }
 }
 File.init(

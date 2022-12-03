@@ -1,5 +1,5 @@
 import sequelize from "../config/connMySql.js";
-import { Model, DataTypes } from "sequelize";
+import { Model, DataTypes, HasManySetAssociationsMixin } from "sequelize";
 import PedidoCompraItem from "./PedidoCompraItem.js";
 import Fornecedor from "./Fornecedor.js";
 import File from "./File.js";
@@ -23,6 +23,7 @@ export default class PedidoCompra extends Model {
   declare observacao: string;
   declare files: Array<File>;
 
+  declare setFiles: HasManySetAssociationsMixin<File, number>;
 
   static associate() {
     // define association here
