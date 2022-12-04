@@ -37,7 +37,7 @@ export default class OrcamentoItem extends Model {
   declare deletedAt: Date;
   declare updatedAt: Date;
   declare createdAt: Date;
-  declare files: Array<File>;
+  declare files: File[];
   
   declare getFiles: HasManyGetAssociationsMixin<File>; //
   declare addFile: HasManyAddAssociationMixin<File, number>;

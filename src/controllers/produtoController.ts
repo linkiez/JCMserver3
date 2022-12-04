@@ -7,7 +7,6 @@ import FileDb from "../models/File.js";
 import Produto_File from "../models/Produto_File.js";
 import sequelize from "../config/connMySql.js";
 
-
 export default class ProdutosController {
   static async findAllProdutos(req: Request, res: Response) {
     try {
@@ -83,7 +82,7 @@ export default class ProdutosController {
     try {
       const produto = await Produto.findOne({
         where: { id: Number(id) },
-        include: [FileDb]
+        include: [FileDb],
       });
       return res.status(200).json(produto);
     } catch (error: any) {
@@ -106,26 +105,38 @@ export default class ProdutosController {
   }
 
   static async createProduto(req: Request, res: Response) {
-    const produto = req.body;
-    const transaction = await sequelize.transaction();
-
-
-    let files: Array<FileDb> = produto.files;
-    delete produto.files;
-
     try {
-      const produtoCreated = await Produto.create(produto,  { transaction: transaction });
+      const produto = req.body;
+      const transaction = await sequelize.transaction();
+
+      let files: Array<FileDb> = produto.files;
+      delete produto.files;
+
+      let fila: Promise<any>[] = [];
+
+      const produtoCreated = await Produto.create(produto, {
+        transaction: transaction,
+      });
 
       if (files) {
-        produtoCreated.setFiles(
+        fila.push(
+          produtoCreated.setFiles(
             files.map((item) => item.id),
             { transaction: transaction }
           )
+        );
       }
 
-      await transaction.commit();
+      Promise.all(fila).then(async () => {
+        await transaction.commit();
 
-      return res.status(201).json(produtoCreated);
+        const produtoCreated2 = await Produto.findOne({
+          where: { id: Number(produtoCreated.id) },
+          include: [FileDb]
+        });
+
+        return res.status(201).json(produtoCreated2);
+      });
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);
@@ -136,23 +147,25 @@ export default class ProdutosController {
     const { id } = req.params;
     const transaction = await sequelize.transaction();
 
-
     const produto = req.body;
     delete produto.id;
 
     let files: Array<FileDb> = produto.files;
     delete produto.files;
-  
-    if(files)
-    files.forEach(async (file: FileDb) => {
+
+    if (files)
+      files.forEach(async (file: FileDb) => {
         await Produto_File.findOrCreate({
           where: { produtoId: id, fileId: file.id },
           transaction: transaction,
-        })
-    });
+        });
+      });
 
     try {
-      await Produto.update(produto, { where: { id: Number(id) },transaction: transaction, });
+      await Produto.update(produto, {
+        where: { id: Number(id) },
+        transaction: transaction,
+      });
 
       await transaction.commit();
 

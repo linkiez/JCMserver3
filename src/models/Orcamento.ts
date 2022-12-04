@@ -30,7 +30,7 @@ export default class Orcamento extends Model {
   declare id_vendedor: number;
   declare prazo_emdias: number;
   declare prazo_data: Date;
-  declare aprovado: boolean;
+  declare status: string;
   declare aprovacao: string;
   declare pc_cliente: string;
   declare deletedAt: Date;
@@ -81,7 +81,7 @@ Orcamento.init(
     },
     prazo_emdias: DataTypes.INTEGER,
     prazo_data: DataTypes.DATE,
-    aprovado: DataTypes.BOOLEAN,
+    status: DataTypes.STRING,
     aprovacao: DataTypes.STRING,
     pc_cliente: DataTypes.STRING,
     cond_pag: DataTypes.STRING,
