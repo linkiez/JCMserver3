@@ -1,5 +1,29 @@
 export const listasGenericas = [
   {
+    nome: "processos",
+    lista_generica_items: [
+      {valor: 'Serviço de Terceiro'},
+      {valor: 'Guilhotina'},
+      {valor: 'Plasma'},
+      {valor: 'Laser'},
+      {valor: 'Dobra'},
+      {valor: 'Punção'},
+      {valor: 'Prensa'},
+      {valor: 'Calandra'},
+      {valor: 'Furadeira'},
+      {valor: 'Metaleira'},
+    ]
+  },
+  {
+    nome: "statusOrcamento",
+    lista_generica_items: [
+      {valor: 'Orçamento'},
+      {valor: 'Aprovado'},
+      {valor: 'Recusado'},
+      {valor: 'Venda'},
+    ]
+  },
+  {
     nome: "statusPedidoCompra",
     lista_generica_items: [
       { valor: 'Orçamento'},

@@ -2,11 +2,14 @@ import { listasGenericas } from "./listas.js";
 import sequelize from "../config/connMySql.js";
 import ListaGenerica from "../models/ListaGenerica.js";
 import ListaGenericaItem from "../models/ListaGenericaItem.js";
-
+import {usuario} from "./usuario.js"
+import Usuario from "../models/Usuario.js";
+import { Authentication } from "../controllers/authController.js";
 
 
 export function seed(){
     seedListas();
+    seedUsuario();
 }
 
 export function seedListas(){
@@ -30,4 +33,11 @@ export function seedListas(){
             console.log(error);
         }
     })
+}
+
+export async function seedUsuario() {
+    if (Authentication.validaSenhaNova(usuario.senha)) {
+      usuario.senha = await Authentication.gerarSenhaHash(usuario.senha);
+      const usuarioCreated = await Usuario.findOrCreate({where: usuario});
+    }
 }

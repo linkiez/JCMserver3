@@ -1,11 +1,42 @@
 import { Request, Response } from "express";
 import Contato from "../models/Contato.js";
+import { Op } from "sequelize";
 
 export default class ContatoController {
   static async findAllContatos(req: Request, res: Response) {
     try {
-      const contatos = await Contato.findAll() as Array<Contato>;
-      return res.status(200).json(contatos);
+      let consulta: any = {
+      pageCount: Number(req.query.pageCount) || 10,
+      page: Number(req.query.page) || 0,
+      searchValue: req.query.searchValue,
+    };
+      let resultado: { contatos: Contato[]; totalRecords: Number } = {
+        contatos: [],
+        totalRecords: 0,
+      };
+
+      let queryWhere: any = {
+        [Op.or]: [
+          { nome: { [Op.like]: "%" + consulta.searchValue + "%" } },
+          { valor: { [Op.like]: "%" + consulta.searchValue + "%" } }
+        ],
+      };
+
+      if(req.query.deleted==='true') queryWhere = {...queryWhere, deletedAt: {[Op.not]: null}}
+
+      resultado.contatos = await Contato.findAll({
+        limit: consulta.pageCount,
+        offset: consulta.pageCount * consulta.page,
+        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
+        paranoid: req.query.deleted==='true'?false:true
+      });
+
+      resultado.totalRecords = await Contato.count({
+        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
+        paranoid: req.query.deleted==='true'?false:true
+      });
+      
+      return res.status(200).json(resultado);
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);

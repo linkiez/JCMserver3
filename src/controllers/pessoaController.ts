@@ -12,12 +12,13 @@ import Operador from "../models/Operador.js";
 
 export default class PessoaController {
   static async findAllPessoas(req: Request, res: Response) {
-    let consulta: any = {
-      pageCount: Number(req.query.pageCount) || 10,
-      page: Number(req.query.page) || 0,
-      searchValue: req.query.searchValue,
-    };
     try {
+      let consulta: any = {
+        pageCount: Number(req.query.pageCount) || 10,
+        page: Number(req.query.page) || 0,
+        searchValue: req.query.searchValue,
+      };
+
       let resultado: { pessoas: Pessoa[]; totalRecords: Number } = {
         pessoas: [],
         totalRecords: 0,

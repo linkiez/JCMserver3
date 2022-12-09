@@ -30,6 +30,7 @@ export default class OrcamentoItem extends Model {
   declare largura: number;
   declare altura: number;
   declare quantidade: number;
+  declare imposto: number;
   declare preco_quilo: number;
   declare tempo: string;
   declare preco_hora: number;
@@ -38,6 +39,7 @@ export default class OrcamentoItem extends Model {
   declare updatedAt: Date;
   declare createdAt: Date;
   declare files: File[];
+  declare total: number;
   
   declare getFiles: HasManyGetAssociationsMixin<File>; //
   declare addFile: HasManyAddAssociationMixin<File, number>;
@@ -68,10 +70,16 @@ OrcamentoItem.init(
     largura: DataTypes.DECIMAL(13, 2),
     altura: DataTypes.DECIMAL(13, 2),
     quantidade: DataTypes.DECIMAL(13, 2),
+    imposto: DataTypes.DECIMAL(5, 2),
     preco_quilo: DataTypes.DECIMAL(13, 2),
     tempo: DataTypes.STRING,
     preco_hora: DataTypes.DECIMAL(13, 2),
     total_manual: DataTypes.DECIMAL(13, 2),
+    total_peso: DataTypes.DECIMAL(13, 2),
+    total_hora: DataTypes.DECIMAL(13, 2),
+    total: DataTypes.DECIMAL(13, 2),
+    peso: DataTypes.FLOAT,
+    custo: DataTypes.DECIMAL(13, 2),
   },
   {
     sequelize,
