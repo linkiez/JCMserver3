@@ -38,6 +38,6 @@ export function seedListas(){
 export async function seedUsuario() {
     if (Authentication.validaSenhaNova(usuario.senha)) {
       usuario.senha = await Authentication.gerarSenhaHash(usuario.senha);
-      const usuarioCreated = await Usuario.findOrCreate({where: usuario});
+      const usuarioCreated = await Usuario.findOrCreate({where: {email: usuario.email}, defaults: usuario});
     }
 }

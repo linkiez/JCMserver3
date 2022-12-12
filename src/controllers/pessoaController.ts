@@ -123,10 +123,10 @@ export default class PessoaController {
         contatos = contatos.filter(
           (contato: Contato) => contato.valor != undefined
         );
-      }
-
-      if (contatos) {
-        let contatosCreated = contatos.map(async (contato: any) => {
+      
+        let contatosCreated = contatos.map(async (contato: Contato) => {
+          if (contato.tipo == 'Telefone' || contato.tipo == 'WhatsApp')
+          contato.valor = Number(contato.valor.toString().replace(/\D/g, ''))
           if (contato.id) {
             return contato;
           } else {
@@ -137,7 +137,7 @@ export default class PessoaController {
             if (contatoFind) {
               return contatoFind;
             } else {
-              return Contato.create(contato, { transaction: transaction });
+              return Contato.create(contato as any, { transaction: transaction });
             }
           }
         });
