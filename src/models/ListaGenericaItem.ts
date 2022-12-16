@@ -23,7 +23,7 @@ ListaGenericaItem.init(
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
-    valor: DataTypes.STRING,
+    valor: DataTypes.TEXT,
     deletedAt: DataTypes.DATE,
   },
   {
