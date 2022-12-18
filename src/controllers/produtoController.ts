@@ -82,7 +82,35 @@ export default class ProdutosController {
     try {
       const produto = await Produto.findOne({
         where: { id: Number(id) },
-        include: [FileDb],
+        include: [
+          FileDb,
+          {
+            model: PedidoCompraItem,
+            attributes: {
+              include: [
+                [Sequelize.literal("(preco*(ipi+1))"), "precoComIpi"],
+                // [Sequelize.fn('max', Sequelize.col('pedido_compra_item.updatedAt')), 'atualizado']
+              ],
+            },
+            order: [["updatedAt", "DESC"]],
+            // limit: 1,
+            separate: true,
+            include: [
+              {
+                model: PedidoCompra,
+                required: true,
+                where: {
+                  status: {
+                    [Op.and]: [
+                      { [Op.not]: "Cancelado" },
+                      { [Op.not]: "Orçamento" },
+                    ],
+                  },
+                },
+              },
+            ],
+          },
+        ],
       });
       return res.status(200).json(produto);
     } catch (error: any) {
@@ -132,7 +160,7 @@ export default class ProdutosController {
 
         const produtoCreated2 = await Produto.findOne({
           where: { id: Number(produtoCreated.id) },
-          include: [FileDb]
+          include: [FileDb],
         });
 
         return res.status(201).json(produtoCreated2);
