@@ -93,7 +93,7 @@ export default class ProdutosController {
               ],
             },
             order: [["updatedAt", "DESC"]],
-            // limit: 1,
+            limit: 5,
             separate: true,
             include: [
               {
