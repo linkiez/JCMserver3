@@ -1,15 +1,15 @@
-import sequelize from "../config/connMySql.js";
+import sequelize from "../config/connMySql";
 import { Request, Response } from "express";
-import Fornecedor from "../models/Fornecedor.js";
-import Produto from "../models/Produto.js";
-import PedidoCompra from "../models/PedidoCompra.js";
-import PedidoCompraItem from "../models/PedidoCompraItem.js";
-import Pessoa from "../models/Pessoa.js";
+import Fornecedor from "../models/Fornecedor";
+import Produto from "../models/Produto";
+import PedidoCompra from "../models/PedidoCompra";
+import PedidoCompraItem from "../models/PedidoCompraItem";
+import Pessoa from "../models/Pessoa";
 import { Op, where } from "sequelize";
-import Contato from "../models/Contato.js";
-import File from "../models/File.js";
-import PedidoCompra_File from "../models/PedidoCompra_File.js";
-import FileDb from "../models/File.js";
+import Contato from "../models/Contato";
+import File from "../models/File";
+import PedidoCompra_File from "../models/PedidoCompra_File";
+import FileDb from "../models/File";
 
 
 export default class PedidoCompraController {

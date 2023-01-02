@@ -1,10 +1,10 @@
-import sequelize from "../config/connMySql.js";
+import sequelize from "../config/connMySql";
 import { Request, Response } from "express";
-import OrdemProducao from "../models/OrdemProducao.js";
-import OrdemProducaoItem from "../models/OrdemProducaoItem.js";
-import OrdemProducaoItemProcesso from "../models/OrdemProducaoItemProcesso.js";
-import Vendedor from "../models/Vendedor.js";
-import FileDb from "../models/File.js";
+import OrdemProducao from "../models/OrdemProducao";
+import OrdemProducaoItem from "../models/OrdemProducaoItem";
+import OrdemProducaoItemProcesso from "../models/OrdemProducaoItemProcesso";
+import Vendedor from "../models/Vendedor";
+import FileDb from "../models/File";
 
 export default class OrdemProducaoController {
   static async findAllOrdemProducao(req: Request, res: Response) {

@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import Operador from "../models/Operador.js";
-import Pessoa from "../models/Pessoa.js";
-import Produto from "../models/Produto.js";
-import RIR from "../models/RIR.js";
-import FileDb from "../models/File.js";
-import PedidoCompraItem from "../models/PedidoCompraItem.js";
+import Operador from "../models/Operador";
+import Pessoa from "../models/Pessoa";
+import Produto from "../models/Produto";
+import RIR from "../models/RIR";
+import FileDb from "../models/File";
+import PedidoCompraItem from "../models/PedidoCompraItem";
 
 export default class RIRController {
   static async findAllRIRs(req: Request, res: Response) {

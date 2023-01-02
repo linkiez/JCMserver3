@@ -1,14 +1,14 @@
 import { Op } from "sequelize";
 import { Request, Response } from "express";
-import Contato from "../models/Contato.js";
-import Pessoa from "../models/Pessoa.js";
-import Pessoa_File from "../models/Pessoa_File.js";
-import FileDb from "../models/File.js";
-import Pessoa_Contato from "../models/Pessoa_Contato.js";
-import sequelize from "../config/connMySql.js";
-import Fornecedor from "../models/Fornecedor.js";
-import Vendedor from "../models/Vendedor.js";
-import Operador from "../models/Operador.js";
+import Contato from "../models/Contato";
+import Pessoa from "../models/Pessoa";
+import Pessoa_File from "../models/Pessoa_File";
+import FileDb from "../models/File";
+import Pessoa_Contato from "../models/Pessoa_Contato";
+import sequelize from "../config/connMySql";
+import Fornecedor from "../models/Fornecedor";
+import Vendedor from "../models/Vendedor";
+import Operador from "../models/Operador";
 
 export default class PessoaController {
   static async findAllPessoas(req: Request, res: Response) {

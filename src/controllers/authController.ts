@@ -1,13 +1,13 @@
 import bcrypt from "bcrypt";
 import passwordValidator from "password-validator";
 import jwt from "jsonwebtoken";
-import { InvalidArgumentError } from "../config/errors.js";
+import { InvalidArgumentError } from "../config/errors";
 import { Request, Response } from "express";
 import dotenv from "dotenv";
-import Usuario from "../models/Usuario.js";
-import TokenAccess from "../models/TokenAccess.js";
-import TokenRefresh from "../models/TokenRefresh.js";
-import Pessoa from "../models/Pessoa.js";
+import Usuario from "../models/Usuario";
+import TokenAccess from "../models/TokenAccess";
+import TokenRefresh from "../models/TokenRefresh";
+import Pessoa from "../models/Pessoa";
 dotenv.config();
 
 export class Authentication {

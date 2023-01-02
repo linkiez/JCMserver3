@@ -1,6 +1,6 @@
-import sequelize from "../config/connMySql.js";
+import sequelize from "../config/connMySql";
 import { Model, DataTypes, Op } from "sequelize";
-import ListaGenerica from "./ListaGenerica.js";
+import ListaGenerica from "./ListaGenerica";
 
 export default class ListaGenericaItem extends Model {
   declare id: number;

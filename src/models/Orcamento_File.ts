@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql.js";
+import sequelize from "../config/connMySql";
 import { Model } from "sequelize";
 
 export default class OrcamentoItem_File extends Model {

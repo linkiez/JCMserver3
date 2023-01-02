@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import Vendedor from "../models/Vendedor.js";
-import Pessoa from "../models/Pessoa.js";
+import Vendedor from "../models/Vendedor";
+import Pessoa from "../models/Pessoa";
 
 export default class VendedorController {
   static async findAllVendedors(req: Request, res: Response) {

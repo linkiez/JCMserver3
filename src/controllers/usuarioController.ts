@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import Usuario from "../models/Usuario.js";
-import Pessoa from "../models/Pessoa.js";
-import { Authentication } from "../controllers/authController.js";
+import Usuario from "../models/Usuario";
+import Pessoa from "../models/Pessoa";
+import { Authentication } from "../controllers/authController";
 
 export default class UsuarioController {
   static async findAllUsuarios(req: Request, res: Response) {

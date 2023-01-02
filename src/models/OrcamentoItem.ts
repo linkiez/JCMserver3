@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql.js";
+import sequelize from "../config/connMySql";
 import {
   Model,
   DataTypes,
@@ -14,9 +14,9 @@ import {
   HasManyCountAssociationsMixin,
   HasManyCreateAssociationMixin,
 } from "sequelize";
-import Orcamento from "./Orcamento.js";
-import Produto from "./Produto.js";
-import FileDb from "./File.js";
+import Orcamento from "./Orcamento";
+import Produto from "./Produto";
+import FileDb from "./File";
 
 export default class OrcamentoItem extends Model {
   declare id: number;

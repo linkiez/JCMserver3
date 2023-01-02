@@ -1,7 +1,7 @@
-import sequelize from "../config/connMySql.js";
+import sequelize from "../config/connMySql";
 import { Model, DataTypes, Op } from "sequelize";
-import Operador from "./Operador.js";
-import OrdemProducaoItem from "./OrdemProducaoItem.js";
+import Operador from "./Operador";
+import OrdemProducaoItem from "./OrdemProducaoItem";
 
 export default class OrdemProducaoItemProcesso extends Model {
     declare id: number;

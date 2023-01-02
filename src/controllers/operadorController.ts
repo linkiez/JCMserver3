@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import Operador from "../models/Operador.js";
-import Pessoa from "../models/Pessoa.js";
+import Operador from "../models/Operador";
+import Pessoa from "../models/Pessoa";
 
 export default class OperadorController {
   static async findAllOperadors(req: Request, res: Response) {

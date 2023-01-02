@@ -1,8 +1,8 @@
-import sequelize from "../config/connMySql.js";
+import sequelize from "../config/connMySql";
 import { Model, DataTypes, HasManySetAssociationsMixin } from "sequelize";
-import PedidoCompraItem from "./PedidoCompraItem.js";
-import Fornecedor from "./Fornecedor.js";
-import File from "./File.js";
+import PedidoCompraItem from "./PedidoCompraItem";
+import Fornecedor from "./Fornecedor";
+import File from "./File";
 
 
 export default class PedidoCompra extends Model {

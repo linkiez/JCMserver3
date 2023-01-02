@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Contato from "../models/Contato.js";
+import Contato from "../models/Contato";
 import { Op } from "sequelize";
 
 export default class ContatoController {

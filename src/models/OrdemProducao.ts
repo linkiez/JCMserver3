@@ -1,8 +1,8 @@
-import sequelize from "../config/connMySql.js";
+import sequelize from "../config/connMySql";
 import { Model, DataTypes, Op } from "sequelize";
-import Orcamento from "./Orcamento.js";
-import Vendedor from "./Vendedor.js";
-import OrdemProducaoItem from "./OrdemProducaoItem.js";
+import Orcamento from "./Orcamento";
+import Vendedor from "./Vendedor";
+import OrdemProducaoItem from "./OrdemProducaoItem";
 
 export default class OrdemProducao extends Model {
   declare id: number;

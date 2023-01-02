@@ -1,10 +1,10 @@
-import sequelize from "../config/connMySql.js";
+import sequelize from "../config/connMySql";
 import { Model, DataTypes, Op } from "sequelize";
-import Pessoa from "./Pessoa.js";
-import OrcamentoItem from "./OrcamentoItem.js";
-import RegistroInspecaoRecebimento from "./RIR.js";
-import PedidoCompra from "./PedidoCompra.js";
-import Produto from "./Produto.js";
+import Pessoa from "./Pessoa";
+import OrcamentoItem from "./OrcamentoItem";
+import RegistroInspecaoRecebimento from "./RIR";
+import PedidoCompra from "./PedidoCompra";
+import Produto from "./Produto";
 
 export default class File extends Model {
   declare id: number

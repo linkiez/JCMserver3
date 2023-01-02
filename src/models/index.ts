@@ -1,20 +1,20 @@
-import Pessoa from './Pessoa.js'
-import Contato from './Contato.js'
-import Produto from './Produto.js'
-import Fornecedor from './Fornecedor.js'
-import ListaGenerica from "./ListaGenerica.js";
-import ListaGenericaItem from "./ListaGenericaItem.js";
-import PedidoCompra from "./PedidoCompra.js";
-import PedidoCompraItem from "./PedidoCompraItem.js";
-import Usuario from './Usuario.js';
-import Vendedor from './Vendedor.js';
-import Orcamento from './Orcamento.js';
-import OrcamentoItem from './OrcamentoItem.js';
-import Operador from './Operador.js';
-import RegistroInspecaoRecebimento from './RIR.js'
-import OrdemProducao from './OrdemProducao.js';
-import OrdemProducaoItem from './OrdemProducaoItem.js';
-import OrdemProducaoItemProcesso from './OrdemProducaoItemProcesso.js';
+import Pessoa from './Pessoa'
+import Contato from './Contato'
+import Produto from './Produto'
+import Fornecedor from './Fornecedor'
+import ListaGenerica from "./ListaGenerica";
+import ListaGenericaItem from "./ListaGenericaItem";
+import PedidoCompra from "./PedidoCompra";
+import PedidoCompraItem from "./PedidoCompraItem";
+import Usuario from './Usuario';
+import Vendedor from './Vendedor';
+import Orcamento from './Orcamento';
+import OrcamentoItem from './OrcamentoItem';
+import Operador from './Operador';
+import RegistroInspecaoRecebimento from './RIR'
+import OrdemProducao from './OrdemProducao';
+import OrdemProducaoItem from './OrdemProducaoItem';
+import OrdemProducaoItemProcesso from './OrdemProducaoItemProcesso';
 
 export function models(): void {
   Pessoa.associate()

@@ -13,12 +13,23 @@ var config: Options = {
 
 if (process.env.NODE_ENV == "production") config.logging = false;
 
-const sequelize = new Sequelize(
-  config.database!,
-  config.username!,
-  config.password,
-  config
-);
+let sequelize: Sequelize;
+if (process.env.NODE_ENV == "test") {
+  sequelize = new Sequelize('sqlite::memory:', { logging: false });
+}else{
+  sequelize = new Sequelize(
+    config.database!,
+    config.username!,
+    config.password,
+    process.env.NODE_ENV != 'test' ? config : {
+      dialect: "sqlite",
+      storage: ":memory:",
+      logging: false
+    }
+  );
+}
+
+
 
 export default sequelize;
 

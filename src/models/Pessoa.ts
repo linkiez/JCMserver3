@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql.js";
+import sequelize from "../config/connMySql";
 import {
   Model,
   DataTypes,
@@ -14,14 +14,14 @@ import {
   HasManyCountAssociationsMixin,
   HasManyCreateAssociationMixin,
 } from "sequelize";
-import Contato from "./Contato.js";
-import Fornecedor from "./Fornecedor.js";
-import File from "./File.js";
-import Usuario from "./Usuario.js";
-import Vendedor from "./Vendedor.js";
-import Orcamento from "./Orcamento.js";
-import RegistroInspecaoRecebimento from "./RIR.js";
-import Operador from "./Operador.js";
+import Contato from "./Contato";
+import Fornecedor from "./Fornecedor";
+import File from "./File";
+import Usuario from "./Usuario";
+import Vendedor from "./Vendedor";
+import Orcamento from "./Orcamento";
+import RegistroInspecaoRecebimento from "./RIR";
+import Operador from "./Operador";
 
 export default class Pessoa extends Model {
   declare id: number;

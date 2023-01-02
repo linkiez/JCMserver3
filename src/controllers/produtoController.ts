@@ -1,11 +1,11 @@
-import Produto from "../models/Produto.js";
+import Produto from "../models/Produto";
 import { Request, Response } from "express";
 import { Op, Sequelize } from "sequelize";
-import PedidoCompraItem from "../models/PedidoCompraItem.js";
-import PedidoCompra from "../models/PedidoCompra.js";
-import FileDb from "../models/File.js";
-import Produto_File from "../models/Produto_File.js";
-import sequelize from "../config/connMySql.js";
+import PedidoCompraItem from "../models/PedidoCompraItem";
+import PedidoCompra from "../models/PedidoCompra";
+import FileDb from "../models/File";
+import Produto_File from "../models/Produto_File";
+import sequelize from "../config/connMySql";
 
 export default class ProdutosController {
   static async findAllProdutos(req: Request, res: Response) {

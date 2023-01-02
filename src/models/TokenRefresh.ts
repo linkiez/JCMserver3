@@ -1,7 +1,6 @@
-import { InvalidTokenError } from "../config/errors.js";
 import crypto from "crypto";
 import moment from "moment";
-import redis from "../config/connRedis.js";
+import redis from "../config/connRedis";
 
 export default class TokenRefresh {
   static async cria(id: any) {

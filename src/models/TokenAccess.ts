@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-import { InvalidTokenError } from "../config/errors.js";
-import Usuario from "./Usuario.js";
+import { InvalidTokenError } from "../config/errors";
+import Usuario from "./Usuario";
 import redis from '../config/connRedis.js'
 
 export default class TokenAccess {

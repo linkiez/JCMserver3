@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
-import sequelize from "../config/connMySql.js";
-import Orcamento from "../models/Orcamento.js";
-import OrcamentoItem from "../models/OrcamentoItem.js";
-import Orcamento_File from "../models/Orcamento_File.js";
-import FileDb from "../models/File.js";
-import Contato from "../models/Contato.js";
-import Pessoa from "../models/Pessoa.js";
-import Vendedor from "../models/Vendedor.js";
+import sequelize from "../config/connMySql";
+import Orcamento from "../models/Orcamento";
+import OrcamentoItem from "../models/OrcamentoItem";
+import FileDb from "../models/File";
+import Contato from "../models/Contato";
+import Pessoa from "../models/Pessoa";
+import Vendedor from "../models/Vendedor";
 
 export default class OrcamentoController {
   static async findAllOrcamento(req: Request, res: Response) {

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Op } from "sequelize";
-import Fornecedor from "../models/Fornecedor.js";
-import Pessoa from "../models/Pessoa.js";
+import Fornecedor from "../models/Fornecedor";
+import Pessoa from "../models/Pessoa";
 
 export default class FornecedorController {
   static async findAllFornecedors(req: Request, res: Response) {

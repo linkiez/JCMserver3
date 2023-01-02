@@ -1,9 +1,9 @@
-import sequelize from "../config/connMySql.js";
+import sequelize from "../config/connMySql";
 import { Model, DataTypes, Op, HasManySetAssociationsMixin } from "sequelize";
-import PedidoCompraItem from "./PedidoCompraItem.js";
-import RegistroInspecaoRecebimento from "./RIR.js";
-import OrdemProducaoItem from "./OrdemProducaoItem.js";
-import FileDb from "./File.js";
+import PedidoCompraItem from "./PedidoCompraItem";
+import RegistroInspecaoRecebimento from "./RIR";
+import OrdemProducaoItem from "./OrdemProducaoItem";
+import FileDb from "./File";
 
 export default class Produto extends Model {
   declare id: number;

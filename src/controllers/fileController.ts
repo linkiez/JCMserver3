@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import FileDb from "../models/File.js";
-import { S3Client } from "../services/AWS-S3.js";
+import FileDb from "../models/File";
+import { S3Client } from "../services/AWS-S3";
 import { IncomingForm } from "formidable";
 
 export default class FileController {
