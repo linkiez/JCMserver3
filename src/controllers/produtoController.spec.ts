@@ -2,6 +2,8 @@ import ProdutosController from "./produtoController";
 import { getMockReq, getMockRes } from "@jest-mock/express";
 import sequelize from "../config/connMySql";
 import { models } from "../models/index";
+import httpMocks from "node-mocks-http";
+import { Response as Res } from "express";
 
 describe("produtoController", () => {
   beforeAll( () => {
@@ -18,12 +20,13 @@ describe("produtoController", () => {
       espessura: "2",
       peso: "8",
     };
-    const req = getMockReq({ body: produto });
+    const req = httpMocks.createRequest({body: produto});
 
-     const { res } = getMockRes();
+    let res = { status: jest.fn(), json: jest.fn()} as any;
 
     const produtoCreated = await ProdutosController.createProduto(req, res);
 
-      expect(produtoCreated).toEqual(produto);
+
+      expect(res.json).toBeCalledWith(produto);
   });
 });

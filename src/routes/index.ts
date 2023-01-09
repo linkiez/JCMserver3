@@ -1,20 +1,21 @@
 import { Express } from "express";
-import produto from "./produtoRoutes.js";
-import pessoa from './pessoaRoutes.js';
-import fornecedor from './fornecedorRoutes.js';
-import contato from './contatoRoutes.js'
-import listaGenerica from './listaGenericaRoutes.js'
-import file from './fileRoutes.js'
-import usuario from './usuarioRoutes.js'
-import vendedor from './vendedorRoutes.js'
-import orcamento from './orcamentoRoutes.js'
-import operador from './operadorRoutes.js'
-import rir from './RIRRoutes.js'
-import auth from './authRoutes.js'
-import ordemProducao from './ordemProducaoRoutes.js'
-import pedidoCompra from './pedidoCompraRoutes.js';
+import produto from "./produtoRoutes";
+import pessoa from './pessoaRoutes';
+import fornecedor from './fornecedorRoutes';
+import contato from './contatoRoutes'
+import listaGenerica from './listaGenericaRoutes'
+import file from './fileRoutes'
+import usuario from './usuarioRoutes'
+import vendedor from './vendedorRoutes'
+import orcamento from './orcamentoRoutes'
+import operador from './operadorRoutes'
+import rir from './RIRRoutes'
+import auth from './authRoutes'
+import ordemProducao from './ordemProducaoRoutes'
+import pedidoCompra from './pedidoCompraRoutes';
 
 export function routes(app: Express) {
+
   app.use(
     //Routas Aqui
     produto,

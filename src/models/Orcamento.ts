@@ -38,6 +38,7 @@ export default class Orcamento extends Model {
   declare createdAt: Date;
   declare cond_pag: string;
   declare frete: number;
+  declare embalagem: string;
   declare transporte: string;
   declare desconto: number;
   declare imposto: number;
@@ -86,6 +87,7 @@ Orcamento.init(
     pc_cliente: DataTypes.STRING,
     cond_pag: DataTypes.STRING,
     frete: DataTypes.DECIMAL(13, 2),
+    embalagem: DataTypes.STRING,
     transporte: DataTypes.STRING,
     desconto: DataTypes.DECIMAL(13, 2),
     imposto: DataTypes.DECIMAL(3, 2),

@@ -132,7 +132,7 @@ export default class ProdutosController {
     }
   }
 
-  static async createProduto(req: Request, res: Response) {
+  static async createProduto(req: Request, res: Response){
     try {
       const produto = req.body;
       const transaction = await sequelize.transaction();
