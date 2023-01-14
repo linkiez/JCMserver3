@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model, DataTypes, Op } from "sequelize";
 import ListaGenerica from "./ListaGenerica";
 
@@ -9,10 +9,10 @@ export default class ListaGenericaItem extends Model {
   declare updatedAt: Date;
   declare createdAt: Date;
   declare id_lista: number;
-  
+
   static associate() {
     // define association here
-    ListaGenericaItem.belongsTo(ListaGenerica, { foreignKey: "id_lista" })
+    ListaGenericaItem.belongsTo(ListaGenerica, { foreignKey: "id_lista" });
   }
 }
 ListaGenericaItem.init(
@@ -35,10 +35,9 @@ ListaGenericaItem.init(
     scopes: {
       deleted: {
         where: {
-          deletedAt: {[Op.not]: null},
+          deletedAt: { [Op.not]: null },
         },
       },
     },
   }
 );
-

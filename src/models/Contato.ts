@@ -1,7 +1,7 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 
 import { Model, DataTypes } from "sequelize";
-import Pessoa from './Pessoa' 
+import Pessoa from "./Pessoa";
 import Orcamento from "./Orcamento";
 
 export default class Contato extends Model {
@@ -12,11 +12,11 @@ export default class Contato extends Model {
   declare deletedAt: Date;
   declare updatedAt: Date;
   declare createdAt: Date;
-  
+
   static associate() {
     // define association here
     Contato.belongsToMany(Pessoa, { through: "pessoa_contato" });
-    Contato.hasMany(Orcamento, { foreignKey: "id_contato" })
+    Contato.hasMany(Orcamento, { foreignKey: "id_contato" });
   }
 }
 Contato.init(
@@ -43,4 +43,3 @@ Contato.init(
     timestamps: true,
   }
 );
-

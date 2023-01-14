@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Request, Response } from "express";
 import Fornecedor from "../models/Fornecedor";
 import Produto from "../models/Produto";
@@ -10,7 +10,6 @@ import Contato from "../models/Contato";
 import File from "../models/File";
 import PedidoCompra_File from "../models/PedidoCompra_File";
 import FileDb from "../models/File";
-
 
 export default class PedidoCompraController {
   static async importPedidoCompra(req: Request, res: Response) {
@@ -122,7 +121,7 @@ export default class PedidoCompraController {
             include: [{ model: Pessoa, include: [Contato] }],
           },
           { model: PedidoCompraItem, include: [Produto] },
-          File
+          File,
         ],
       });
 
@@ -135,7 +134,6 @@ export default class PedidoCompraController {
 
   static async createPedidoCompra(req: Request, res: Response) {
     const transaction = await sequelize.transaction();
-    
 
     try {
       let pedidoCompra = req.body;
@@ -172,10 +170,10 @@ export default class PedidoCompraController {
       }
 
       if (files) {
-          await pedidoCompraCreated.setFiles(
-            files.map((item) => item.id),
-            { transaction: transaction }
-          )
+        await pedidoCompraCreated.setFiles(
+          files.map((item) => item.id),
+          { transaction: transaction }
+        );
       }
 
       await transaction.commit();
@@ -242,15 +240,20 @@ export default class PedidoCompraController {
 
       let fila: Promise<any>[] = [];
 
-      fila.push(PedidoCompra.update(pedidoCompra, {
-        where: { id: Number(id) },transaction: transaction
-      })) 
+      fila.push(
+        PedidoCompra.update(pedidoCompra, {
+          where: { id: Number(id) },
+          transaction: transaction,
+        })
+      );
 
-      fila.push(PedidoCompraItem.destroy({
-        where: { id_pedido: Number(id) },
-        transaction: transaction,
-      }))
-      
+      fila.push(
+        PedidoCompraItem.destroy({
+          where: { id_pedido: Number(id) },
+          transaction: transaction,
+        })
+      );
+
       files.forEach(async (file: File) => {
         fila.push(
           PedidoCompra_File.findOrCreate({
@@ -267,13 +270,15 @@ export default class PedidoCompraController {
           delete item.produto;
           delete item.id;
 
-          fila.push(PedidoCompraItem.create(item, { transaction: transaction })) ;
+          fila.push(
+            PedidoCompraItem.create(item, { transaction: transaction })
+          );
         });
       }
 
-      Promise.all(fila).then(async ()=> {
+      Promise.all(fila).then(async () => {
         await transaction.commit();
-      
+
         pedidoCompraUpdated = await PedidoCompra.findOne({
           where: { id: Number(id) },
           include: [
@@ -284,11 +289,9 @@ export default class PedidoCompraController {
             { model: PedidoCompraItem, include: [Produto] },
           ],
         });
-  
-        return res.status(202).json(pedidoCompraUpdated);
-      
-      })
 
+        return res.status(202).json(pedidoCompraUpdated);
+      });
     } catch (error: any) {
       await transaction.rollback();
       console.log(error);

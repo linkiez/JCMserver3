@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import ListaGenericaItem from "../models/ListaGenericaItem";
 import ListaGenerica from "../models/ListaGenerica";
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 
 export default class ListaGenericaController {
   static async findAllListaGenerica(req: Request, res: Response) {
@@ -115,37 +115,60 @@ export default class ListaGenericaController {
 
       let listaPromises: any = [];
 
-      let listaGenericaItemOld = await ListaGenericaItem.findAll({where: { id_lista: Number(id)}});
+      let listaGenericaItemOld = await ListaGenericaItem.findAll({
+        where: { id_lista: Number(id) },
+      });
 
-      let listaGenericaItemOldRemove = listaGenericaItemOld.filter((item: ListaGenericaItem)=>{
-        let filtrado = listaGenericaItem.filter((item2: ListaGenericaItem) => {return item2.id === item.id})
-        if(filtrado.length == 0){return true}else{return false};
-      })
+      let listaGenericaItemOldRemove = listaGenericaItemOld.filter(
+        (item: ListaGenericaItem) => {
+          let filtrado = listaGenericaItem.filter(
+            (item2: ListaGenericaItem) => {
+              return item2.id === item.id;
+            }
+          );
+          if (filtrado.length == 0) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      );
 
       listaGenericaItemOldRemove.forEach((item: ListaGenericaItem) => {
-        listaPromises.push(ListaGenericaItem.destroy({where: {id: item.id}, transaction: transaction}));
-      })
+        listaPromises.push(
+          ListaGenericaItem.destroy({
+            where: { id: item.id },
+            transaction: transaction,
+          })
+        );
+      });
 
       listaGenericaItem.forEach((item: any) => {
-          item.id_lista = Number(id);
-          if(!item.id){
-            listaPromises.push(ListaGenericaItem.create(item, { transaction: transaction }));
-          }else{
-            listaPromises.push(ListaGenericaItem.update(item, {where: {id: Number(item.id)}, transaction: transaction}));
-          }
+        item.id_lista = Number(id);
+        if (!item.id) {
+          listaPromises.push(
+            ListaGenericaItem.create(item, { transaction: transaction })
+          );
+        } else {
+          listaPromises.push(
+            ListaGenericaItem.update(item, {
+              where: { id: Number(item.id) },
+              transaction: transaction,
+            })
+          );
+        }
+      });
+
+      Promise.all(listaPromises).then(async () => {
+        await transaction.commit();
+
+        let listaGenericaUpdated = await ListaGenerica.findOne({
+          where: { id: Number(id) },
+          include: ListaGenericaItem,
         });
 
-        Promise.all(listaPromises).then(async () => {
-          await transaction.commit();
-
-          let listaGenericaUpdated = await ListaGenerica.findOne({
-            where: { id: Number(id) },
-            include: ListaGenericaItem,
-          });
-
-          return res.status(202).json(listaGenericaUpdated);
-        });
-
+        return res.status(202).json(listaGenericaUpdated);
+      });
     } catch (error: any) {
       await transaction.rollback();
       console.log(error);

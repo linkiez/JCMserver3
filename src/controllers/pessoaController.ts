@@ -5,7 +5,7 @@ import Pessoa from "../models/Pessoa";
 import Pessoa_File from "../models/Pessoa_File";
 import FileDb from "../models/File";
 import Pessoa_Contato from "../models/Pessoa_Contato";
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import Fornecedor from "../models/Fornecedor";
 import Vendedor from "../models/Vendedor";
 import Operador from "../models/Operador";
@@ -27,28 +27,32 @@ export default class PessoaController {
         [Op.or]: [
           { nome: { [Op.like]: "%" + consulta.searchValue + "%" } },
           { cnpj_cpf: { [Op.like]: "%" + consulta.searchValue + "%" } },
-          { telefone: { [Op.like]: "%" + consulta.searchValue + "%" } }
+          { telefone: { [Op.like]: "%" + consulta.searchValue + "%" } },
         ],
       };
 
-      if(req.query.deleted==='true') queryWhere = {...queryWhere, deletedAt: {[Op.not]: null}}
+      if (req.query.deleted === "true")
+        queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
 
-      let queryIncludes = []
-      if(req.query.fornecedor==='true') queryIncludes.push({model: Fornecedor, required: true});
-      if(req.query.operador==='true') queryIncludes.push({model: Operador, required: true});
-      if(req.query.vendedor==='true') queryIncludes.push({model: Vendedor, required: true});
+      let queryIncludes = [];
+      if (req.query.fornecedor === "true")
+        queryIncludes.push({ model: Fornecedor, required: true });
+      if (req.query.operador === "true")
+        queryIncludes.push({ model: Operador, required: true });
+      if (req.query.vendedor === "true")
+        queryIncludes.push({ model: Vendedor, required: true });
 
       resultado.pessoas = await Pessoa.findAll({
         limit: consulta.pageCount,
         offset: consulta.pageCount * consulta.page,
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
         include: queryIncludes,
-        paranoid: req.query.deleted==='true'?false:true
+        paranoid: req.query.deleted === "true" ? false : true,
       });
       resultado.totalRecords = await Pessoa.count({
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
         include: queryIncludes,
-        paranoid: req.query.deleted==='true'?false:true
+        paranoid: req.query.deleted === "true" ? false : true,
       });
 
       return res.status(200).json(resultado);
@@ -123,10 +127,10 @@ export default class PessoaController {
         contatos = contatos.filter(
           (contato: Contato) => contato.valor != undefined
         );
-      
+
         let contatosCreated = contatos.map(async (contato: Contato) => {
-          if (contato.tipo == 'Telefone' || contato.tipo == 'WhatsApp')
-          contato.valor = Number(contato.valor.toString().replace(/\D/g, ''))
+          if (contato.tipo == "Telefone" || contato.tipo == "WhatsApp")
+            contato.valor = Number(contato.valor.toString().replace(/\D/g, ""));
           if (contato.id) {
             return contato;
           } else {
@@ -137,7 +141,9 @@ export default class PessoaController {
             if (contatoFind) {
               return contatoFind;
             } else {
-              return Contato.create(contato as any, { transaction: transaction });
+              return Contato.create(contato as any, {
+                transaction: transaction,
+              });
             }
           }
         });
@@ -182,7 +188,7 @@ export default class PessoaController {
     delete pessoa.files;
     delete pessoa.id;
 
-    console.log(pessoa)
+    console.log(pessoa);
 
     const transaction = await sequelize.transaction();
 

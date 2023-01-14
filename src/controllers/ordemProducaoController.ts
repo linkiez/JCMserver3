@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Request, Response } from "express";
 import OrdemProducao from "../models/OrdemProducao";
 import OrdemProducaoItem from "../models/OrdemProducaoItem";
@@ -244,32 +244,27 @@ export default class OrdemProducaoController {
       );
 
       Promise.all(ordemProducaoItens).then(async () => {
-        let ordemProducaoUpdated = await OrdemProducao.findByPk(
-          id
-        );
+        let ordemProducaoUpdated = await OrdemProducao.findByPk(id);
 
         await transaction.commit();
 
-        ordemProducaoUpdated = await OrdemProducao.findByPk(
-          id,
-          {
-            include: [
-              Vendedor,
-              {
-                model: OrdemProducaoItem,
-                include: [
-                  FileDb,
-                  {
-                    model: OrdemProducaoItemProcesso,
-                    attributes: { exclude: ["id_ordem_producao_item"] },
-                  },
-                ],
-                attributes: { exclude: ["id_ordem_producao"] },
-              },
-            ],
-            attributes: { exclude: ["id_vendedor"] },
-          }
-        );
+        ordemProducaoUpdated = await OrdemProducao.findByPk(id, {
+          include: [
+            Vendedor,
+            {
+              model: OrdemProducaoItem,
+              include: [
+                FileDb,
+                {
+                  model: OrdemProducaoItemProcesso,
+                  attributes: { exclude: ["id_ordem_producao_item"] },
+                },
+              ],
+              attributes: { exclude: ["id_ordem_producao"] },
+            },
+          ],
+          attributes: { exclude: ["id_vendedor"] },
+        });
         return res.status(202).json(ordemProducaoUpdated);
       });
     } catch (error: any) {

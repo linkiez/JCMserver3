@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model, DataTypes, Op } from "sequelize";
 import PedidoCompraItem from "./PedidoCompraItem";
 import Produto from "./Produto";
@@ -29,13 +29,23 @@ export default class RegistroInspecaoRecebimento extends Model {
   declare file: FileDb[];
 
   static associate() {
-    RegistroInspecaoRecebimento.belongsTo(Produto, { foreignKey: 'id_produto'})
-    RegistroInspecaoRecebimento.belongsTo(Pessoa, { foreignKey: "id_pessoa" })
-    RegistroInspecaoRecebimento.belongsTo(Operador, { foreignKey: 'id_operador'})
-    RegistroInspecaoRecebimento.belongsTo(PedidoCompraItem, { foreignKey: 'id_pedido_compra_item'})
-    RegistroInspecaoRecebimento.belongsToMany(FileDb, { through: "registro_inspecao_recebimento_file" });
+    RegistroInspecaoRecebimento.belongsTo(Produto, {
+      foreignKey: "id_produto",
+    });
+    RegistroInspecaoRecebimento.belongsTo(Pessoa, { foreignKey: "id_pessoa" });
+    RegistroInspecaoRecebimento.belongsTo(Operador, {
+      foreignKey: "id_operador",
+    });
+    RegistroInspecaoRecebimento.belongsTo(PedidoCompraItem, {
+      foreignKey: "id_pedido_compra_item",
+    });
+    RegistroInspecaoRecebimento.belongsToMany(FileDb, {
+      through: "registro_inspecao_recebimento_file",
+    });
 
-    RegistroInspecaoRecebimento.hasOne(OrdemProducaoItem, { foreignKey: 'id_rir'})
+    RegistroInspecaoRecebimento.hasOne(OrdemProducaoItem, {
+      foreignKey: "id_rir",
+    });
   }
 }
 RegistroInspecaoRecebimento.init(
@@ -54,7 +64,7 @@ RegistroInspecaoRecebimento.init(
     cliente: DataTypes.BOOLEAN,
     recebido_data: DataTypes.DATE,
     conferido: DataTypes.BOOLEAN,
-    observacoes: DataTypes.TEXT
+    observacoes: DataTypes.TEXT,
   },
   {
     sequelize,

@@ -1,19 +1,23 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model, DataTypes, Op } from "sequelize";
 import Operador from "./Operador";
 import OrdemProducaoItem from "./OrdemProducaoItem";
 
 export default class OrdemProducaoItemProcesso extends Model {
-    declare id: number;
-    declare processo: string;
-    declare operador: Operador;
-    declare id_operador: number;
-    declare fabricado: Date;
+  declare id: number;
+  declare processo: string;
+  declare operador: Operador;
+  declare id_operador: number;
+  declare fabricado: Date;
 
-    static associate() {
-        OrdemProducaoItemProcesso.belongsTo(Operador, { foreignKey: 'id_operador'})
-        OrdemProducaoItemProcesso.belongsTo(OrdemProducaoItem, { foreignKey: 'id_ordem_producao_item'})
-    }
+  static associate() {
+    OrdemProducaoItemProcesso.belongsTo(Operador, {
+      foreignKey: "id_operador",
+    });
+    OrdemProducaoItemProcesso.belongsTo(OrdemProducaoItem, {
+      foreignKey: "id_ordem_producao_item",
+    });
+  }
 }
 OrdemProducaoItemProcesso.init(
   {
@@ -24,7 +28,7 @@ OrdemProducaoItemProcesso.init(
       type: DataTypes.BIGINT,
     },
     processo: DataTypes.STRING,
-    fabricado: DataTypes.DATE
+    fabricado: DataTypes.DATE,
   },
   {
     sequelize,

@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model } from "sequelize";
 
 export default class Pessoa_File extends Model {

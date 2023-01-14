@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa";
 
@@ -11,11 +11,11 @@ export default class Usuario extends Model {
   declare createdAt: Date;
   declare id_pessoa: number;
   declare pessoa: Pessoa;
-  declare acesso: any
+  declare acesso: any;
 
   static associate() {
     // define association here
-    Usuario.belongsTo(Pessoa, { foreignKey: "id_pessoa" })
+    Usuario.belongsTo(Pessoa, { foreignKey: "id_pessoa" });
   }
 }
 Usuario.init(
@@ -31,11 +31,10 @@ Usuario.init(
       unique: true,
       validate: {
         isEmail: true,
-  
       },
     },
     senha: DataTypes.STRING,
-    acesso: DataTypes.JSON
+    acesso: DataTypes.JSON,
   },
   {
     sequelize,
@@ -46,7 +45,7 @@ Usuario.init(
     scopes: {
       deleted: {
         where: {
-          deletedAt: {[Op.not]: null},
+          deletedAt: { [Op.not]: null },
         },
       },
     },

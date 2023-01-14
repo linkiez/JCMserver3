@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa";
 import PedidoCompra from "./PedidoCompra";
@@ -16,8 +16,8 @@ export default class Fornecedor extends Model {
 
   static associate() {
     // define association here
-    Fornecedor.belongsTo(Pessoa, { foreignKey: "id_pessoa" })
-    Fornecedor.hasMany(PedidoCompra, { foreignKey: "id_fornecedor" })
+    Fornecedor.belongsTo(Pessoa, { foreignKey: "id_pessoa" });
+    Fornecedor.hasMany(PedidoCompra, { foreignKey: "id_fornecedor" });
   }
 }
 Fornecedor.init(
@@ -42,7 +42,7 @@ Fornecedor.init(
     scopes: {
       deleted: {
         where: {
-          deletedAt: {[Op.not]: null},
+          deletedAt: { [Op.not]: null },
         },
       },
     },

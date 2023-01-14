@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import Orcamento from "../models/Orcamento";
 import OrcamentoItem from "../models/OrcamentoItem";
 import FileDb from "../models/File";
@@ -24,7 +24,7 @@ export default class OrcamentoController {
       };
 
       let queryWhere: any = {
-        [Op.or]: [{ id: { [Op.like]: "%" + consulta.searchValue + "%" } }],
+        // [Op.or]: [{ id: { [Op.like]: "%" + consulta.searchValue + "%" } }],
       };
 
       if (req.query.deleted === "true")
@@ -42,7 +42,7 @@ export default class OrcamentoController {
           },
           {
             model: Pessoa,
-          }
+          },
         ],
         order: [["id", "DESC"]],
       });
@@ -107,13 +107,24 @@ export default class OrcamentoController {
       delete orcamento.orcamento_items;
 
       if (orcamento.pessoa) orcamento.id_pessoa = orcamento.pessoa.id;
-      if (orcamento.contato) orcamento.id_contato = orcamento.contato.id;
+      if (orcamento.contato.id) {
+        orcamento.id_contato = orcamento.contato.id;
+      } else {
+        if (orcamento.contato.nome && orcamento.contato.valor) {
+          let contato = await Contato.create(orcamento.contato, {
+            transaction: transaction,
+          });
+          orcamento.id_contato = contato.id;
+        }
+      }
       if (orcamento.vendedor) orcamento.id_vendedor = orcamento.vendedor.id;
 
       delete orcamento.pessoa;
       delete orcamento.contato;
       delete orcamento.vendedor;
       delete orcamento.produto;
+
+      if (!orcamento.id) orcamento.id = await Orcamento.max("id") as number + 1;
 
       let orcamentoCreated: Orcamento = await Orcamento.create(orcamento, {
         transaction: transaction,
@@ -188,7 +199,16 @@ export default class OrcamentoController {
       delete orcamento.orcamento_items;
 
       if (orcamento.pessoa) orcamento.id_pessoa = orcamento.pessoa.id;
-      if (orcamento.contato) orcamento.id_contato = orcamento.contato.id;
+      if (orcamento.contato.id) {
+        orcamento.id_contato = orcamento.contato.id;
+      } else {
+        if (orcamento.contato.nome && orcamento.contato.valor) {
+          let contato = await Contato.create(orcamento.contato, {
+            transaction: transaction,
+          });
+          orcamento.id_contato = contato.id;
+        }
+      }
       if (orcamento.vendedor) orcamento.id_vendedor = orcamento.vendedor.id;
 
       delete orcamento.pessoa;

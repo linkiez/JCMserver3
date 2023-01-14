@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import {
   Model,
   DataTypes,
@@ -49,11 +49,17 @@ export default class Orcamento extends Model {
   declare addOrcamentoItem: HasManyAddAssociationMixin<OrcamentoItem, number>;
   declare addOrcamentoItems: HasManyAddAssociationsMixin<OrcamentoItem, number>;
   declare setOrcamentoItems: HasManySetAssociationsMixin<OrcamentoItem, number>;
-  declare removeOrcamentoItem: HasManyRemoveAssociationMixin<OrcamentoItem, number>;
-  declare removeOrcamentoItems: HasManyRemoveAssociationsMixin<OrcamentoItem, number>;
+  declare removeOrcamentoItem: HasManyRemoveAssociationMixin<
+    OrcamentoItem,
+    number
+  >;
+  declare removeOrcamentoItems: HasManyRemoveAssociationsMixin<
+    OrcamentoItem,
+    number
+  >;
   declare hasOrcamentoItem: HasManyHasAssociationMixin<OrcamentoItem, number>;
   declare hasOrcamentoItems: HasManyHasAssociationsMixin<OrcamentoItem, number>;
-  declare countOrcamentoItems: HasManyCountAssociationsMixin;  
+  declare countOrcamentoItems: HasManyCountAssociationsMixin;
 
   static associate() {
     Orcamento.belongsTo(Contato, {
@@ -65,18 +71,18 @@ export default class Orcamento extends Model {
     });
 
     Orcamento.hasMany(OrcamentoItem, {
-        foreignKey: "id_orcamento",
-        onDelete: "cascade",
-      });
+      foreignKey: "id_orcamento",
+      onDelete: "cascade",
+    });
 
-    Orcamento.hasMany(OrdemProducao, { foreignKey: 'id_orcamento'})
+    Orcamento.hasMany(OrdemProducao, { foreignKey: "id_orcamento" });
   }
 }
 Orcamento.init(
   {
     id: {
       allowNull: false,
-      autoIncrement: true,
+      autoIncrement: false,
       primaryKey: true,
       type: DataTypes.BIGINT,
     },

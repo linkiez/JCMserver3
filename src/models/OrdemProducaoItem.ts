@@ -1,18 +1,18 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import {
-    Model,
-    DataTypes,
-    Op,
-    HasManyGetAssociationsMixin,
-    HasManyAddAssociationMixin,
-    HasManySetAssociationsMixin,
-    HasManyAddAssociationsMixin,
-    HasManyRemoveAssociationMixin,
-    HasManyRemoveAssociationsMixin,
-    HasManyHasAssociationMixin,
-    HasManyHasAssociationsMixin,
-    HasManyCountAssociationsMixin,
-  } from "sequelize";
+  Model,
+  DataTypes,
+  Op,
+  HasManyGetAssociationsMixin,
+  HasManyAddAssociationMixin,
+  HasManySetAssociationsMixin,
+  HasManyAddAssociationsMixin,
+  HasManyRemoveAssociationMixin,
+  HasManyRemoveAssociationsMixin,
+  HasManyHasAssociationMixin,
+  HasManyHasAssociationsMixin,
+  HasManyCountAssociationsMixin,
+} from "sequelize";
 import Produto from "./Produto";
 import RegistroInspecaoRecebimento from "./RIR";
 import FileDb from "./File";
@@ -44,11 +44,20 @@ export default class OrdemProducaoItem extends Model {
   declare countFiles: HasManyCountAssociationsMixin;
 
   static associate() {
-    OrdemProducaoItem.belongsToMany(FileDb, { through: "ordem_producao_item_file" });
-    OrdemProducaoItem.belongsTo(Produto, { foreignKey: 'id_produto'});
-    OrdemProducaoItem.belongsTo(RegistroInspecaoRecebimento, { foreignKey: 'id_rir'})
-    OrdemProducaoItem.belongsTo(OrdemProducao, {foreignKey: 'id_ordem_producao'})
-    OrdemProducaoItem.hasMany(OrdemProducaoItemProcesso, { foreignKey: 'id_ordem_producao_item', onDelete: 'cascade'})
+    OrdemProducaoItem.belongsToMany(FileDb, {
+      through: "ordem_producao_item_file",
+    });
+    OrdemProducaoItem.belongsTo(Produto, { foreignKey: "id_produto" });
+    OrdemProducaoItem.belongsTo(RegistroInspecaoRecebimento, {
+      foreignKey: "id_rir",
+    });
+    OrdemProducaoItem.belongsTo(OrdemProducao, {
+      foreignKey: "id_ordem_producao",
+    });
+    OrdemProducaoItem.hasMany(OrdemProducaoItemProcesso, {
+      foreignKey: "id_ordem_producao_item",
+      onDelete: "cascade",
+    });
   }
 }
 OrdemProducaoItem.init(

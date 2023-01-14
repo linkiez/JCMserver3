@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model, DataTypes, Op } from "sequelize";
 import ListaGenericaItem from "./ListaGenericaItem";
 
@@ -9,10 +9,13 @@ export default class ListaGenerica extends Model {
   declare deletedAt: Date;
   declare updatedAt: Date;
   declare createdAt: Date;
-  
+
   static associate() {
     // define association here
-    ListaGenerica.hasMany(ListaGenericaItem, { foreignKey: "id_lista", onDelete: 'cascade'})
+    ListaGenerica.hasMany(ListaGenericaItem, {
+      foreignKey: "id_lista",
+      onDelete: "cascade",
+    });
   }
 }
 ListaGenerica.init(
@@ -35,10 +38,9 @@ ListaGenerica.init(
     scopes: {
       deleted: {
         where: {
-          deletedAt: {[Op.not]: null},
+          deletedAt: { [Op.not]: null },
         },
       },
     },
   }
 );
-

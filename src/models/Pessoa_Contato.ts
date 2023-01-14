@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model } from "sequelize";
 
 export default class Pessoa_Contato extends Model {
@@ -14,5 +14,5 @@ Pessoa_Contato.init(
     paranoid: false,
     timestamps: true,
     freezeTableName: true,
-  } 
+  }
 );

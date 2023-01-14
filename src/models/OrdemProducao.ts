@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model, DataTypes, Op } from "sequelize";
 import Orcamento from "./Orcamento";
 import Vendedor from "./Vendedor";
@@ -20,37 +20,40 @@ export default class OrdemProducao extends Model {
   declare createdAt: Date;
 
   static associate() {
-    OrdemProducao.belongsTo(Orcamento, { foreignKey: 'id_orcamento'});
-    OrdemProducao.belongsTo(Vendedor, { foreignKey: 'id_vendedor'})
-    OrdemProducao.hasMany(OrdemProducaoItem, { foreignKey: 'id_ordem_producao', onDelete: 'cascade'})
+    OrdemProducao.belongsTo(Orcamento, { foreignKey: "id_orcamento" });
+    OrdemProducao.belongsTo(Vendedor, { foreignKey: "id_vendedor" });
+    OrdemProducao.hasMany(OrdemProducaoItem, {
+      foreignKey: "id_ordem_producao",
+      onDelete: "cascade",
+    });
   }
 }
 OrdemProducao.init(
-    {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: DataTypes.BIGINT,
-      },
-      data_prazo: DataTypes.DATE,
-      data_finalizacao: DataTypes.DATE,
-      data_entregue: DataTypes.DATE,
-      venda: DataTypes.INTEGER,
-      status: DataTypes.STRING
+  {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.BIGINT,
     },
-    {
-      sequelize,
-      modelName: "ordem_producao",
-      paranoid: true,
-      timestamps: true,
-      freezeTableName: true,
-      scopes: {
-        deleted: {
-          where: {
-            deletedAt: { [Op.not]: null },
-          },
+    data_prazo: DataTypes.DATE,
+    data_finalizacao: DataTypes.DATE,
+    data_entregue: DataTypes.DATE,
+    venda: DataTypes.INTEGER,
+    status: DataTypes.STRING,
+  },
+  {
+    sequelize,
+    modelName: "ordem_producao",
+    paranoid: true,
+    timestamps: true,
+    freezeTableName: true,
+    scopes: {
+      deleted: {
+        where: {
+          deletedAt: { [Op.not]: null },
         },
       },
-    }
-  );
+    },
+  }
+);

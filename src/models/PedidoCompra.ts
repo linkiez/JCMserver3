@@ -1,9 +1,8 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model, DataTypes, HasManySetAssociationsMixin } from "sequelize";
 import PedidoCompraItem from "./PedidoCompraItem";
 import Fornecedor from "./Fornecedor";
 import File from "./File";
-
 
 export default class PedidoCompra extends Model {
   declare id: number;
@@ -58,6 +57,5 @@ PedidoCompra.init(
     freezeTableName: true,
     paranoid: true,
     timestamps: true,
-    
   }
 );

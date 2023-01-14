@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import {
   Model,
   DataTypes,
@@ -40,7 +40,7 @@ export default class OrcamentoItem extends Model {
   declare createdAt: Date;
   declare files: File[];
   declare total: number;
-  
+
   declare getFiles: HasManyGetAssociationsMixin<File>; //
   declare addFile: HasManyAddAssociationMixin<File, number>;
   declare addFiles: HasManyAddAssociationsMixin<File, number>;
@@ -50,7 +50,7 @@ export default class OrcamentoItem extends Model {
   declare hasFile: HasManyHasAssociationMixin<File, number>;
   declare hasFiles: HasManyHasAssociationsMixin<File, number>;
   declare countFiles: HasManyCountAssociationsMixin;
-  
+
   static associate() {
     OrcamentoItem.belongsTo(Orcamento, { foreignKey: "id_orcamento" });
     OrcamentoItem.belongsTo(Produto, { foreignKey: "id_produto" });
@@ -67,7 +67,7 @@ OrcamentoItem.init(
     },
     descricao: DataTypes.STRING,
     material_incluido: DataTypes.BOOLEAN,
-    processo: DataTypes.STRING,
+    processo: DataTypes.ARRAY(DataTypes.STRING),
     largura: DataTypes.DECIMAL(13, 2),
     altura: DataTypes.DECIMAL(13, 2),
     quantidade: DataTypes.DECIMAL(13, 2),

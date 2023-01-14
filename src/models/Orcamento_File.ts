@@ -1,10 +1,9 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model } from "sequelize";
 
 export default class OrcamentoItem_File extends Model {
   static associate() {
     // define association here
-    
   }
 }
 OrcamentoItem_File.init(

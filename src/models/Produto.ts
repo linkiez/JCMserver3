@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model, DataTypes, Op, HasManySetAssociationsMixin } from "sequelize";
 import PedidoCompraItem from "./PedidoCompraItem";
 import RegistroInspecaoRecebimento from "./RIR";
@@ -18,12 +18,11 @@ export default class Produto extends Model {
 
   declare setFiles: HasManySetAssociationsMixin<File, number>;
 
-
   static associate() {
     // define association here
     Produto.hasMany(PedidoCompraItem, { foreignKey: "id_produto" });
     Produto.hasMany(RegistroInspecaoRecebimento, { foreignKey: "id_produto" });
-    Produto.hasMany(OrdemProducaoItem, { foreignKey: "id_produto" })
+    Produto.hasMany(OrdemProducaoItem, { foreignKey: "id_produto" });
     Produto.belongsToMany(FileDb, { through: "produto_file" });
   }
 }

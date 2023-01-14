@@ -1,10 +1,9 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model } from "sequelize";
 
 export default class OrdemProducaoItem_File extends Model {
   static associate() {
     // define association here
-    
   }
 }
 OrdemProducaoItem_File.init(

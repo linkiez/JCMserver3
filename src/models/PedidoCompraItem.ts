@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import { Model, DataTypes } from "sequelize";
 import PedidoCompra from "./PedidoCompra";
 import Produto from "./Produto";

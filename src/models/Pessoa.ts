@@ -1,4 +1,4 @@
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 import {
   Model,
   DataTypes,
@@ -44,10 +44,10 @@ export default class Pessoa extends Model {
   declare createdAt: Date;
   declare contatos: Array<Contato>;
   declare files: Array<File>;
-  declare fornecedor: Fornecedor
-  declare operador: Operador
-  declare usuario: Usuario
-  declare vendedor: Vendedor
+  declare fornecedor: Fornecedor;
+  declare operador: Operador;
+  declare usuario: Usuario;
+  declare vendedor: Vendedor;
 
   declare getFiles: HasManyGetAssociationsMixin<File>; //
   declare addFile: HasManyAddAssociationMixin<File, number>;
@@ -69,15 +69,14 @@ export default class Pessoa extends Model {
   declare hasContatos: HasManyHasAssociationsMixin<Contato, number>;
   declare countContatos: HasManyCountAssociationsMixin;
 
-
   static associate() {
     // define association here
     Pessoa.hasOne(Fornecedor, { foreignKey: "id_pessoa" });
     Pessoa.hasOne(Usuario, { foreignKey: "id_pessoa" });
     Pessoa.hasOne(Vendedor, { foreignKey: "id_pessoa" });
     Pessoa.hasOne(Operador, { foreignKey: "id_pessoa" });
-    Pessoa.hasMany(RegistroInspecaoRecebimento, { foreignKey: "id_pessoa" })
-    Pessoa.hasMany(Orcamento, { foreignKey: "id_pessoa" })
+    Pessoa.hasMany(RegistroInspecaoRecebimento, { foreignKey: "id_pessoa" });
+    Pessoa.hasMany(Orcamento, { foreignKey: "id_pessoa" });
     Pessoa.belongsToMany(File, { through: "pessoa_file" });
     Pessoa.belongsToMany(Contato, { through: "pessoa_contato" });
   }
@@ -97,13 +96,13 @@ Pessoa.init(
     email: {
       type: DataTypes.STRING,
       validate: {
-         isEmail: true,
+        isEmail: true,
       },
     },
     email_nfe: {
       type: DataTypes.STRING,
       validate: {
-         isEmail: true,
+        isEmail: true,
       },
     },
     endereco: DataTypes.STRING,

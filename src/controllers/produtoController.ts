@@ -5,7 +5,7 @@ import PedidoCompraItem from "../models/PedidoCompraItem";
 import PedidoCompra from "../models/PedidoCompra";
 import FileDb from "../models/File";
 import Produto_File from "../models/Produto_File";
-import sequelize from "../config/connMySql";
+import sequelize from "../config/connPostgre";
 
 export default class ProdutosController {
   static async findAllProdutos(req: Request, res: Response) {
@@ -24,9 +24,13 @@ export default class ProdutosController {
       let queryWhere: any = {
         [Op.or]: [
           { nome: { [Op.like]: "%" + consulta.searchValue + "%" } },
-          { espessura: { [Op.like]: "%" + consulta.searchValue + "%" } },
+          // { espessura: { [Op.like]: "%" + consulta.searchValue + "%" } },
         ],
       };
+      if (Number.isFinite(+consulta.searchValue)){
+        queryWhere[Op.or].push({ espessura: { [Op.like]: "%" + +consulta.searchValue.toFixed(2) + "%" } })
+      }
+
       if (req.query.deleted === "true")
         queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
 
@@ -132,7 +136,7 @@ export default class ProdutosController {
     }
   }
 
-  static async createProduto(req: Request, res: Response){
+  static async createProduto(req: Request, res: Response) {
     try {
       const produto = req.body;
       const transaction = await sequelize.transaction();
