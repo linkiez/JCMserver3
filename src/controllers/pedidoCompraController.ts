@@ -81,8 +81,6 @@ export default class PedidoCompraController {
       if (req.query.deleted === "true")
         queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
 
-      console.log(consulta.searchValue);
-
       resultado.pedidosCompra = await PedidoCompra.findAll({
         limit: consulta.pageCount,
         offset: consulta.pageCount * consulta.page,

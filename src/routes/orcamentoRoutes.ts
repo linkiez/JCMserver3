@@ -24,8 +24,8 @@ router
   )
   .get(
     "/orcamento/:id",
-    Authentication.verificaLogin,
-    Authentication.verificaAcesso(["orcamento", "findOne"]),
+    // Authentication.verificaLogin,
+    // Authentication.verificaAcesso(["orcamento", "findOne"]),
     OrcamentoController.findOneOrcamento
   )
   .put(

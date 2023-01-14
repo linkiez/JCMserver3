@@ -53,6 +53,7 @@ export default class OrcamentoItem extends Model {
   
   static associate() {
     OrcamentoItem.belongsTo(Orcamento, { foreignKey: "id_orcamento" });
+    OrcamentoItem.belongsTo(Produto, { foreignKey: "id_produto" });
     OrcamentoItem.belongsToMany(FileDb, { through: "orcamento_file" });
   }
 }

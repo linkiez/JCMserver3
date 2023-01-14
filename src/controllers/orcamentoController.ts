@@ -6,12 +6,53 @@ import FileDb from "../models/File";
 import Contato from "../models/Contato";
 import Pessoa from "../models/Pessoa";
 import Vendedor from "../models/Vendedor";
+import Produto from "../models/Produto";
+import { Op } from "sequelize";
 
 export default class OrcamentoController {
   static async findAllOrcamento(req: Request, res: Response) {
     try {
-      let orcamento = await Orcamento.findAll();
-      return res.status(200).json(orcamento);
+      let consulta: any = {
+        pageCount: Number(req.query.pageCount) || 10,
+        page: Number(req.query.page) || 0,
+        searchValue: req.query.searchValue,
+      };
+
+      let resultado: { orcamento: Orcamento[]; totalRecords: Number } = {
+        orcamento: [],
+        totalRecords: 0,
+      };
+
+      let queryWhere: any = {
+        [Op.or]: [{ id: { [Op.like]: "%" + consulta.searchValue + "%" } }],
+      };
+
+      if (req.query.deleted === "true")
+        queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
+
+      resultado.orcamento = await Orcamento.findAll({
+        limit: consulta.pageCount,
+        offset: consulta.pageCount * consulta.page,
+        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
+        paranoid: req.query.deleted === "true" ? false : true,
+        include: [
+          {
+            model: Vendedor,
+            include: [{ model: Pessoa }],
+          },
+          {
+            model: Pessoa,
+          }
+        ],
+        order: [["id", "DESC"]],
+      });
+
+      resultado.totalRecords = await Orcamento.count({
+        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
+        paranoid: req.query.deleted === "true" ? false : true,
+      });
+
+      return res.status(200).json(resultado);
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);
@@ -37,12 +78,16 @@ export default class OrcamentoController {
         include: [
           {
             model: OrcamentoItem,
-            include: [FileDb],
-            attributes: { exclude: ["id_orcamento"] },
+            include: [FileDb, Produto],
+            attributes: { exclude: ["id_orcamento", "id_produto"] },
           },
           Contato,
           Pessoa,
-          Vendedor,
+          {
+            model: Vendedor,
+            include: [Pessoa],
+            attributes: { exclude: ["id_pessoa"] },
+          },
         ],
         attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
       });
@@ -68,6 +113,7 @@ export default class OrcamentoController {
       delete orcamento.pessoa;
       delete orcamento.contato;
       delete orcamento.vendedor;
+      delete orcamento.produto;
 
       let orcamentoCreated: Orcamento = await Orcamento.create(orcamento, {
         transaction: transaction,
@@ -80,9 +126,13 @@ export default class OrcamentoController {
         if (orcamentoItem.produto) {
           orcamentoItem.id_produto = orcamentoItem.produto.id;
           delete orcamentoItem.produto;
+        } else {
+          throw new Error("Produto não encontrado");
         }
 
         orcamentoItem.id_orcamento = orcamentoCreated.id;
+
+        delete orcamentoItem.id;
 
         let orcamentoItemCreated = await OrcamentoItem.create(orcamentoItem, {
           transaction: transaction,
@@ -105,12 +155,16 @@ export default class OrcamentoController {
           include: [
             {
               model: OrcamentoItem,
-              include: [FileDb],
-              attributes: { exclude: ["id_orcamento"] },
+              include: [FileDb, Produto],
+              attributes: { exclude: ["id_orcamento", "id_produto"] },
             },
             Contato,
             Pessoa,
-            Vendedor,
+            {
+              model: Vendedor,
+              include: [Pessoa],
+              attributes: { exclude: ["id_pessoa"] },
+            },
           ],
           attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
         });
@@ -159,7 +213,11 @@ export default class OrcamentoController {
         if (orcamentoItem.produto) {
           orcamentoItem.id_produto = orcamentoItem.produto.id;
           delete orcamentoItem.produto;
+        } else {
+          throw new Error("Produto não encontrado");
         }
+
+        delete orcamentoItem.id;
 
         orcamentoItem.id_orcamento = id;
 
@@ -184,12 +242,16 @@ export default class OrcamentoController {
           include: [
             {
               model: OrcamentoItem,
-              include: [FileDb],
-              attributes: { exclude: ["id_orcamento"] },
+              include: [FileDb, Produto],
+              attributes: { exclude: ["id_orcamento", "id_produto"] },
             },
             Contato,
             Pessoa,
-            Vendedor,
+            {
+              model: Vendedor,
+              include: [Pessoa],
+              attributes: { exclude: ["id_pessoa"] },
+            },
           ],
           attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
         });
