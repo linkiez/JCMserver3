@@ -1,3 +1,4 @@
+import { TinyERP } from "./../services/tinyERP";
 import { Request, Response } from "express";
 import sequelize from "../config/connPostgre";
 import Orcamento from "../models/Orcamento";
@@ -40,9 +41,8 @@ export default class OrcamentoController {
             model: Vendedor,
             include: [{ model: Pessoa }],
           },
-          {
-            model: Pessoa,
-          },
+          Pessoa,
+          Contato,
         ],
         order: [["id", "DESC"]],
       });
@@ -124,7 +124,8 @@ export default class OrcamentoController {
       delete orcamento.vendedor;
       delete orcamento.produto;
 
-      if (!orcamento.id) orcamento.id = await Orcamento.max("id") as number + 1;
+      if (!orcamento.id)
+        orcamento.id = ((await Orcamento.max("id")) as number) + 1;
 
       let orcamentoCreated: Orcamento = await Orcamento.create(orcamento, {
         transaction: transaction,
@@ -304,6 +305,100 @@ export default class OrcamentoController {
         where: { id: Number(id) },
       });
       return res.status(202).json(orcamentoUpdated);
+    } catch (error: any) {
+      console.log(error);
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async aprovarOrcamento(req: Request, res: Response) {
+    const { id } = req.params;
+    try {
+      const transaction = await sequelize.transaction();
+
+      await Orcamento.update(
+        { status: "Aprovado", aprovado: true },
+        { where: { id: Number(id) }, transaction: transaction }
+      );
+
+      let orcamento = await Orcamento.findByPk(id, {
+        include: [
+          Contato,
+          Pessoa,
+          {
+            model: Vendedor,
+            include: [Pessoa],
+            attributes: { exclude: ["id_pessoa"] },
+          },
+        ],
+        attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
+      });
+
+      if (!orcamento) throw new Error("Orçamento não encontrado");
+      if (!orcamento.pessoa) throw new Error("Pessoa não encontrada");
+      if (!orcamento.pessoa.cnpj_cpf)
+        throw new Error("CNPJ/CPF não encontrado");
+
+      if (!orcamento?.pessoa?.id_tinyerp && orcamento?.pessoa?.cnpj_cpf) {
+        const verificaPessoa = await TinyERP.getPessoaPorCNPJ_CPF(
+          orcamento?.pessoa.cnpj_cpf!
+        );
+        // console.log(verificaPessoa);
+        // console.log(verificaPessoa.retorno.erros[0].erro)
+        if (verificaPessoa.retorno.status === "OK") {
+          await Pessoa.update(
+            { id_tinyerp: verificaPessoa.retorno.contatos[0].contato.id },
+            { where: { id: orcamento?.pessoa.id }, transaction: transaction }
+          );
+
+          orcamento = await Orcamento.findByPk(id, {
+            include: [
+              Contato,
+              Pessoa,
+              {
+                model: Vendedor,
+                include: [Pessoa],
+                attributes: { exclude: ["id_pessoa"] },
+              },
+            ],
+            attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
+          });
+        } else if (
+          verificaPessoa.retorno.erros[0].erro ==
+          "A consulta não retornou registros"
+        ) {
+          const response = await TinyERP.createPessoa(orcamento.pessoa);
+
+          if (response.retorno.status === "Erro")
+            throw new Error(response.retorno.erros[0].erro);
+          if (response.retorno.status === "OK") {
+            await Pessoa.update(
+              { id_tinyerp: response.retorno.registros[0].registro.id },
+              { where: { id: orcamento?.pessoa.id }, transaction: transaction }
+            );
+          }
+
+          orcamento = await Orcamento.findByPk(id, {
+            include: [
+              Contato,
+              Pessoa,
+              {
+                model: Vendedor,
+                include: [Pessoa],
+                attributes: { exclude: ["id_pessoa"] },
+              },
+            ],
+            attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
+          });
+        } else {
+          throw new Error(verificaPessoa.retorno.erros[0].erro);
+        }
+      }
+
+      
+
+      transaction.commit();
+      return res.status(200).json(orcamento);
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);

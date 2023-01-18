@@ -12,8 +12,8 @@ router
   )
   .get(
     "/pessoa/:id",
-    Authentication.verificaLogin,
-    Authentication.verificaAcesso(["pessoa", "findOne"]),
+    // Authentication.verificaLogin,
+    // Authentication.verificaAcesso(["pessoa", "findOne"]),
     PessoasController.findOnePessoa
   )
   .get(
@@ -30,8 +30,8 @@ router
   )
   .post(
     "/pessoa/cnpj_cpf/existe",
-    Authentication.verificaLogin,
-    Authentication.verificaAcesso(["pessoa", "create"]),
+    // Authentication.verificaLogin,
+    // Authentication.verificaAcesso(["pessoa", "create"]),
     PessoasController.existeCnpjCpfPessoa
   )
   .post(

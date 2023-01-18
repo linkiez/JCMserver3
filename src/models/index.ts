@@ -15,6 +15,7 @@ import RegistroInspecaoRecebimento from './RIR'
 import OrdemProducao from './OrdemProducao';
 import OrdemProducaoItem from './OrdemProducaoItem';
 import OrdemProducaoItemProcesso from './OrdemProducaoItemProcesso';
+import Empresa from './Empresa';
 
 export function models(): void {
   Pessoa.associate()
@@ -34,4 +35,5 @@ export function models(): void {
   OrdemProducao.associate()
   OrdemProducaoItem.associate()
   OrdemProducaoItemProcesso.associate()
+  Empresa.associate()
 }

@@ -19,6 +19,7 @@ import Contato from "./Contato";
 import Vendedor from "./Vendedor";
 import OrcamentoItem from "./OrcamentoItem";
 import OrdemProducao from "./OrdemProducao";
+import Empresa from "./Empresa";
 
 export default class Orcamento extends Model {
   declare id: number;
@@ -69,7 +70,9 @@ export default class Orcamento extends Model {
     Orcamento.belongsTo(Vendedor, {
       foreignKey: { name: "id_vendedor", allowNull: false },
     });
-
+    Orcamento.belongsTo(Empresa, {
+      foreignKey: { name: "id_empresa", allowNull: true },
+    });
     Orcamento.hasMany(OrcamentoItem, {
       foreignKey: "id_orcamento",
       onDelete: "cascade",

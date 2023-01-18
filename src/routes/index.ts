@@ -13,6 +13,7 @@ import rir from './RIRRoutes'
 import auth from './authRoutes'
 import ordemProducao from './ordemProducaoRoutes'
 import pedidoCompra from './pedidoCompraRoutes';
+import empresa from './empresaRoutes';
 
 export function routes(app: Express) {
 
@@ -31,6 +32,7 @@ export function routes(app: Express) {
     rir,
     auth,
     ordemProducao,
-    pedidoCompra
+    pedidoCompra,
+    empresa
   );
 }

@@ -27,8 +27,15 @@ export default class ProdutosController {
           // { espessura: { [Op.like]: "%" + consulta.searchValue + "%" } },
         ],
       };
-      if (Number.isFinite(+consulta.searchValue)){
-        queryWhere[Op.or].push({ espessura: { [Op.like]: "%" + +consulta.searchValue.toFixed(2) + "%" } })
+      console.log('************')
+      console.log(typeof consulta.searchValue, Number(consulta.searchValue));
+      console.log('************')
+      if (Number.isFinite(Number(consulta.searchValue)) && consulta.searchValue !== '') {
+        queryWhere[Op.or].push({
+          espessura: {
+            [Op.like]: "%" + Number(consulta.searchValue).toFixed(2) + "%",
+          },
+        });
       }
 
       if (req.query.deleted === "true")

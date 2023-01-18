@@ -22,9 +22,11 @@ import Vendedor from "./Vendedor";
 import Orcamento from "./Orcamento";
 import RegistroInspecaoRecebimento from "./RIR";
 import Operador from "./Operador";
+import Empresa from "./Empresa";
 
 export default class Pessoa extends Model {
   declare id: number;
+  declare id_tinyerp: string;
   declare nome: string;
   declare razao_social: string;
   declare pessoa_juridica: boolean;
@@ -32,6 +34,9 @@ export default class Pessoa extends Model {
   declare email: string;
   declare email_nfe: string;
   declare endereco: string;
+  declare numero: string;
+  declare complemento: string;
+  declare bairro: string;
   declare municipio: string;
   declare uf: string;
   declare cep: string;
@@ -48,6 +53,7 @@ export default class Pessoa extends Model {
   declare operador: Operador;
   declare usuario: Usuario;
   declare vendedor: Vendedor;
+  declare empresa: Empresa;
 
   declare getFiles: HasManyGetAssociationsMixin<File>; //
   declare addFile: HasManyAddAssociationMixin<File, number>;
@@ -74,6 +80,7 @@ export default class Pessoa extends Model {
     Pessoa.hasOne(Fornecedor, { foreignKey: "id_pessoa" });
     Pessoa.hasOne(Usuario, { foreignKey: "id_pessoa" });
     Pessoa.hasOne(Vendedor, { foreignKey: "id_pessoa" });
+    Pessoa.hasOne(Empresa, { foreignKey: "id_pessoa" });
     Pessoa.hasOne(Operador, { foreignKey: "id_pessoa" });
     Pessoa.hasMany(RegistroInspecaoRecebimento, { foreignKey: "id_pessoa" });
     Pessoa.hasMany(Orcamento, { foreignKey: "id_pessoa" });
@@ -89,6 +96,7 @@ Pessoa.init(
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
+    id_tinyerp: DataTypes.STRING,
     nome: DataTypes.STRING,
     razao_social: DataTypes.STRING,
     pessoa_juridica: DataTypes.BOOLEAN,
@@ -106,6 +114,9 @@ Pessoa.init(
       },
     },
     endereco: DataTypes.STRING,
+    numero: DataTypes.STRING,
+    complemento: DataTypes.STRING,
+    bairro: DataTypes.STRING,
     municipio: DataTypes.STRING,
     uf: DataTypes.STRING(2),
     cep: DataTypes.STRING,
