@@ -6,7 +6,6 @@ import OrdemProducao from "./OrdemProducao";
 
 export default class Vendedor extends Model {
   declare id: number;
-  declare senha: string;
   declare deletedAt: Date;
   declare updatedAt: Date;
   declare createdAt: Date;

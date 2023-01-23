@@ -26,7 +26,7 @@ export default class OrcamentoItem extends Model {
   declare produto: Produto;
   declare id_produto: number;
   declare material_incluido: boolean;
-  declare processo: string;
+  declare processo: Array<string>;
   declare largura: number;
   declare altura: number;
   declare quantidade: number;

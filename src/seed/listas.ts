@@ -1,5 +1,14 @@
 export const listasGenericas = [
   {
+    nome: "aprovadoOrcamento",
+    lista_generica_items: [
+      { valor: "Balcão" },
+      { valor: "Email" },
+      { valor: "WhatsApp" },
+      { valor: "Telefone" },
+    ],
+  },
+  {
     nome: "processos",
     lista_generica_items: [
       { valor: "Serviço de Terceiro" },

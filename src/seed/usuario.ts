@@ -123,6 +123,15 @@ export var usuario = {
             "update": true,
             "destroy": true,
             "restore": true
+        },
+        "empresa": {
+            "findAll": true,
+            "findAllDeleted": true,
+            "findOne": true,
+            "create": true,
+            "update": true,
+            "destroy": true,
+            "restore": true
         }
     }
 

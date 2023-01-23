@@ -9,6 +9,16 @@ import Pessoa from "../models/Pessoa";
 import Vendedor from "../models/Vendedor";
 import Produto from "../models/Produto";
 import { Op } from "sequelize";
+import Empresa from "../models/Empresa";
+import Pessoa_Empresa from "../models/Pessoa_Empresa";
+import VendaTiny from "../models/VendaTiny";
+import moment from "moment";
+import momentBussiness from "moment-business-days";
+import { google } from "googleapis";
+import { GoogleApi } from "../services/googleapis";
+import OrdemProducao from "../models/OrdemProducao";
+import OrdemProducaoItem from "../models/OrdemProducaoItem";
+import OrdemProducaoItemProcesso from "../models/OrdemProducaoItemProcesso";
 
 export default class OrcamentoController {
   static async findAllOrcamento(req: Request, res: Response) {
@@ -74,23 +84,7 @@ export default class OrcamentoController {
   static async findOneOrcamento(req: Request, res: Response) {
     const { id } = req.params;
     try {
-      let orcamento = await Orcamento.findByPk(id, {
-        include: [
-          {
-            model: OrcamentoItem,
-            include: [FileDb, Produto],
-            attributes: { exclude: ["id_orcamento", "id_produto"] },
-          },
-          Contato,
-          Pessoa,
-          {
-            model: Vendedor,
-            include: [Pessoa],
-            attributes: { exclude: ["id_pessoa"] },
-          },
-        ],
-        attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
-      });
+      let orcamento = await orcamentoFindByPk(id);
       return res.status(200).json(orcamento);
     } catch (error: any) {
       console.log(error);
@@ -118,6 +112,7 @@ export default class OrcamentoController {
         }
       }
       if (orcamento.vendedor) orcamento.id_vendedor = orcamento.vendedor.id;
+      if (orcamento.empresa) orcamento.id_empresa = orcamento.empresa.id;
 
       delete orcamento.pessoa;
       delete orcamento.contato;
@@ -163,23 +158,9 @@ export default class OrcamentoController {
       Promise.all(orcamentoItens).then(async () => {
         await transaction.commit();
 
-        let orcamentoCreated2 = await Orcamento.findByPk(orcamentoCreated!.id, {
-          include: [
-            {
-              model: OrcamentoItem,
-              include: [FileDb, Produto],
-              attributes: { exclude: ["id_orcamento", "id_produto"] },
-            },
-            Contato,
-            Pessoa,
-            {
-              model: Vendedor,
-              include: [Pessoa],
-              attributes: { exclude: ["id_pessoa"] },
-            },
-          ],
-          attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
-        });
+        let orcamentoCreated2 = await orcamentoFindByPk(
+          orcamentoCreated!.id.toString()
+        );
 
         return res.status(201).json(orcamentoCreated2);
       });
@@ -211,6 +192,7 @@ export default class OrcamentoController {
         }
       }
       if (orcamento.vendedor) orcamento.id_vendedor = orcamento.vendedor.id;
+      if (orcamento.empresa) orcamento.id_empresa = orcamento.empresa.id;
 
       delete orcamento.pessoa;
       delete orcamento.contato;
@@ -259,23 +241,7 @@ export default class OrcamentoController {
       Promise.all(orcamentoItens).then(async (orcamentoItem) => {
         await transaction.commit();
 
-        let orcamentoUpdated = await Orcamento.findByPk(id, {
-          include: [
-            {
-              model: OrcamentoItem,
-              include: [FileDb, Produto],
-              attributes: { exclude: ["id_orcamento", "id_produto"] },
-            },
-            Contato,
-            Pessoa,
-            {
-              model: Vendedor,
-              include: [Pessoa],
-              attributes: { exclude: ["id_pessoa"] },
-            },
-          ],
-          attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
-        });
+        let orcamentoUpdated = await orcamentoFindByPk(id);
 
         return res.status(201).json(orcamentoUpdated);
       });
@@ -316,92 +282,170 @@ export default class OrcamentoController {
     try {
       const transaction = await sequelize.transaction();
 
-      await Orcamento.update(
-        { status: "Aprovado", aprovado: true },
-        { where: { id: Number(id) }, transaction: transaction }
-      );
-
-      let orcamento = await Orcamento.findByPk(id, {
-        include: [
-          Contato,
-          Pessoa,
-          {
-            model: Vendedor,
-            include: [Pessoa],
-            attributes: { exclude: ["id_pessoa"] },
-          },
-        ],
-        attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
-      });
+      let orcamento = await orcamentoFindByPk(id);
 
       if (!orcamento) throw new Error("Orçamento não encontrado");
       if (!orcamento.pessoa) throw new Error("Pessoa não encontrada");
+      if (!orcamento.empresa)
+        throw new Error("Empresa para faturamento não encontrada");
       if (!orcamento.pessoa.cnpj_cpf)
-        throw new Error("CNPJ/CPF não encontrado");
+        throw new Error("CNPJ/CPF da Pessoa não encontrado");
 
-      if (!orcamento?.pessoa?.id_tinyerp && orcamento?.pessoa?.cnpj_cpf) {
+      const pessoa_Empresa = await Pessoa_Empresa.findOne({
+        where: {
+          pessoaId: orcamento.pessoa.id,
+          empresaId: orcamento.empresa.id,
+        },
+      });
+
+      if (pessoa_Empresa == null || !pessoa_Empresa.id_tinyerp) {
         const verificaPessoa = await TinyERP.getPessoaPorCNPJ_CPF(
-          orcamento?.pessoa.cnpj_cpf!
+          orcamento?.pessoa.cnpj_cpf!,
+          orcamento?.empresa.token_tiny
         );
-        // console.log(verificaPessoa);
-        // console.log(verificaPessoa.retorno.erros[0].erro)
+
         if (verificaPessoa.retorno.status === "OK") {
-          await Pessoa.update(
-            { id_tinyerp: verificaPessoa.retorno.contatos[0].contato.id },
-            { where: { id: orcamento?.pessoa.id }, transaction: transaction }
+          await Pessoa_Empresa.create(
+            {
+              pessoaId: orcamento.pessoa.id,
+              empresaId: orcamento.empresa.id,
+              id_tinyerp: verificaPessoa.retorno.contatos[0].contato.id,
+            },
+            { transaction: transaction }
           );
 
-          orcamento = await Orcamento.findByPk(id, {
-            include: [
-              Contato,
-              Pessoa,
-              {
-                model: Vendedor,
-                include: [Pessoa],
-                attributes: { exclude: ["id_pessoa"] },
-              },
-            ],
-            attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
-          });
+          orcamento = await orcamentoFindByPk(id);
         } else if (
           verificaPessoa.retorno.erros[0].erro ==
           "A consulta não retornou registros"
         ) {
-          const response = await TinyERP.createPessoa(orcamento.pessoa);
+          const response = await TinyERP.createPessoa(
+            orcamento.pessoa,
+            orcamento.empresa.token_tiny
+          );
 
           if (response.retorno.status === "Erro")
             throw new Error(response.retorno.erros[0].erro);
+
           if (response.retorno.status === "OK") {
-            await Pessoa.update(
-              { id_tinyerp: response.retorno.registros[0].registro.id },
-              { where: { id: orcamento?.pessoa.id }, transaction: transaction }
+            await Pessoa_Empresa.create(
+              {
+                pessoaId: orcamento.pessoa.id,
+                empresaId: orcamento.empresa.id,
+                id_tinyerp: response.retorno.registros[0].registro.id,
+              },
+              { transaction: transaction }
             );
           }
 
-          orcamento = await Orcamento.findByPk(id, {
-            include: [
-              Contato,
-              Pessoa,
-              {
-                model: Vendedor,
-                include: [Pessoa],
-                attributes: { exclude: ["id_pessoa"] },
-              },
-            ],
-            attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
-          });
+          orcamento = await orcamentoFindByPk(id);
         } else {
           throw new Error(verificaPessoa.retorno.erros[0].erro);
         }
       }
 
-      
+      let createVenda = await TinyERP.createVenda(
+        orcamento!,
+        orcamento!.empresa.token_tiny
+      );
+
+      if (createVenda.retorno.status === "Erro")
+        throw new Error(createVenda.retorno.erros[0].erro);
+
+      if (createVenda.retorno.status === "OK") {
+        
+        let ordemProducao = await OrdemProducao.create(
+          {
+            id: createVenda.retorno.registros.registro.numero,
+            id_orcamento: orcamento!.id,
+            id_vendedor: orcamento!.id_vendedor,
+            data_prazo: momentBussiness()
+              .businessAdd(orcamento!.prazo_emdias)
+              .toDate(),
+            venda: createVenda.retorno.registros.registro.numero,
+            status: "Aguardando",
+          },
+          { transaction: transaction }
+        );
+
+        orcamento?.orcamento_items?.forEach(async (item) => {
+          const ordemProducaoItem = await OrdemProducaoItem.create(
+            {
+              descricao: item.descricao,
+              quantidade: item.quantidade,
+              id_ordem_producao: ordemProducao.id,
+              id_produto: item.id_produto,
+            },
+            { transaction: transaction }
+          );
+
+          ordemProducaoItem.setFiles(item.files);
+
+          item.processo.push("Inspeção")
+
+          if (item.processo.includes("Laser") || item.processo.includes("Plasma")) {
+            item.processo.push("Programação")
+          }
+
+          item.processo.forEach(async (processo) => {
+            const ordemProducaoProcesso =
+              await OrdemProducaoItemProcesso.create(
+                {
+                  id_ordem_producao_item: ordemProducaoItem.id,
+                  processo: processo,
+                },
+                { transaction: transaction }
+              );
+          });
+        });
+
+        const {aprovacao} = req.body
+
+         const venda = await VendaTiny.create({id: createVenda.retorno.registros.registro.numero, id_orcamento: orcamento!.id, id_ordem_producao: ordemProducao.id, aprovacao: aprovacao}, {transaction: transaction})
+      }
+
+      await Orcamento.update(
+        { status: "Aprovado", aprovado: true },
+        { where: { id: Number(id) }, transaction: transaction }
+      );
 
       transaction.commit();
+
+      orcamento = await orcamentoFindByPk(id);
       return res.status(200).json(orcamento);
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);
     }
   }
+}
+
+function orcamentoFindByPk(id: string) {
+  return Orcamento.findOne( { where: { id: Number(id) },
+    include: [
+      {
+        model: OrcamentoItem,
+        include: [FileDb, Produto],
+        attributes: { exclude: ["id_orcamento", "id_produto"] },
+      },
+      Contato,
+      Pessoa,
+      {
+        model: Vendedor,
+        include: [Pessoa],
+        attributes: { exclude: ["id_pessoa"] },
+      },
+      {
+        model: Empresa,
+        include: [Pessoa],
+        attributes: { exclude: ["id_pessoa"] },
+      },
+      {
+        model: VendaTiny,
+        include: [],
+        attributes: { exclude: ["id_ordem_producao"] },
+      }
+    ],
+    attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
+  });
 }

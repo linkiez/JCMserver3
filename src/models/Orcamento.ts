@@ -20,6 +20,7 @@ import Vendedor from "./Vendedor";
 import OrcamentoItem from "./OrcamentoItem";
 import OrdemProducao from "./OrdemProducao";
 import Empresa from "./Empresa";
+import VendaTiny from "./VendaTiny";
 
 export default class Orcamento extends Model {
   declare id: number;
@@ -45,6 +46,8 @@ export default class Orcamento extends Model {
   declare imposto: number;
   declare total: number;
   declare observacao: string;
+  declare empresa: Empresa;
+  declare orcamento_items: Array<OrcamentoItem>;
 
   declare getOrcamentoItems: HasManyGetAssociationsMixin<OrcamentoItem>; //
   declare addOrcamentoItem: HasManyAddAssociationMixin<OrcamentoItem, number>;
@@ -73,6 +76,7 @@ export default class Orcamento extends Model {
     Orcamento.belongsTo(Empresa, {
       foreignKey: { name: "id_empresa", allowNull: true },
     });
+    Orcamento.hasMany(VendaTiny, { foreignKey: "id_orcamento" })
     Orcamento.hasMany(OrcamentoItem, {
       foreignKey: "id_orcamento",
       onDelete: "cascade",

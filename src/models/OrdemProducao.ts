@@ -3,6 +3,7 @@ import { Model, DataTypes, Op } from "sequelize";
 import Orcamento from "./Orcamento";
 import Vendedor from "./Vendedor";
 import OrdemProducaoItem from "./OrdemProducaoItem";
+import VendaTiny from "./VendaTiny";
 
 export default class OrdemProducao extends Model {
   declare id: number;
@@ -26,13 +27,13 @@ export default class OrdemProducao extends Model {
       foreignKey: "id_ordem_producao",
       onDelete: "cascade",
     });
+    OrdemProducao.hasOne(VendaTiny, { foreignKey: "id_ordem_producao" });
   }
 }
 OrdemProducao.init(
   {
     id: {
       allowNull: false,
-      autoIncrement: true,
       primaryKey: true,
       type: DataTypes.BIGINT,
     },

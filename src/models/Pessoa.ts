@@ -26,7 +26,6 @@ import Empresa from "./Empresa";
 
 export default class Pessoa extends Model {
   declare id: number;
-  declare id_tinyerp: string;
   declare nome: string;
   declare razao_social: string;
   declare pessoa_juridica: boolean;
@@ -65,6 +64,10 @@ export default class Pessoa extends Model {
   declare hasFiles: HasManyHasAssociationsMixin<File, number>;
   declare countFiles: HasManyCountAssociationsMixin;
 
+  declare addEmpresa: HasManyAddAssociationMixin<Empresa, number>;
+  declare hasEmpresa: HasManyHasAssociationMixin<Empresa, number>;
+  declare getEmpresas: HasManyGetAssociationsMixin<Empresa>;
+
   declare getContatos: HasManyGetAssociationsMixin<Contato>;
   declare addContato: HasManyAddAssociationMixin<Contato, number>;
   declare addContatos: HasManyAddAssociationsMixin<Contato, number>;
@@ -81,6 +84,7 @@ export default class Pessoa extends Model {
     Pessoa.hasOne(Usuario, { foreignKey: "id_pessoa" });
     Pessoa.hasOne(Vendedor, { foreignKey: "id_pessoa" });
     Pessoa.hasOne(Empresa, { foreignKey: "id_pessoa" });
+    Pessoa.belongsToMany(Empresa, { through: "pessoa_empresa" })
     Pessoa.hasOne(Operador, { foreignKey: "id_pessoa" });
     Pessoa.hasMany(RegistroInspecaoRecebimento, { foreignKey: "id_pessoa" });
     Pessoa.hasMany(Orcamento, { foreignKey: "id_pessoa" });
@@ -96,7 +100,6 @@ Pessoa.init(
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
-    id_tinyerp: DataTypes.STRING,
     nome: DataTypes.STRING,
     razao_social: DataTypes.STRING,
     pessoa_juridica: DataTypes.BOOLEAN,

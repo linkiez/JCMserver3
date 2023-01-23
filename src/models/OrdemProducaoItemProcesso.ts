@@ -28,6 +28,7 @@ OrdemProducaoItemProcesso.init(
       type: DataTypes.BIGINT,
     },
     processo: DataTypes.STRING,
+    inicio: DataTypes.DATE,
     fabricado: DataTypes.DATE,
   },
   {

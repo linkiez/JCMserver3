@@ -118,5 +118,15 @@
     "update": false,
     "destroy": false,
     "restore": false
+  },
+  "empresa": {
+    "findAll": true,
+    "findAllDeleted": false,
+    "findOne": true,
+    "create": false,
+    "update": false,
+    "destroy": false,
+    "restore": false
   }
+  
 }

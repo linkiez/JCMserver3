@@ -4,39 +4,34 @@ import Pessoa from "./Pessoa";
 import Orcamento from "./Orcamento";
 import OrdemProducao from "./OrdemProducao";
 
-export default class Empresa extends Model {
+export default class VendaTiny extends Model {
   declare id: number;
-  declare senha: string;
   declare deletedAt: Date;
   declare updatedAt: Date;
   declare createdAt: Date;
-  declare id_pessoa: number;
-  declare pessoa: Pessoa;
-  declare token_tiny: string;
+  declare id_orcamento: number;
+  declare id_ordem_producao: number;
+  declare google_docs: string;
 
   static associate() {
     // define association here
-    Empresa.belongsTo(Pessoa, { foreignKey: "id_pessoa" });
-    Empresa.belongsToMany(Pessoa, { through: "pessoa_empresa" })
-
-    Empresa.hasMany(Orcamento, { foreignKey: "id_empresa" });
-    Empresa.hasMany(OrdemProducao, { foreignKey: "id_empresa" });
+    VendaTiny.belongsTo(Orcamento, { foreignKey: "id_orcamento" });
+    VendaTiny.belongsTo(OrdemProducao, { foreignKey: "id_ordem_producao" });
   }
 }
-Empresa.init(
+VendaTiny.init(
   {
     id: {
       allowNull: false,
-      autoIncrement: true,
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
     deletedAt: DataTypes.DATE,
-    token_tiny: DataTypes.STRING,
+    aprovacao: DataTypes.STRING,
   },
   {
     sequelize,
-    modelName: "empresa",
+    modelName: "vendastiny",
     paranoid: true,
     timestamps: true,
     freezeTableName: true,
