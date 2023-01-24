@@ -16,6 +16,7 @@ import OrdemProducao from './OrdemProducao';
 import OrdemProducaoItem from './OrdemProducaoItem';
 import OrdemProducaoItemProcesso from './OrdemProducaoItemProcesso';
 import Empresa from './Empresa';
+import VendaTiny from './VendaTiny';
 
 export function models(): void {
   Pessoa.associate()
@@ -36,4 +37,5 @@ export function models(): void {
   OrdemProducaoItem.associate()
   OrdemProducaoItemProcesso.associate()
   Empresa.associate()
+  VendaTiny.associate()
 }

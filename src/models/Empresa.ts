@@ -3,6 +3,7 @@ import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa";
 import Orcamento from "./Orcamento";
 import OrdemProducao from "./OrdemProducao";
+import VendaTiny from "./VendaTiny";
 
 export default class Empresa extends Model {
   declare id: number;
@@ -21,6 +22,7 @@ export default class Empresa extends Model {
 
     Empresa.hasMany(Orcamento, { foreignKey: "id_empresa" });
     Empresa.hasMany(OrdemProducao, { foreignKey: "id_empresa" });
+    Empresa.hasMany(VendaTiny, { foreignKey: "id_empresa" })
   }
 }
 Empresa.init(

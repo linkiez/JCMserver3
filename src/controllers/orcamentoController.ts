@@ -356,7 +356,6 @@ export default class OrcamentoController {
         
         let ordemProducao = await OrdemProducao.create(
           {
-            id: createVenda.retorno.registros.registro.numero,
             id_orcamento: orcamento!.id,
             id_vendedor: orcamento!.id_vendedor,
             data_prazo: momentBussiness()
@@ -401,7 +400,7 @@ export default class OrcamentoController {
 
         const {aprovacao} = req.body
 
-         const venda = await VendaTiny.create({id: createVenda.retorno.registros.registro.numero, id_orcamento: orcamento!.id, id_ordem_producao: ordemProducao.id, aprovacao: aprovacao}, {transaction: transaction})
+         const venda = await VendaTiny.create({venda: createVenda.retorno.registros.registro.numero, id_orcamento: orcamento!.id, id_ordem_producao: ordemProducao.id, aprovacao: aprovacao, id_empresa: orcamento?.empresa.id}, {transaction: transaction})
       }
 
       await Orcamento.update(
@@ -442,7 +441,7 @@ function orcamentoFindByPk(id: string) {
       },
       {
         model: VendaTiny,
-        include: [],
+        include: [OrdemProducao],
         attributes: { exclude: ["id_ordem_producao"] },
       }
     ],

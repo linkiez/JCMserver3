@@ -72,9 +72,6 @@ export default class OrdemProducaoController {
       delete ordemProducao.orcamento;
       delete ordemProducao.vendedor;
 
-      if (!ordemProducao.id)
-      ordemProducao.id = ((await OrdemProducao.max("id")) as number) + 1;
-
       let ordemProducaoCreated: OrdemProducao = await OrdemProducao.create(
         ordemProducao,
         { transaction: transaction }

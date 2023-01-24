@@ -3,6 +3,7 @@ import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa";
 import Orcamento from "./Orcamento";
 import OrdemProducao from "./OrdemProducao";
+import Empresa from "./Empresa";
 
 export default class VendaTiny extends Model {
   declare id: number;
@@ -17,6 +18,7 @@ export default class VendaTiny extends Model {
     // define association here
     VendaTiny.belongsTo(Orcamento, { foreignKey: "id_orcamento" });
     VendaTiny.belongsTo(OrdemProducao, { foreignKey: "id_ordem_producao" });
+    VendaTiny.belongsTo(Empresa, { foreignKey: "id_empresa" });
   }
 }
 VendaTiny.init(
@@ -24,10 +26,12 @@ VendaTiny.init(
     id: {
       allowNull: false,
       primaryKey: true,
+      autoIncrement: true,
       type: DataTypes.BIGINT,
     },
     deletedAt: DataTypes.DATE,
     aprovacao: DataTypes.STRING,
+    venda: DataTypes.INTEGER,
   },
   {
     sequelize,

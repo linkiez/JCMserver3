@@ -35,11 +35,13 @@ OrdemProducao.init(
     id: {
       allowNull: false,
       primaryKey: true,
+      autoIncrement: true,
       type: DataTypes.BIGINT,
     },
     data_prazo: DataTypes.DATE,
     data_finalizacao: DataTypes.DATE,
     data_entregue: DataTypes.DATE,
+    data_negociado: DataTypes.DATE,
     venda: DataTypes.INTEGER,
     status: DataTypes.STRING,
   },
