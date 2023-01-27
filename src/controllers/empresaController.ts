@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Empresa from "../models/Empresa";
 import Pessoa from "../models/Pessoa";
 import { Op } from "sequelize";
+import File from "../models/File";
 
 export default class EmpresaController {
   static async findAllEmpresas(req: Request, res: Response) {
@@ -35,9 +36,10 @@ export default class EmpresaController {
                 ? queryWhere
                 : undefined,
           },
+          File
         ],
         paranoid: req.query.deleted === "true" ? false : true,
-        attributes: { exclude: ["id_pessoa"] },
+        attributes: { exclude: ["id_pessoa","id_file"] },
       });
       resultado.totalRecords = await Empresa.count({
         include: [
@@ -64,8 +66,8 @@ export default class EmpresaController {
     try {
       const empresa = await Empresa.findOne({
         where: { id: Number(id) },
-        include: [Pessoa],
-        attributes: { exclude: ["id_pessoa"] },
+        include: [Pessoa, File],
+        attributes: { exclude: ["id_pessoa", "id_file"] },
       });
       return res.status(200).json(empresa);
     } catch (error: any) {

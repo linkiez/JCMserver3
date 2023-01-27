@@ -42,6 +42,7 @@ OrdemProducao.init(
     data_finalizacao: DataTypes.DATE,
     data_entregue: DataTypes.DATE,
     data_negociado: DataTypes.DATE,
+    dias_de_producao: DataTypes.INTEGER,
     venda: DataTypes.INTEGER,
     status: DataTypes.STRING,
   },

@@ -5,6 +5,7 @@ import OrcamentoItem from "./OrcamentoItem";
 import RegistroInspecaoRecebimento from "./RIR";
 import PedidoCompra from "./PedidoCompra";
 import Produto from "./Produto";
+import Empresa from "./Empresa";
 
 export default class File extends Model {
   declare id: number;
@@ -27,6 +28,8 @@ export default class File extends Model {
     });
     File.belongsToMany(PedidoCompra, { through: "pedido_compra_file" });
     File.belongsToMany(Produto, { through: "produto_file" });
+
+    File.hasOne(Empresa, { foreignKey: "id_file" })
   }
 }
 File.init(

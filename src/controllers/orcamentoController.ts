@@ -436,8 +436,8 @@ function orcamentoFindByPk(id: string) {
       },
       {
         model: Empresa,
-        include: [Pessoa],
-        attributes: { exclude: ["id_pessoa"] },
+        include: [Pessoa, FileDb],
+        attributes: { exclude: ["id_pessoa", "id_file"] },
       },
       {
         model: VendaTiny,
@@ -445,6 +445,6 @@ function orcamentoFindByPk(id: string) {
         attributes: { exclude: ["id_ordem_producao"] },
       }
     ],
-    attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato"] },
+    attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato", "id_empresa"] },
   });
 }

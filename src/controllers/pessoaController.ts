@@ -68,7 +68,18 @@ export default class PessoaController {
     try {
       const pessoa = await Pessoa.findOne({
         where: { id: Number(id) },
-        include: [Contato, FileDb, Fornecedor, Vendedor, Operador, Empresa],
+        include: [
+          Contato,
+          FileDb,
+          Fornecedor,
+          Vendedor,
+          Operador,
+          {
+            model: Empresa,
+            include: [FileDb],
+            attributes: { exclude: ["id_file"] },
+          },
+        ],
       });
       return res.status(200).json(pessoa);
     } catch (error: any) {
@@ -125,6 +136,11 @@ export default class PessoaController {
       if (pessoa.empresa) {
         let empresa = pessoa.empresa;
         empresa.id_pessoa = pessoaCreated.id;
+        if (empresa.file) {
+          let file = empresa.file;
+          delete empresa.file;
+          empresa.id_file = file.id;
+        }
         await Empresa.create(empresa, { transaction: transaction });
       }
 
@@ -238,6 +254,11 @@ export default class PessoaController {
           let empresa = pessoa.empresa;
           let id_empresa = empresa.id;
           delete empresa.id;
+          if (empresa.file) {
+            let file = empresa.file;
+            delete empresa.file;
+            empresa.id_file = file.id;
+          }
           await Empresa.update(empresa, {
             where: { id: Number(id_empresa) },
             transaction: transaction,
@@ -245,6 +266,11 @@ export default class PessoaController {
         } else {
           let empresa = pessoa.empresa;
           empresa.id_pessoa = id;
+          if (empresa.file) {
+            let file = empresa.file;
+            delete empresa.file;
+            empresa.id_file = file.id;
+          }
           await Empresa.create(empresa, { transaction: transaction });
         }
       }
