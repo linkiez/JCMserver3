@@ -71,6 +71,7 @@ OrdemProducaoItem.init(
     descricao: DataTypes.STRING,
     quantidade: DataTypes.FLOAT,
     observacao: DataTypes.TEXT,
+    
   },
   {
     sequelize,

@@ -22,7 +22,6 @@ export default class Empresa extends Model {
     Empresa.belongsToMany(Pessoa, { through: "pessoa_empresa" })
 
     Empresa.hasMany(Orcamento, { foreignKey: "id_empresa" });
-    Empresa.hasMany(OrdemProducao, { foreignKey: "id_empresa" });
     Empresa.hasMany(VendaTiny, { foreignKey: "id_empresa" })
 
     Empresa.belongsTo(File, { foreignKey: "id_file" })

@@ -19,6 +19,7 @@ import { GoogleApi } from "../services/googleapis";
 import OrdemProducao from "../models/OrdemProducao";
 import OrdemProducaoItem from "../models/OrdemProducaoItem";
 import OrdemProducaoItemProcesso from "../models/OrdemProducaoItemProcesso";
+import { create } from "domain";
 
 export default class OrcamentoController {
   static async findAllOrcamento(req: Request, res: Response) {
@@ -344,16 +345,48 @@ export default class OrcamentoController {
         }
       }
 
-      let createVenda = await TinyERP.createVenda(
-        orcamento!,
-        orcamento!.empresa.token_tiny
-      );
+      let createVenda: any = null;
+
+      if (orcamento?.empresa.pessoa.cnpj_cpf == "42768425000195") {
+        orcamento.orcamento_items = orcamento.orcamento_items.map(
+          (item: any) => {
+            if (!item.produto.id_tiny) {
+              let produtoRetorno = TinyERP.getProduto(
+                item.produto,
+                orcamento!.empresa.token_tiny
+              );
+
+              produtoRetorno.then((retorno: any) => {
+                if (retorno.retorno.status === "OK") {
+                  item.produto.id_tiny = retorno.retorno.produtos[0].produto.id;
+                  Produto.update(
+                    { id_tiny: retorno.retorno.produtos[0].produto.id },
+                    { where: { id: item.produto.id } }
+                  );
+                  return item;
+                }
+                if (retorno.retorno.status === "Erro")
+                  throw new Error(retorno.retorno.erros[0].erro);
+              });
+            }
+            return item;
+          }
+        );
+        createVenda = await TinyERP.createVendaFmoreno(
+          orcamento!,
+          orcamento!.empresa.token_tiny
+        );
+      } else {
+        createVenda = await TinyERP.createVenda(
+          orcamento!,
+          orcamento!.empresa.token_tiny
+        );
+      }
 
       if (createVenda.retorno.status === "Erro")
         throw new Error(createVenda.retorno.erros[0].erro);
 
       if (createVenda.retorno.status === "OK") {
-        
         let ordemProducao = await OrdemProducao.create(
           {
             id_orcamento: orcamento!.id,
@@ -373,17 +406,20 @@ export default class OrcamentoController {
               descricao: item.descricao,
               quantidade: item.quantidade,
               id_ordem_producao: ordemProducao.id,
-              id_produto: item.id_produto,
+              id_produto: item.produto.id,
             },
             { transaction: transaction }
           );
 
           ordemProducaoItem.setFiles(item.files);
 
-          item.processo.push("Inspeção")
+          item.processo.push("Inspeção");
 
-          if (item.processo.includes("Laser") || item.processo.includes("Plasma")) {
-            item.processo.push("Programação")
+          if (
+            item.processo.includes("Laser") ||
+            item.processo.includes("Plasma")
+          ) {
+            item.processo.push("Programação");
           }
 
           item.processo.forEach(async (processo) => {
@@ -398,9 +434,18 @@ export default class OrcamentoController {
           });
         });
 
-        const {aprovacao} = req.body
+        const { aprovacao } = req.body;
 
-         const venda = await VendaTiny.create({venda: createVenda.retorno.registros.registro.numero, id_orcamento: orcamento!.id, id_ordem_producao: ordemProducao.id, aprovacao: aprovacao, id_empresa: orcamento?.empresa.id}, {transaction: transaction})
+        const venda = await VendaTiny.create(
+          {
+            venda: createVenda.retorno.registros.registro.numero,
+            id_orcamento: orcamento!.id,
+            id_ordem_producao: ordemProducao.id,
+            aprovacao: aprovacao,
+            id_empresa: orcamento?.empresa.id,
+          },
+          { transaction: transaction }
+        );
       }
 
       await Orcamento.update(
@@ -420,7 +465,8 @@ export default class OrcamentoController {
 }
 
 function orcamentoFindByPk(id: string) {
-  return Orcamento.findOne( { where: { id: Number(id) },
+  return Orcamento.findOne({
+    where: { id: Number(id) },
     include: [
       {
         model: OrcamentoItem,
@@ -443,8 +489,10 @@ function orcamentoFindByPk(id: string) {
         model: VendaTiny,
         include: [OrdemProducao],
         attributes: { exclude: ["id_ordem_producao"] },
-      }
+      },
     ],
-    attributes: { exclude: ["id_pessoa", "id_vendedor", "id_contato", "id_empresa"] },
+    attributes: {
+      exclude: ["id_pessoa", "id_vendedor", "id_contato", "id_empresa"],
+    },
   });
 }

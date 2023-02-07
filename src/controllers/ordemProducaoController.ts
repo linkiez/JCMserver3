@@ -5,6 +5,10 @@ import OrdemProducaoItem from "../models/OrdemProducaoItem";
 import OrdemProducaoItemProcesso from "../models/OrdemProducaoItemProcesso";
 import Vendedor from "../models/Vendedor";
 import FileDb from "../models/File";
+import Orcamento from "../models/Orcamento";
+import Empresa from "../models/Empresa";
+import Pessoa from "../models/Pessoa";
+import Produto from "../models/Produto";
 
 export default class OrdemProducaoController {
   static async findAllOrdemProducao(req: Request, res: Response) {
@@ -34,7 +38,16 @@ export default class OrdemProducaoController {
     try {
       let ordemProducao = await OrdemProducao.findByPk(id, {
         include: [
-          Vendedor,
+          {
+            model: Vendedor,
+            include: [Pessoa],
+            attributes: { exclude: ["id_pessoa"] },
+          },
+          {
+            model: Orcamento,
+            include: [Pessoa],
+            attributes: { exclude: ["id_pessoa"] },
+          },
           {
             model: OrdemProducaoItem,
             include: [
@@ -43,11 +56,12 @@ export default class OrdemProducaoController {
                 model: OrdemProducaoItemProcesso,
                 attributes: { exclude: ["id_ordem_producao_item"] },
               },
+              Produto
             ],
-            attributes: { exclude: ["id_ordem_producao"] },
+            attributes: { exclude: ["id_ordem_producao", "id_produto"] },
           },
         ],
-        attributes: { exclude: ["id_vendedor"] },
+        attributes: { exclude: ["id_vendedor", "id_orcamento"] },
       });
 
       return res.status(201).json(ordemProducao);

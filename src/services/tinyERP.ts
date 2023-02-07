@@ -3,18 +3,16 @@ import Pessoa from "../models/Pessoa";
 import moment from "moment";
 import momentBussiness from "moment-business-days";
 import Pessoa_Empresa from "../models/Pessoa_Empresa";
+import Produto from "../models/Produto";
 export class TinyERP {
-  static formato = "json";
-
   constructor() {}
 
-  static async postData(url = "", data = {}, token: string) {
-    let dados = { ...data, token: token, formato: this.formato };
+  static async postData(url = "") {
     // Default options are marked with *
     const response = await fetch(url, {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
       mode: "same-origin", // no-cors, *cors, same-origin
-      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      cache: "default", // *default, no-cache, reload, force-cache, only-if-cached
       credentials: "same-origin", // include, *same-origin, omit
       headers: {
         "Content-Type": "application/json",
@@ -22,15 +20,14 @@ export class TinyERP {
       },
       redirect: "follow", // manual, *follow, error
       referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      body: JSON.stringify(dados), // body data type must match "Content-Type" header
+      //body: JSON.stringify(dados), // body data type must match "Content-Type" header
     });
-    const stream = await response.body?.getReader().read();
 
-    let jsonBuffer = Buffer.from(stream?.value!);
-
-    let jsonString = jsonBuffer.toString("utf8");
-    console.log(jsonString);
-    return JSON.parse(jsonString); // parses JSON response into native JavaScript objects
+    if (!response.ok) {
+      throw new Error(`HTTP error ${response.status}`);
+    }
+    // *** Fully read the response body and parse it from JSON:
+    return await response.json();
   }
 
   static async getPessoaPorCNPJ_CPF(cnpj_cpf: string, token: string) {
@@ -39,9 +36,7 @@ export class TinyERP {
       "https://api.tiny.com.br/api2/contatos.pesquisa.php?token=" +
         token +
         "&formato=JSON&cpf_cnpj=" +
-        cnpj_cpf,
-      request,
-      token
+        cnpj_cpf
     );
   }
 
@@ -82,9 +77,7 @@ export class TinyERP {
       "https://api.tiny.com.br/api2/contato.incluir.php?token=" +
         token +
         "&formato=JSON&contato=" +
-        JSON.stringify(request),
-      request,
-      token
+        JSON.stringify(request)
     );
   }
 
@@ -125,9 +118,62 @@ export class TinyERP {
       "https://api.tiny.com.br/api2/pedido.incluir.php?token=" +
         token +
         "&formato=JSON&pedido=" +
-        JSON.stringify(request),
-      request,
-      token
+        JSON.stringify(request)
     );
   }
+
+  static async createVendaFmoreno(orcamento: Orcamento, token: string) {
+    momentBussiness.updateLocale("pt-BR", { workingWeekdays: [1, 2, 3, 4, 5] });
+    const codigoCliente = await Pessoa_Empresa.findOne({
+      where: { pessoaId: orcamento.pessoa.id, empresaId: orcamento.empresa.id },
+    });
+    let request = {
+      pedido: {
+        data_pedido: moment().format("DD-MM-YYYY"),
+        data_prevista: momentBussiness()
+          .businessAdd(orcamento.prazo_emdias)
+          .format("DD-MM-YYYY"),
+        cliente: {
+          codigo: codigoCliente?.id_tinyerp,
+          nome: orcamento.pessoa.nome,
+        },
+        itens: orcamento.orcamento_items.map((item, index) => {
+          return {
+            item: {
+              codigo: item.produto.id_tiny,
+              descricao: item.produto.nome,
+              unidade: "KG",
+              quantidade: item.total_peso,
+              valor_unitario: item.total / item.total_peso,
+            },
+          };
+        }),
+        valor_frete: orcamento.frete,
+        valor_desconto: orcamento.desconto,
+        numero_ordem_compra: orcamento.pc_cliente,
+        situacao: "Aberto",
+        obs: orcamento.observacao,
+      },
+    };
+
+    return this.postData(
+      "https://api.tiny.com.br/api2/pedido.incluir.php?token=" +
+        token +
+        "&formato=JSON&pedido=" +
+        JSON.stringify(request)
+    );
+  }
+
+  static getProduto(produto: Produto, token: string) {
+    return this.postData(
+      "https://api.tiny.com.br/api2/produtos.pesquisa.php?token=" +
+        token +
+        "&formato=JSON&pesquisa=" +
+        JSON.stringify(produto.nome)
+    );
+  }
+}
+
+function timeout(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

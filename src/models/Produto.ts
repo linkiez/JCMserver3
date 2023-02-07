@@ -15,6 +15,7 @@ export default class Produto extends Model {
   declare createdAt: Date;
   declare deletedAt: Date;
   declare files: Array<FileDb>;
+  declare id_tiny: string;
 
   declare setFiles: HasManySetAssociationsMixin<File, number>;
 

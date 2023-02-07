@@ -34,6 +34,7 @@ export default class OrcamentoItem extends Model {
   declare preco_quilo: number;
   declare tempo: string;
   declare preco_hora: number;
+  declare total_peso: number;
   declare total_manual: number;
   declare deletedAt: Date;
   declare updatedAt: Date;
