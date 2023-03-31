@@ -383,8 +383,9 @@ export default class OrcamentoController {
         );
       }
 
-      if (createVenda.retorno.status === "Erro")
-        throw new Error(createVenda.retorno.erros[0].erro);
+      if (createVenda.retorno.status === "Erro") {
+        throw new Error(createVenda.retorno.registros.registro.erros[0].erro);
+      }
 
       if (createVenda.retorno.status === "OK") {
         let ordemProducao = await OrdemProducao.create(

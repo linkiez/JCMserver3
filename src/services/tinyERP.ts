@@ -169,7 +169,7 @@ export class TinyERP {
       "https://api.tiny.com.br/api2/produtos.pesquisa.php?token=" +
         token +
         "&formato=JSON&pesquisa=" +
-        JSON.stringify(produto.nome)
+        produto.nome
     );
   }
 }
