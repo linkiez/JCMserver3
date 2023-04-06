@@ -1,6 +1,7 @@
 import sequelize from "../config/connPostgre";
 import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa";
+import OrdemProducaoHistorico from "./OrdemProducaoHistorico";
 
 export default class Usuario extends Model {
   declare id: number;
@@ -16,6 +17,7 @@ export default class Usuario extends Model {
   static associate() {
     // define association here
     Usuario.belongsTo(Pessoa, { foreignKey: "id_pessoa" });
+    Usuario.belongsTo(OrdemProducaoHistorico, { foreignKey: "id_usuario" })
   }
 }
 Usuario.init(

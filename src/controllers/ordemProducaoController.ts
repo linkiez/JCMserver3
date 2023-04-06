@@ -9,12 +9,55 @@ import Orcamento from "../models/Orcamento";
 import Empresa from "../models/Empresa";
 import Pessoa from "../models/Pessoa";
 import Produto from "../models/Produto";
+import { Op } from "sequelize";
+import VendaTiny from "../models/VendaTiny";
 
 export default class OrdemProducaoController {
   static async findAllOrdemProducao(req: Request, res: Response) {
     try {
-      let orcamento = await OrdemProducao.findAll();
-      return res.status(200).json(orcamento);
+      let consulta: any = {
+        pageCount: Number(req.query.pageCount) || 10,
+        page: Number(req.query.page) || 0,
+        searchValue: req.query.searchValue,
+      };
+
+      let resultado: { ordemProducao: OrdemProducao[]; totalRecords: Number } = {
+        ordemProducao: [],
+        totalRecords: 0,
+      };
+
+      let queryWhere: any = {
+        // [Op.or]: [{ id: { [Op.like]: "%" + consulta.searchValue + "%" } }],
+      };
+
+      if (req.query.deleted === "true")
+        queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
+      
+      resultado.ordemProducao = await OrdemProducao.findAll({
+        limit: consulta.pageCount,
+        offset: consulta.pageCount * consulta.page,
+        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
+        paranoid: req.query.deleted === "true" ? false : true,
+        include: [
+          {
+            model: Vendedor,
+            include: [{ model: Pessoa }],
+          },
+          {
+            model: Orcamento,
+            include: [{ model: Pessoa }],
+          },
+          VendaTiny
+        ],
+        order: [["id", "DESC"]],
+      });
+
+      resultado.totalRecords = await OrdemProducao.count({
+        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
+        paranoid: req.query.deleted === "true" ? false : true,
+      });
+
+      return res.status(200).json(resultado);
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);

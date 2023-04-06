@@ -4,6 +4,7 @@ import Orcamento from "./Orcamento";
 import Vendedor from "./Vendedor";
 import OrdemProducaoItem from "./OrdemProducaoItem";
 import VendaTiny from "./VendaTiny";
+import OrdemProducaoHistorico from "./OrdemProducaoHistorico";
 
 export default class OrdemProducao extends Model {
   declare id: number;
@@ -24,6 +25,10 @@ export default class OrdemProducao extends Model {
     OrdemProducao.belongsTo(Orcamento, { foreignKey: "id_orcamento" });
     OrdemProducao.belongsTo(Vendedor, { foreignKey: "id_vendedor" });
     OrdemProducao.hasMany(OrdemProducaoItem, {
+      foreignKey: "id_ordem_producao",
+      onDelete: "cascade",
+    });
+    OrdemProducao.hasMany(OrdemProducaoHistorico, {
       foreignKey: "id_ordem_producao",
       onDelete: "cascade",
     });

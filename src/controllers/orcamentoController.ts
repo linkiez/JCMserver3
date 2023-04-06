@@ -283,7 +283,8 @@ export default class OrcamentoController {
     try {
       const transaction = await sequelize.transaction();
 
-      let orcamento = await orcamentoFindByPk(id);
+      let orcamento = await orcamentoFindByPk(id)
+      console.log(orcamento);
 
       if (!orcamento) throw new Error("Orçamento não encontrado");
       if (!orcamento.pessoa) throw new Error("Pessoa não encontrada");
