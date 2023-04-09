@@ -283,7 +283,8 @@ export default class OrcamentoController {
     try {
       const transaction = await sequelize.transaction();
 
-      let orcamento = await orcamentoFindByPk(id);
+      let orcamento = await orcamentoFindByPk(id)
+      console.log(orcamento);
 
       if (!orcamento) throw new Error("Orçamento não encontrado");
       if (!orcamento.pessoa) throw new Error("Pessoa não encontrada");
@@ -383,8 +384,9 @@ export default class OrcamentoController {
         );
       }
 
-      if (createVenda.retorno.status === "Erro")
-        throw new Error(createVenda.retorno.erros[0].erro);
+      if (createVenda.retorno.status === "Erro") {
+        throw new Error(createVenda.retorno.registros.registro.erros[0].erro);
+      }
 
       if (createVenda.retorno.status === "OK") {
         let ordemProducao = await OrdemProducao.create(

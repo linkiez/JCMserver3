@@ -9,12 +9,55 @@ import Orcamento from "../models/Orcamento";
 import Empresa from "../models/Empresa";
 import Pessoa from "../models/Pessoa";
 import Produto from "../models/Produto";
+import { Op } from "sequelize";
+import VendaTiny from "../models/VendaTiny";
 
 export default class OrdemProducaoController {
   static async findAllOrdemProducao(req: Request, res: Response) {
     try {
-      let orcamento = await OrdemProducao.findAll();
-      return res.status(200).json(orcamento);
+      let consulta: any = {
+        pageCount: Number(req.query.pageCount) || 10,
+        page: Number(req.query.page) || 0,
+        searchValue: req.query.searchValue,
+      };
+
+      let resultado: { ordemProducao: OrdemProducao[]; totalRecords: Number } = {
+        ordemProducao: [],
+        totalRecords: 0,
+      };
+
+      let queryWhere: any = {
+        // [Op.or]: [{ id: { [Op.like]: "%" + consulta.searchValue + "%" } }],
+      };
+
+      if (req.query.deleted === "true")
+        queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
+      
+      resultado.ordemProducao = await OrdemProducao.findAll({
+        limit: consulta.pageCount,
+        offset: consulta.pageCount * consulta.page,
+        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
+        paranoid: req.query.deleted === "true" ? false : true,
+        include: [
+          {
+            model: Vendedor,
+            include: [{ model: Pessoa }],
+          },
+          {
+            model: Orcamento,
+            include: [{ model: Pessoa }],
+          },
+          VendaTiny
+        ],
+        order: [["id", "DESC"]],
+      });
+
+      resultado.totalRecords = await OrdemProducao.count({
+        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
+        paranoid: req.query.deleted === "true" ? false : true,
+      });
+
+      return res.status(200).json(resultado);
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);
@@ -154,7 +197,16 @@ export default class OrdemProducaoController {
           ordemProducaoCreated.id,
           {
             include: [
-              Vendedor,
+              {
+                model: Vendedor,
+                include: [Pessoa],
+                attributes: { exclude: ["id_pessoa"] },
+              },
+              {
+                model: Orcamento,
+                include: [Pessoa],
+                attributes: { exclude: ["id_pessoa"] },
+              },
               {
                 model: OrdemProducaoItem,
                 include: [
@@ -163,11 +215,12 @@ export default class OrdemProducaoController {
                     model: OrdemProducaoItemProcesso,
                     attributes: { exclude: ["id_ordem_producao_item"] },
                   },
+                  Produto
                 ],
-                attributes: { exclude: ["id_ordem_producao"] },
+                attributes: { exclude: ["id_ordem_producao", "id_produto"] },
               },
             ],
-            attributes: { exclude: ["id_vendedor"] },
+            attributes: { exclude: ["id_vendedor", "id_orcamento"] },
           }
         );
         return res.status(201).json(ordemProducaoCreated2);
@@ -210,6 +263,8 @@ export default class OrdemProducaoController {
           let files = ordemProducaoItem.files;
           delete ordemProducaoItem.files;
 
+          delete ordemProducaoItem.id
+
           if (ordemProducaoItem.produto) {
             ordemProducaoItem.id_produto = ordemProducaoItem.produto.id;
             delete ordemProducaoItem.produto;
@@ -243,6 +298,8 @@ export default class OrdemProducaoController {
               ordemProducaoItemProcesso.id_ordem_producao_item =
                 ordemProducaoItemCreated.id;
 
+              delete ordemProducaoItemProcesso.id
+
               let OrdemProducaoItemProcessoCreated =
                 await OrdemProducaoItemProcesso.create(
                   ordemProducaoItemProcesso,
@@ -264,7 +321,16 @@ export default class OrdemProducaoController {
 
         ordemProducaoUpdated = await OrdemProducao.findByPk(id, {
           include: [
-            Vendedor,
+            {
+              model: Vendedor,
+              include: [Pessoa],
+              attributes: { exclude: ["id_pessoa"] },
+            },
+            {
+              model: Orcamento,
+              include: [Pessoa],
+              attributes: { exclude: ["id_pessoa"] },
+            },
             {
               model: OrdemProducaoItem,
               include: [
@@ -273,11 +339,12 @@ export default class OrdemProducaoController {
                   model: OrdemProducaoItemProcesso,
                   attributes: { exclude: ["id_ordem_producao_item"] },
                 },
+                Produto
               ],
-              attributes: { exclude: ["id_ordem_producao"] },
+              attributes: { exclude: ["id_ordem_producao", "id_produto"] },
             },
           ],
-          attributes: { exclude: ["id_vendedor"] },
+          attributes: { exclude: ["id_vendedor", "id_orcamento"] },
         });
         return res.status(202).json(ordemProducaoUpdated);
       });
