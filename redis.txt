@@ -1,16 +1,1 @@
-docker run -p 6379:6379 -v redis_data:/data redis
-
-docker run -p 6379:6379 -d redis --save 60 1 --loglevel warning
-
-Usage
-
-Run redis-server
-docker run -d --name redis -p 6379:6379 dockerfile/redis
-
-Run redis-server with persistent data directory. (creates dump.rdb)
-docker run -d -p 6379:6379 -v <data-dir>:/data --name redis dockerfile/redis
-
-Run redis-server with persistent data directory and password.
-docker run -d -p 6379:6379 -v <data-dir>:/data --name redis dockerfile/redis redis-server /etc/redis/redis.conf --requirepass <password>
-
-docker run -p 6379:6379 -v host:/data --name redis -d redis redis-server --appendonly yes  --requirepass "__@picker-redis" --restart unless-stopped
+docker run -d --name redis -p 6379:6379 -v <volume-name>:/data --restart unless-stopped redis redis-server --appendonly yes --requirepass '__@picker-redis'
