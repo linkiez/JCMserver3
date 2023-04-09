@@ -27,4 +27,18 @@ export default class OrdemProducaoHistoricoController {
             return res.status(500).json(error);
         }
     }
+
+    static async DeleteOrdemProducaoHistorico(req: Request, res: Response) {
+        const id = req.params.id;
+        try {
+            await OrdemProducaoHistorico.destroy({
+                where: {
+                    id: id,
+                },
+            });
+            return res.status(200).json({msg: "Historico excluido com sucesso"});
+        } catch (error) {
+            return res.status(500).json(error);
+        }
+    }
 }

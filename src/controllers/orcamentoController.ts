@@ -12,14 +12,10 @@ import { Op } from "sequelize";
 import Empresa from "../models/Empresa";
 import Pessoa_Empresa from "../models/Pessoa_Empresa";
 import VendaTiny from "../models/VendaTiny";
-import moment from "moment";
 import momentBussiness from "moment-business-days";
-import { google } from "googleapis";
-import { GoogleApi } from "../services/googleapis";
 import OrdemProducao from "../models/OrdemProducao";
 import OrdemProducaoItem from "../models/OrdemProducaoItem";
 import OrdemProducaoItemProcesso from "../models/OrdemProducaoItemProcesso";
-import { create } from "domain";
 
 export default class OrcamentoController {
   static async findAllOrcamento(req: Request, res: Response) {

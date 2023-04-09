@@ -11,6 +11,8 @@ import Pessoa from "../models/Pessoa";
 import Produto from "../models/Produto";
 import { Op } from "sequelize";
 import VendaTiny from "../models/VendaTiny";
+import OrdemProducaoHistorico from "../models/OrdemProducaoHistorico";
+import Usuario from "../models/Usuario";
 
 export default class OrdemProducaoController {
   static async findAllOrdemProducao(req: Request, res: Response) {
@@ -47,7 +49,14 @@ export default class OrdemProducaoController {
             model: Orcamento,
             include: [{ model: Pessoa }],
           },
-          VendaTiny
+          VendaTiny,
+          {
+            model: OrdemProducaoHistorico,
+            include: [{
+              model: Usuario,
+              include: [Pessoa]
+            }]
+          }
         ],
         order: [["id", "DESC"]],
       });
@@ -103,6 +112,13 @@ export default class OrdemProducaoController {
             ],
             attributes: { exclude: ["id_ordem_producao", "id_produto"] },
           },
+          {
+            model: OrdemProducaoHistorico,
+            include: [{
+              model: Usuario,
+              include: [Pessoa]
+            }]
+          }
         ],
         attributes: { exclude: ["id_vendedor", "id_orcamento"] },
       });

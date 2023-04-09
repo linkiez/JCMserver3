@@ -41,6 +41,11 @@ export class Authentication {
 
   static async login(req: Request, res: Response) {
     const { email, senha } = req.body;
+
+    if (!email || !senha) {
+      return res.status(400).json({ message: "Email e senha são obrigatórios." });
+    }
+
     let usuario = await Usuario.findOne({
       where: { email: email },
       include: [Pessoa],
@@ -48,7 +53,7 @@ export class Authentication {
     });
 
     if (usuario) {
-      const verificaSenha = await bcrypt.compare(senha, usuario.senha!);
+      const verificaSenha = await bcrypt.compareSync(senha, usuario.senha);
       usuario.senha = "";
       if (verificaSenha) {
         const refreshToken = await TokenRefresh.cria(usuario.id);
