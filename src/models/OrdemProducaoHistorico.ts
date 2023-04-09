@@ -15,7 +15,7 @@ export default class OrdemProducaoHistorico extends Model {
     OrdemProducaoHistorico.belongsTo(OrdemProducao, {
         foreignKey: "id_ordem_producao",
       });
-    OrdemProducaoHistorico.hasOne(Usuario, {
+    OrdemProducaoHistorico.belongsTo(Usuario, {
         foreignKey: "id_usuario",
     })
   }
