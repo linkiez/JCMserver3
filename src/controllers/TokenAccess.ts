@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { InvalidTokenError } from "../config/errors";
-import Usuario from "./Usuario";
-import redis from '../config/connRedis.js'
+import Usuario from "../models/Usuario";
+import redis from "../config/connRedis";
 
 export default class TokenAccess {
   static async cria(usuario: Usuario) {
@@ -16,7 +16,8 @@ export default class TokenAccess {
   }
 
   static async verifica(token: string) {
-    if(await this.existe(token)) throw new InvalidTokenError("Access token inválido por logout!")
+    if (await this.existe(token))
+      throw new InvalidTokenError("Access token inválido por logout!");
 
     let decoded: any = jwt.verify(
       token,
@@ -28,16 +29,16 @@ export default class TokenAccess {
         return decoded;
       }
     );
-    let user = await Usuario.findByPk(Number(decoded.id))
+    let user = await Usuario.findByPk(Number(decoded.id));
     return user;
   }
 
   static async salva(token: any) {
-    await redis.set(token, '')
-    redis.expire(token, Number(process.env.ACCESS_TOKEN_EXPIRE_IN || 900))
+    await redis.set(token, "");
+    redis.expire(token, Number(process.env.ACCESS_TOKEN_EXPIRE_IN || 900));
   }
 
   static async existe(token: string) {
-    return await redis.exists(token)
+    return await redis.exists(token);
   }
 }

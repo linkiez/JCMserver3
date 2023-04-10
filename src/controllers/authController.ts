@@ -5,8 +5,8 @@ import { InvalidArgumentError } from "../config/errors";
 import { Request, Response } from "express";
 import dotenv from "dotenv";
 import Usuario from "../models/Usuario";
-import TokenAccess from "../models/TokenAccess";
-import TokenRefresh from "../models/TokenRefresh";
+import TokenAccess from "./TokenAccess";
+import TokenRefresh from "./TokenRefresh";
 import Pessoa from "../models/Pessoa";
 dotenv.config();
 
@@ -43,31 +43,38 @@ export class Authentication {
     const { email, senha } = req.body;
 
     if (!email || !senha) {
-      return res.status(400).json({ message: "Email e senha são obrigatórios." });
+      return res
+        .status(400)
+        .json({ message: "Email e senha são obrigatórios." });
     }
 
-    let usuario = await Usuario.findOne({
-      where: { email: email },
-      include: [Pessoa],
-      attributes: { exclude: ["id_pessoa"] },
-    });
+    try {
+      let usuario = await Usuario.findOne({
+        where: { email: email },
+        include: [Pessoa],
+        attributes: { exclude: ["id_pessoa"] },
+      });
 
-    if (usuario) {
-      const verificaSenha = await bcrypt.compareSync(senha, usuario.senha);
-      usuario.senha = "";
-      if (verificaSenha) {
-        const refreshToken = await TokenRefresh.cria(usuario.id);
-        const accessToken = await TokenAccess.cria(usuario);
-        return res.json({
-          auth: true,
-          accessToken: accessToken,
-          refreshToken: refreshToken,
-        });
+      if (usuario) {
+        const verificaSenha = await bcrypt.compare(senha, usuario.senha);
+        usuario.senha = "";
+        if (verificaSenha) {
+          const refreshToken = await TokenRefresh.cria(usuario.id);
+          const accessToken = await TokenAccess.cria(usuario);
+          return res.json({
+            auth: true,
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+          });
+        } else {
+          res.status(401).json({ message: "Email ou senha incorreto!" });
+        }
       } else {
-        res.status(401).json({ message: "Email ou senha incorreto!" });
+        res.status(401).json({ message: "Usuário não encontrado." });
       }
-    } else {
-      res.status(500).json({ message: "Login inválido!" });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Erro durante o login." });
     }
   }
 
