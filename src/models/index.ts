@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export function models(): void {
+export async function models(): Promise<void> {
   const currentDir = path.dirname(import.meta.url);
   const currentDir2 = currentDir.replace(/^file:\/\/\//, "");
   fs.readdirSync(currentDir2)

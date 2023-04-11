@@ -24,8 +24,8 @@ app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json(), express.urlencoded({ extended: true }));
 
-models();
-routes(app);
+await models();
+await routes(app);
 
 const server = http.createServer(app);
 server.keepAliveTimeout = 60 * 1000 + 1000;
