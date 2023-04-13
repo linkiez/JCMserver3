@@ -1,12 +1,12 @@
 import sequelize from "../config/connPostgre";
 import { Model } from "sequelize";
 
-export default class Pessoa_File extends Model {
+export default class Produto_File extends Model {
   static associate() {
     // define association here
   }
 }
-Pessoa_File.init(
+Produto_File.init(
   {},
   {
     sequelize,

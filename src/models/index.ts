@@ -1,17 +1,61 @@
-import fs from 'fs';
-import path from 'path';
+import Empresa from './Empresa';
+import File from './File';
+import Contato from './Contato';
+import Fornecedor from './Fornecedor';
+import ListaGenerica from './ListaGenerica';
+import ListaGenericaItem from './ListaGenericaItem';
+import Operador from './Operador';
+import OrcamentoItem_File from './Orcamento_File';
+import Orcamento from './Orcamento';
+import OrcamentoItem from './OrcamentoItem';
+import OrdemProducao from './OrdemProducao';
+import OrdemProducaoHistorico from './OrdemProducaoHistorico';
+import OrdemProducaoItem_File from './OrdemProducaoItem_File';
+import OrdemProducaoItem from './OrdemProducaoItem';
+import OrdemProducaoItemProcesso from './OrdemProducaoItemProcesso';
+import PedidoCompra from './PedidoCompra';
+import PedidoCompraItem from './PedidoCompraItem';
+import PedidoCompra_File from './PedidoCompra_File';
+import Pessoa from './Pessoa';
+import Pessoa_Contato from './Pessoa_Contato';
+import Pessoa_Empresa from './Pessoa_Empresa';
+import Pessoa_File from './Pessoa_File';
+import Produto from './Produto';
+import Produto_File from './Produto_File';
+import RegistroInspecaoRecebimento from './RIR';
+import RegistroInspecaoRecebimento_File from './RIR_File';
+import Usuario from './Usuario';
+import VendaTiny from './VendaTiny';
+import Vendedor from './Vendedor';
 
-export async function models(): Promise<void> {
-  const currentDir = path.dirname(import.meta.url);
-  const currentDir2 = currentDir.replace(/^file:\/\/\//, "");
-  fs.readdirSync(currentDir2)
-    .filter(file => file !== 'index.js' && !file.includes('.map'))
-    .forEach(async(file) => {
-      const model: any = await import(path.join(currentDir, file));
-      if (typeof model.default.associate === 'function') {
-        model.default.associate();
-      }else{
-        console.log('no associate', model);
-      }
-    });
+export function models() {
+  Contato.associate();
+  Empresa.associate();
+  File.associate();
+  Fornecedor.associate();
+  ListaGenerica.associate();
+  ListaGenericaItem.associate();
+  Operador.associate();
+  OrcamentoItem_File.associate();
+  Orcamento.associate();
+  OrcamentoItem.associate();
+  OrdemProducao.associate();
+  OrdemProducaoHistorico.associate();
+  OrdemProducaoItem_File.associate();
+  OrdemProducaoItem.associate();
+  OrdemProducaoItemProcesso.associate();
+  PedidoCompra.associate();
+  PedidoCompraItem.associate();
+  PedidoCompra_File.associate();
+  Pessoa.associate();
+  Pessoa_Contato.associate();
+  Pessoa_Empresa.associate();
+  Pessoa_File.associate();
+  Produto.associate();
+  Produto_File.associate();
+  RegistroInspecaoRecebimento.associate();
+  RegistroInspecaoRecebimento_File.associate();
+  Usuario.associate();
+  VendaTiny.associate();
+  Vendedor.associate();
 }

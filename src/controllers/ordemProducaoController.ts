@@ -23,10 +23,11 @@ export default class OrdemProducaoController {
         searchValue: req.query.searchValue,
       };
 
-      let resultado: { ordemProducao: OrdemProducao[]; totalRecords: Number } = {
-        ordemProducao: [],
-        totalRecords: 0,
-      };
+      let resultado: { ordemProducao: OrdemProducao[]; totalRecords: Number } =
+        {
+          ordemProducao: [],
+          totalRecords: 0,
+        };
 
       let queryWhere: any = {
         // [Op.or]: [{ id: { [Op.like]: "%" + consulta.searchValue + "%" } }],
@@ -34,7 +35,7 @@ export default class OrdemProducaoController {
 
       if (req.query.deleted === "true")
         queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
-      
+
       resultado.ordemProducao = await OrdemProducao.findAll({
         limit: consulta.pageCount,
         offset: consulta.pageCount * consulta.page,
@@ -52,11 +53,13 @@ export default class OrdemProducaoController {
           VendaTiny,
           {
             model: OrdemProducaoHistorico,
-            include: [{
-              model: Usuario,
-              include: [Pessoa]
-            }]
-          }
+            include: [
+              {
+                model: Usuario,
+                include: [Pessoa],
+              },
+            ],
+          },
         ],
         order: [["id", "DESC"]],
       });
@@ -108,17 +111,21 @@ export default class OrdemProducaoController {
                 model: OrdemProducaoItemProcesso,
                 attributes: { exclude: ["id_ordem_producao_item"] },
               },
-              Produto
+              Produto,
             ],
             attributes: { exclude: ["id_ordem_producao", "id_produto"] },
           },
           {
             model: OrdemProducaoHistorico,
-            include: [{
-              model: Usuario,
-              include: [Pessoa]
-            }]
-          }
+            include: [
+              {
+                model: Usuario,
+                include: [Pessoa],
+                attributes: { exclude: ["id_pessoa"] },
+              },
+            ],
+            attributes: { exclude: ["id_ordem_producao", "id_usuario"] },
+          },
         ],
         attributes: { exclude: ["id_vendedor", "id_orcamento"] },
       });
@@ -231,7 +238,7 @@ export default class OrdemProducaoController {
                     model: OrdemProducaoItemProcesso,
                     attributes: { exclude: ["id_ordem_producao_item"] },
                   },
-                  Produto
+                  Produto,
                 ],
                 attributes: { exclude: ["id_ordem_producao", "id_produto"] },
               },
@@ -253,13 +260,18 @@ export default class OrdemProducaoController {
     try {
       const { id } = req.params;
       let ordemProducao = req.body;
-      let ordemProducaoItens: any = ordemProducao.ordem_producao_items;
-      delete ordemProducao.ordem_producao_items;
 
       if (ordemProducao.orcamento)
         ordemProducao.id_orcamento = ordemProducao.orcamento.id;
       if (ordemProducao.vendedor)
         ordemProducao.id_vendedor = ordemProducao.vendedor.id;
+
+      let ordemProducaoHistoricos = ordemProducao.ordem_producao_historicos;
+      delete ordemProducao.ordem_producao_historicos;
+      let ordemProducaoItens = ordemProducao.ordem_producao_items;
+      delete ordemProducao.ordem_producao_items;
+
+      let updatePromises: Promise<any>[] = [];
 
       delete ordemProducao.orcamento;
       delete ordemProducao.vendedor;
@@ -269,74 +281,58 @@ export default class OrdemProducaoController {
         transaction: transaction,
       });
 
-      await OrdemProducaoItem.destroy({
+      let oldHistoricos = await OrdemProducaoHistorico.findAll({
         where: { id_ordem_producao: Number(id) },
-        transaction: transaction,
       });
 
-      ordemProducaoItens = ordemProducaoItens.map(
-        async (ordemProducaoItem: any) => {
-          let files = ordemProducaoItem.files;
-          delete ordemProducaoItem.files;
-
-          delete ordemProducaoItem.id
-
-          if (ordemProducaoItem.produto) {
-            ordemProducaoItem.id_produto = ordemProducaoItem.produto.id;
-            delete ordemProducaoItem.produto;
-          }
-
-          if (ordemProducaoItem.rir) {
-            ordemProducaoItem.id_rir = ordemProducaoItem.rir.id;
-            delete ordemProducaoItem.rir;
-          }
-
-          ordemProducaoItem.id_ordem_producao = id;
-
-          let OrdemProducaoItemProcessos =
-            ordemProducaoItem.ordem_producao_item_processos;
-          delete ordemProducaoItem.ordem_producao_item_processos;
-
-          let ordemProducaoItemCreated = await OrdemProducaoItem.create(
-            ordemProducaoItem,
-            { transaction: transaction }
+      updatePromises = updatePromises.concat(
+        oldHistoricos.map(async (historico) => {
+          let search = ordemProducaoHistoricos.find(
+            (item: OrdemProducaoHistorico) => item.id == historico.id
           );
-
-          if (files) {
-            await ordemProducaoItemCreated.setFiles(
-              files.map((item: any) => item.id),
-              { transaction: transaction }
-            );
+          if (!search) {
+            await OrdemProducaoHistorico.destroy({
+              where: { id: historico.id },
+              transaction: transaction,
+            });
           }
-
-          OrdemProducaoItemProcessos = OrdemProducaoItemProcessos.map(
-            async (ordemProducaoItemProcesso: any) => {
-              ordemProducaoItemProcesso.id_ordem_producao_item =
-                ordemProducaoItemCreated.id;
-
-              delete ordemProducaoItemProcesso.id
-
-              let OrdemProducaoItemProcessoCreated =
-                await OrdemProducaoItemProcesso.create(
-                  ordemProducaoItemProcesso,
-                  { transaction: transaction }
-                );
-
-              return OrdemProducaoItemProcessoCreated;
-            }
-          );
-
-          return ordemProducaoItemCreated;
-        }
+        })
       );
 
-      Promise.all(ordemProducaoItens).then(async () => {
-        let ordemProducaoUpdated = await OrdemProducao.findByPk(id);
+      updatePromises = updatePromises.concat(
+        ordemProducaoHistoricos.map(async (ordemProducaoHistorico: any) => {
+          ordemProducaoHistorico.id_ordem_producao = Number(id);
+          ordemProducaoHistorico.id_usuario = ordemProducaoHistorico.usuario.id;
+          delete ordemProducaoHistorico.usuario;
+          if (ordemProducaoHistorico.id) {
+            await OrdemProducaoHistorico.update(ordemProducaoHistorico, {
+              where: { id: ordemProducaoHistorico.id },
+              transaction: transaction,
+            });
+          } else {
+            await OrdemProducaoHistorico.create(ordemProducaoHistorico, {
+              transaction: transaction,
+            });
+          }
+        })
+      );
 
+      Promise.all(updatePromises).then(async () => {
         await transaction.commit();
 
-        ordemProducaoUpdated = await OrdemProducao.findByPk(id, {
+        let ordemProducaoUpdated = await OrdemProducao.findByPk(id, {
           include: [
+            {
+              model: OrdemProducaoHistorico,
+              include: [
+                {
+                  model: Usuario,
+                  include: [Pessoa],
+                  attributes: { exclude: ["id_pessoa"] },
+                },
+              ],
+              attributes: { exclude: ["id_ordem_producao", "id_usuario"] },
+            },
             {
               model: Vendedor,
               include: [Pessoa],
@@ -347,18 +343,18 @@ export default class OrdemProducaoController {
               include: [Pessoa],
               attributes: { exclude: ["id_pessoa"] },
             },
-            {
-              model: OrdemProducaoItem,
-              include: [
-                FileDb,
-                {
-                  model: OrdemProducaoItemProcesso,
-                  attributes: { exclude: ["id_ordem_producao_item"] },
-                },
-                Produto
-              ],
-              attributes: { exclude: ["id_ordem_producao", "id_produto"] },
-            },
+            // {
+            //   model: OrdemProducaoItem,
+            //   include: [
+            //     FileDb,
+            //     {
+            //       model: OrdemProducaoItemProcesso,
+            //       attributes: { exclude: ["id_ordem_producao_item"] },
+            //     },
+            //     Produto,
+            //   ],
+            //   attributes: { exclude: ["id_ordem_producao", "id_produto"] },
+            // },
           ],
           attributes: { exclude: ["id_vendedor", "id_orcamento"] },
         });

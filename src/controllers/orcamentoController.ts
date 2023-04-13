@@ -387,7 +387,7 @@ export default class OrcamentoController {
         let ordemProducao = await OrdemProducao.create(
           {
             id_orcamento: orcamento!.id,
-            id_vendedor: orcamento!.id_vendedor,
+            id_vendedor: orcamento!.vendedor.id,
             data_prazo: momentBussiness()
               .businessAdd(orcamento!.prazo_emdias)
               .toDate(),

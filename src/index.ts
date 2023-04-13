@@ -24,7 +24,7 @@ app.use(cors(corsOptions));
 app.use(helmet());
 app.use(express.json(), express.urlencoded({ extended: true }));
 
-await models();
+models();
 await routes(app);
 
 const server = http.createServer(app);

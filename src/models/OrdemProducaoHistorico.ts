@@ -9,7 +9,7 @@ import Usuario from "./Usuario";
 
 export default class OrdemProducaoHistorico extends Model {
   declare id: number;
-
+  declare texto: string;
 
   static associate() {
     OrdemProducaoHistorico.belongsTo(OrdemProducao, {
