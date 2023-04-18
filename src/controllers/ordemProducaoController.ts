@@ -13,6 +13,7 @@ import { Op } from "sequelize";
 import VendaTiny from "../models/VendaTiny";
 import OrdemProducaoHistorico from "../models/OrdemProducaoHistorico";
 import Usuario from "../models/Usuario";
+import OrcamentoItem from "../models/OrcamentoItem";
 
 export default class OrdemProducaoController {
   static async findAllOrdemProducao(req: Request, res: Response) {
@@ -21,6 +22,7 @@ export default class OrdemProducaoController {
         pageCount: Number(req.query.pageCount) || 10,
         page: Number(req.query.page) || 0,
         searchValue: req.query.searchValue,
+        status: req.query.status,
       };
 
       let resultado: { ordemProducao: OrdemProducao[]; totalRecords: Number } =
@@ -30,11 +32,20 @@ export default class OrdemProducaoController {
         };
 
       let queryWhere: any = {
-        // [Op.or]: [{ id: { [Op.like]: "%" + consulta.searchValue + "%" } }],
       };
 
+      if (consulta.searchValue) {
+        if (!isNaN(Number(consulta.searchValue)))
+          queryWhere.id = Number(consulta.searchValue);
+      }
+
+      console.log(queryWhere);
+      if (consulta.status !== "undefined" && consulta.status !== '') {
+        queryWhere.status = consulta.status;
+      }
+
       if (req.query.deleted === "true")
-        queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
+        queryWhere.deletedAt = { [Op.not]: null } ;
 
       resultado.ordemProducao = await OrdemProducao.findAll({
         limit: consulta.pageCount,
@@ -48,7 +59,16 @@ export default class OrdemProducaoController {
           },
           {
             model: Orcamento,
-            include: [{ model: Pessoa }],
+            include: [
+              {
+                model: Pessoa,
+                where:
+                  isNaN(Number(consulta.searchValue)) ||
+                  consulta.searchValue !== "undefined"
+                    ? { nome: { [Op.like]: "%" + consulta.searchValue + "%" } }
+                    : undefined,
+              },
+            ],
           },
           VendaTiny,
           {
@@ -100,7 +120,7 @@ export default class OrdemProducaoController {
           },
           {
             model: Orcamento,
-            include: [Pessoa],
+            include: [Pessoa, OrcamentoItem],
             attributes: { exclude: ["id_pessoa"] },
           },
           {

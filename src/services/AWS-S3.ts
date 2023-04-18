@@ -32,7 +32,7 @@ export class S3 {
     const response = await s3.send(command);
 
     if (response?.Contents) {
-      return response.Contents.map((item) => item.Key);
+      return response.Contents.map((item: any) => item.Key);
     }
 
     return [];
