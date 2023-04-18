@@ -24,8 +24,8 @@ router
   )
   .post(
     "/usuario",
-    // Authentication.verificaLogin,
-    // Authentication.verificaAcesso(["usuario", "create"]),
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["usuario", "create"]),
     UsuarioController.createUsuario
   )
   .post(
@@ -36,8 +36,8 @@ router
   )
   .put(
     "/usuario/:id",
-    // Authentication.verificaLogin,
-    // Authentication.verificaAcesso(["usuario", "update"]),
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["usuario", "update"]),
     UsuarioController.updateUsuario
   )
   .delete(
