@@ -1,21 +1,21 @@
-# Base image
+# Production environment
 FROM node:18
 
 # Set working directory inside the container
 WORKDIR /app
 
-# Install dependencies
-COPY package*.json ./
-RUN npm install --production
+# Copy dependencies
+COPY --chown=node:node package*.json ./
 
-# Copy source code to container
+RUN npm install --omit=dev
+
 COPY . .
-
-# Build TypeScript files
-RUN npm run build
 
 # Expose port for container
 EXPOSE 3000
+
+# Healthcheck
+HEALTHCHECK --interval=30s CMD curl -f http://localhost:3000/health || exit 1
 
 # Start server when container starts
 CMD ["npm", "start"]

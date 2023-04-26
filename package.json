@@ -8,7 +8,6 @@
     "build": "rimraf dist && tsc",
     "preserve": "npm run build",
     "serve": "cross-env NODE_ENV=development concurrently \"tsc --watch\" \"nodemon --experimental-specifier-resolution=node -q dist/index.js\"",
-    "prestart": "npm run build",
     "start": "cross-env NODE_ENV=production node --experimental-specifier-resolution=node dist/index.js",
     "test": "jest",
     "inspect": "cross-env NODE_ENV=development node --inspect-brk --experimental-specifier-resolution=node dist/index.js"

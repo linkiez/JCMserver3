@@ -1,18 +1,36 @@
 import { Express } from "express";
-import path from "path";
-import fs from "fs";
+import authRoutes from "./authRoutes";
+import contatoRoutes from "./contatoRoutes";
+import empresaRoutes from "./empresaRoutes";
+import fileRoutes from "./fileRoutes";
+import fornecedorRoutes from "./fornecedorRoutes";
+import produtoRoutes from "./produtoRoutes";
+import usuarioRoutes from "./usuarioRoutes";
+import listaGenericaRoutes from "./listaGenericaRoutes";
+import operadorRoutes from "./operadorRoutes";
+import orcamentoRoutes from "./orcamentoRoutes";
+import ordemProducaoRoutes from "./ordemProducaoRoutes";
+import pedidoCompraRoutes from "./pedidoCompraRoutes";
+import pessoaRoutes from "./pessoaRoutes";
+import RIRRoutes from "./RIRRoutes";
+import vendedorRoutes from "./vendedorRoutes";
 
 export async function routes(app: Express) {
-  const currentDir = path.dirname(import.meta.url);
-  const currentDir2 = currentDir.replace(/^file:\/\/\//, "");
-  fs.readdirSync(currentDir2)
-    .filter(
-      (file) =>
-        file !== "index.js" && !file.includes(".map") && file.includes("Routes")
-    )
-    .forEach(async (file) => {
-      const model: any = await import(path.join(currentDir, file));
-
-      app.use(model.default);
-    });
+  app.use(
+    authRoutes,
+    contatoRoutes,
+    empresaRoutes,
+    fileRoutes,
+    fornecedorRoutes,
+    produtoRoutes,
+    usuarioRoutes,
+    listaGenericaRoutes,
+    operadorRoutes,
+    orcamentoRoutes,
+    ordemProducaoRoutes,
+    pedidoCompraRoutes,
+    pessoaRoutes,
+    RIRRoutes,
+    vendedorRoutes
+  );
 }
