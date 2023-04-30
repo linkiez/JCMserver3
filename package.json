@@ -10,8 +10,7 @@
     "serve": "cross-env NODE_ENV=development concurrently \"tsc --watch\" \"nodemon --experimental-specifier-resolution=node -q dist/index.js\"",
     "start": "cross-env NODE_ENV=production node --experimental-specifier-resolution=node dist/index.js",
     "test": "jest",
-    "inspect": "cross-env NODE_ENV=development node --inspect-brk --experimental-specifier-resolution=node dist/index.js"
-  },
+    "inspect": "cross-env NODE_ENV=development node --inspect-brk --experimental-specifier-resolution=node dist/index.js"},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/linkiez/JCMserver3.git"
