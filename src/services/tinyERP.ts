@@ -110,7 +110,7 @@ export class TinyERP {
         valor_desconto: orcamento.desconto,
         numero_ordem_compra: orcamento.pc_cliente,
         situacao: "Aberto",
-        obs: orcamento.observacao,
+        obs: orcamento.observacao + "/n Orçamento: " + orcamento.id,
       },
     };
 
@@ -152,7 +152,7 @@ export class TinyERP {
         valor_desconto: orcamento.desconto,
         numero_ordem_compra: orcamento.pc_cliente,
         situacao: "Aberto",
-        obs: orcamento.observacao,
+        obs: orcamento.observacao  + "/n Orçamento: " + orcamento.id,
       },
     };
 

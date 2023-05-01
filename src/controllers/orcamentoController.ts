@@ -385,7 +385,7 @@ export default class OrcamentoController {
 
       if (createVenda.retorno.status === "OK") {
         let ordemProducao = await OrdemProducao.create(
-          {
+          { id: createVenda.retorno.registros.registro.numero,
             id_orcamento: orcamento!.id,
             id_vendedor: orcamento!.vendedor.id,
             data_prazo: momentBussiness()
