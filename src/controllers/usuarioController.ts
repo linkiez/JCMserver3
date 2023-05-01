@@ -2,15 +2,43 @@ import { Request, Response } from "express";
 import Usuario from "../models/Usuario";
 import Pessoa from "../models/Pessoa";
 import { Authentication } from "../controllers/authController";
+import { Op } from "sequelize";
 
 export default class UsuarioController {
   static async findAllUsuarios(req: Request, res: Response) {
     try {
-      const usuario = await Usuario.findAll({
+      let consulta: any = {
+        pageCount: Number(req.query.pageCount) || 10,
+        page: Number(req.query.page) || 0,
+        searchValue: req.query.searchValue,
+      };
+      let resultado: { usuarios: Usuario[]; totalRecords: Number } = {
+        usuarios: [],
+        totalRecords: 0,
+      };
+
+      let queryWhere: any = {
+        email: { [Op.like]: `%${consulta.searchValue}%` },
+      };
+
+      if (req.query.deleted === "true")
+        queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
+
+      resultado.usuarios = await Usuario.findAll({
+        limit: consulta.pageCount,
+        offset: consulta.pageCount * consulta.page,
+        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
         include: [Pessoa],
         attributes: { exclude: ["id_pessoa", "senha", "acesso"] },
+        paranoid: req.query.deleted === "true" ? false : true,
       });
-      return res.status(200).json(usuario);
+
+      resultado.totalRecords = await Usuario.count({
+        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
+        paranoid: req.query.deleted === "true" ? false : true,
+      });
+      
+      return res.status(200).json(resultado);
     } catch (error: any) {
       console.log(error);
       return res.status(500).json(error.message);
@@ -38,15 +66,19 @@ export default class UsuarioController {
       usuario.id_pessoa = usuario.pessoa.id;
       delete usuario.pessoa;
     }
-    // let usuarioAuth = req.user;
-    // if(usuarioAuth.acesso && !usuarioAuth?.acesso?.admin){
-    //   delete usuario.acesso
-    // }
+    let usuarioAuth = req.user;
+    if (usuarioAuth.acesso && !usuarioAuth?.acesso?.admin) {
+      throw new Error("Você não tem permissão para criar um usuário");
+    }
     try {
       if (Authentication.validaSenhaNova(usuario.senha)) {
         usuario.senha = await Authentication.gerarSenhaHash(usuario.senha);
         const usuarioCreated = await Usuario.create(usuario);
-        return res.status(201).json(usuarioCreated);
+        const usuarioUpdated = await Usuario.findOne({
+          where: { id: Number(usuarioCreated.id) },
+          attributes: { exclude: ["id_pessoa", "senha"] },
+        });
+        return res.status(201).json(usuarioUpdated);
       }
     } catch (error: any) {
       console.log(error);
@@ -61,10 +93,10 @@ export default class UsuarioController {
       usuario.id_pessoa = usuario.pessoa.id;
       delete usuario.pessoa;
     }
-    let usuarioAuth: any = req.user;
-    // if(usuarioAuth.acesso && !usuarioAuth.acesso.admin){
-    //   delete usuario.acesso
-    // }
+    let usuarioAuth = req.user;
+    if (usuarioAuth.acesso && !usuarioAuth?.acesso?.admin) {
+      throw new Error("Você não tem permissão para alterar um usuário");
+    }
     delete usuario.id;
     try {
       if (usuario.senha) {

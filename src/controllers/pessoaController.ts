@@ -103,6 +103,7 @@ export default class PessoaController {
 
   static async createPessoa(req: Request, res: Response) {
     let pessoa = req.body;
+    console.log(pessoa)
     let contatos: Array<Contato> = pessoa.contatos;
     delete pessoa.contatos;
     let files: Array<FileDb> = pessoa.files;

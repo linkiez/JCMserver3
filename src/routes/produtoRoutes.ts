@@ -6,8 +6,8 @@ const router = Router();
 router
   .get(
     "/produto",
-    // Authentication.verificaLogin,
-    // Authentication.verificaAcesso(["produto", "findAll"]),
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["produto", "findAll"]),
     ProdutosController.findAllProdutos
   )
   .get(
@@ -24,8 +24,8 @@ router
   )
   .post(
     "/produto",
-    // Authentication.verificaLogin,
-    // Authentication.verificaAcesso(["produto", "create"]),
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["produto", "create"]),
     ProdutosController.createProduto
   )
   .post(

@@ -17,14 +17,14 @@ router
   )
   .get(
     "/pedidocompra",
-    // Authentication.verificaLogin,
-    // Authentication.verificaAcesso(["pedidoCompra", "findAll"]),
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["pedidoCompra", "findAll"]),
     PedidoCompraController.findAllPedidoCompra
   )
   .get(
     "/pedidocompra/:id",
-    // Authentication.verificaLogin,
-    // Authentication.verificaAcesso(["pedidoCompra", "findOne"]),
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["pedidoCompra", "findOne"]),
     PedidoCompraController.findOnePedidoCompra
   )
   .delete(

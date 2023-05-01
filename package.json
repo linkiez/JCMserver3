@@ -8,11 +8,9 @@
     "build": "rimraf dist && tsc",
     "preserve": "npm run build",
     "serve": "cross-env NODE_ENV=development concurrently \"tsc --watch\" \"nodemon --experimental-specifier-resolution=node -q dist/index.js\"",
-    "prestart": "npm run build",
     "start": "cross-env NODE_ENV=production node --experimental-specifier-resolution=node dist/index.js",
     "test": "jest",
-    "inspect": "cross-env NODE_ENV=development node --inspect-brk --experimental-specifier-resolution=node dist/index.js"
-  },
+    "inspect": "cross-env NODE_ENV=development node --inspect-brk --experimental-specifier-resolution=node dist/index.js"},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/linkiez/JCMserver3.git"
@@ -42,6 +40,7 @@
     "moment": "^2.29.3",
     "moment-business-days": "^1.2.0",
     "node-mocks-http": "^1.12.1",
+    "package-json": "^8.1.0",
     "password-validator": "^5.3.0",
     "pg": "^8.8.0",
     "redis": "^4.1.0",

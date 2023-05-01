@@ -12,8 +12,8 @@ router
   )
   .get(
     "/pessoa/:id",
-    // Authentication.verificaLogin,
-    // Authentication.verificaAcesso(["pessoa", "findOne"]),
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["pessoa", "findOne"]),
     PessoasController.findOnePessoa
   )
   .get(
@@ -24,8 +24,8 @@ router
   )
   .post(
     "/pessoa",
-    // Authentication.verificaLogin,
-    // Authentication.verificaAcesso(["pessoa", "create"]),
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["pessoa", "create"]),
     PessoasController.createPessoa
   )
   .post(

@@ -45,38 +45,44 @@ export class Authentication {
     if (!email || !senha) {
       return res
         .status(400)
-        .json({ message: "Email e senha são obrigatórios." });
+        .json({ error: "Email e senha são obrigatórios." });
     }
 
     try {
       let usuario = await Usuario.findOne({
-        where: { email: email },
+        where: { email },
         include: [Pessoa],
         attributes: { exclude: ["id_pessoa"] },
       });
 
-      if (usuario) {
-        const verificaSenha = await bcrypt.compare(senha, usuario.senha);
-        usuario.senha = "";
-        if (verificaSenha) {
-          const refreshToken = await TokenRefresh.cria(usuario.id);
-          const accessToken = await TokenAccess.cria(usuario);
-          return res.json({
-            auth: true,
-            accessToken: accessToken,
-            refreshToken: refreshToken,
-          });
-        } else {
-          res.status(401).json({ message: "Email ou senha incorreto!" });
-        }
-      } else {
-        res.status(401).json({ message: "Usuário não encontrado." });
+      if (!usuario) {
+        return res.status(404).json({ error: "Usuário não encontrado." });
       }
+
+      if(usuario.senha){
+        const verificaSenha = await bcrypt.compare(senha, usuario.senha);
+        if (!verificaSenha) {
+          return res.status(401).json({ error: "Email ou senha incorretos." });
+        }
+      }
+
+      delete usuario.dataValues.senha;
+
+      const refreshToken = await TokenRefresh.cria(usuario.id);
+      const accessToken = await TokenAccess.cria(usuario);
+
+      return res.json({
+        auth: true,
+        accessToken,
+        refreshToken
+      });
+
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Erro durante o login." });
+      return res.status(500).json({ error: "Erro durante o login." });
     }
   }
+
 
   static async verificaLogin(req: any, res: any, next: any) {
     const token = req.headers["x-access-token"];
