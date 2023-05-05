@@ -68,7 +68,7 @@ OrdemProducaoItem.init(
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
-    descricao: DataTypes.STRING,
+    descricao: DataTypes.CITEXT,
     quantidade: DataTypes.FLOAT,
     observacao: DataTypes.TEXT,
     

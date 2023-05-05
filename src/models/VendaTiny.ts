@@ -30,7 +30,7 @@ VendaTiny.init(
       type: DataTypes.BIGINT,
     },
     deletedAt: DataTypes.DATE,
-    aprovacao: DataTypes.STRING,
+    aprovacao: DataTypes.CITEXT,
     venda: DataTypes.INTEGER,
   },
   {

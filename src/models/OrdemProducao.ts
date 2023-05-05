@@ -49,7 +49,7 @@ OrdemProducao.init(
     data_negociado: DataTypes.DATE,
     dias_de_producao: DataTypes.INTEGER,
     venda: DataTypes.INTEGER,
-    status: DataTypes.STRING,
+    status: DataTypes.CITEXT,
   },
   {
     sequelize,

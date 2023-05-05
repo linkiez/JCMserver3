@@ -29,7 +29,7 @@ Usuario.init(
       type: DataTypes.BIGINT,
     },
     email: {
-      type: DataTypes.STRING,
+      type: DataTypes.CITEXT,
       unique: true,
       validate: {
         isEmail: true,

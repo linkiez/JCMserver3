@@ -36,7 +36,7 @@ PedidoCompraItem.init(
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
-    dimensao: DataTypes.STRING,
+    dimensao: DataTypes.CITEXT,
     quantidade: DataTypes.FLOAT,
     peso: DataTypes.FLOAT,
     preco: DataTypes.FLOAT,

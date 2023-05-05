@@ -66,7 +66,7 @@ OrcamentoItem.init(
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
-    descricao: DataTypes.STRING,
+    descricao: DataTypes.CITEXT,
     material_incluido: DataTypes.BOOLEAN,
     processo: DataTypes.ARRAY(DataTypes.STRING),
     largura: DataTypes.DECIMAL(13, 2),

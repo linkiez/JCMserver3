@@ -27,10 +27,10 @@ Contato.init(
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
-    nome: DataTypes.STRING,
-    tipo: DataTypes.STRING,
+    nome: DataTypes.CITEXT,
+    tipo: DataTypes.CITEXT,
     valor: {
-      type: DataTypes.STRING,
+      type: DataTypes.CITEXT,
       unique: true,
     },
     deletedAt: DataTypes.DATE,

@@ -26,7 +26,7 @@ ListaGenerica.init(
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
-    nome: DataTypes.STRING,
+    nome: DataTypes.CITEXT,
     deletedAt: DataTypes.DATE,
   },
   {

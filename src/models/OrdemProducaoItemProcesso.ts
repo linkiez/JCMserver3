@@ -27,7 +27,7 @@ OrdemProducaoItemProcesso.init(
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
-    processo: DataTypes.STRING,
+    processo: DataTypes.CITEXT,
     inicio: DataTypes.DATE,
     fabricado: DataTypes.DATE,
   },
