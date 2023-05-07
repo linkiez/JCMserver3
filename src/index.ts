@@ -33,9 +33,16 @@ server.headersTimeout = 60 * 1000 + 2000;
 // For Master process
 if (cluster.isPrimary) {
   console.log(`Master ${process.pid} is running`);
-  sequelize.sync({ alter: true, force: false }).then(() => {
-    seed();
-  });
+  sequelize
+    .sync({
+      alter: JSON.parse(process.env.SEQUELIZE_ALTER ?? "false"),
+      force: JSON.parse(process.env.SEQUELIZE_FORCE ?? "false"),
+    })
+    .then(() => {
+      if(JSON.parse(process.env.SEQUELIZE_SEED ?? "false")){
+        seed();
+      }
+    });
 
   // Fork workers.
   for (let i = 0; i < numCPUs; i++) {
