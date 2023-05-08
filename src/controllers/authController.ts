@@ -78,7 +78,7 @@ export class Authentication {
       });
 
     } catch (error) {
-      console.error(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json({ error: "Erro durante o login." });
     }
   }
@@ -95,7 +95,7 @@ export class Authentication {
       req.user = await TokenAccess.verifica(token);
       next();
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(401).json(error.message);
     }
   }

@@ -38,7 +38,7 @@ export default class ContatoController {
       
       return res.status(200).json(resultado);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -51,7 +51,7 @@ export default class ContatoController {
       }) as Array<Contato>;
       return res.status(200).json(contatos);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -64,7 +64,7 @@ export default class ContatoController {
       });
       return res.status(200).json(contato);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -75,7 +75,7 @@ export default class ContatoController {
       const contatoCreated = await Contato.create(contato) ;
       return res.status(201).json(contatoCreated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -91,7 +91,7 @@ export default class ContatoController {
       }) ;
       return res.status(202).json(contatoUpdated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -102,7 +102,7 @@ export default class ContatoController {
       await Contato.destroy({ where: { id: Number(id) } });
       return res.status(202).json({ message: `Contato apagada` });
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -114,7 +114,7 @@ export default class ContatoController {
       });
       return res.status(200).json(contato);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -128,7 +128,7 @@ export default class ContatoController {
       });
       return res.status(202).json(contatoUpdated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }

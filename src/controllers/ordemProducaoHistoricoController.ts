@@ -8,6 +8,7 @@ export default class OrdemProducaoHistoricoController {
             const historicoCreated = await OrdemProducaoHistorico.create(historico);
             return res.status(200).json(historicoCreated);
         } catch (error) {
+            console.log("Resquest: ", req.body, "Erro: ", error)
             return res.status(500).json(error);
         }
     }
@@ -24,6 +25,7 @@ export default class OrdemProducaoHistoricoController {
             const historicoUpdated = await OrdemProducaoHistorico.findByPk(id);
             return res.status(200).json(historicoUpdated);
         } catch (error) {
+            console.log("Resquest: ", req.body, "Erro: ", error)
             return res.status(500).json(error);
         }
     }
@@ -38,6 +40,7 @@ export default class OrdemProducaoHistoricoController {
             });
             return res.status(200).json({msg: "Historico excluido com sucesso"});
         } catch (error) {
+            console.log("Resquest: ", req.body, "Erro: ", error)
             return res.status(500).json(error);
         }
     }

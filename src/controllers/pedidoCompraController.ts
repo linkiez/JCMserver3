@@ -51,7 +51,7 @@ export default class PedidoCompraController {
 
       return res.status(201).json(pedidoCompraCreated2);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -105,7 +105,7 @@ export default class PedidoCompraController {
 
       return res.status(200).json(resultado);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -127,7 +127,7 @@ export default class PedidoCompraController {
 
       return res.status(200).json(pedidoCompra);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -192,7 +192,7 @@ export default class PedidoCompraController {
       return res.status(201).json(pedidoCompraCreated2);
     } catch (error: any) {
       await transaction.rollback();
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -212,7 +212,7 @@ export default class PedidoCompraController {
       return res.status(202).json({ message: `Pedido de compra apagado` });
     } catch (error: any) {
       await t.rollback();
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -294,7 +294,7 @@ export default class PedidoCompraController {
       });
     } catch (error: any) {
       await transaction.rollback();
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }

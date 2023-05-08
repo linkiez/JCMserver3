@@ -17,7 +17,7 @@ export default class RIRController {
       });
       return res.status(200).json(rir);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -34,7 +34,7 @@ export default class RIRController {
       });
       return res.status(200).json(rir);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -65,7 +65,7 @@ export default class RIRController {
       const rirCreated = await RIR.create(rir);
       return res.status(201).json(rirCreated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -105,7 +105,7 @@ export default class RIRController {
       });
       return res.status(202).json(rirUpdated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -116,7 +116,7 @@ export default class RIRController {
       await RIR.destroy({ where: { id: Number(id) } });
       return res.status(202).json({ message: `RIR apagado` });
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -132,7 +132,7 @@ export default class RIRController {
       });
       return res.status(200).json(rir);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -146,7 +146,7 @@ export default class RIRController {
       });
       return res.status(202).json(rirUpdated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }

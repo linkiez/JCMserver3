@@ -12,7 +12,7 @@ export default class ListaGenericaController {
 
       return res.status(200).json(listaGenericas);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -25,7 +25,7 @@ export default class ListaGenericaController {
 
       return res.status(200).json(listaGenericas);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -40,7 +40,7 @@ export default class ListaGenericaController {
 
       return res.status(200).json(listaGenerica);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -55,7 +55,7 @@ export default class ListaGenericaController {
 
       return res.status(200).json(listaGenerica);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -91,7 +91,7 @@ export default class ListaGenericaController {
       return res.status(201).json(listaGenericaCreated2);
     } catch (error: any) {
       await transaction.rollback();
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -171,7 +171,7 @@ export default class ListaGenericaController {
       });
     } catch (error: any) {
       await transaction.rollback();
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -184,7 +184,7 @@ export default class ListaGenericaController {
 
       return res.status(202).json({ message: `Lista apagada` });
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -199,7 +199,7 @@ export default class ListaGenericaController {
       });
       return res.status(202).json(listaGenericaUpdated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }

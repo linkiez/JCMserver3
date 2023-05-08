@@ -58,7 +58,7 @@ export default class PessoaController {
 
       return res.status(200).json(resultado);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -83,7 +83,7 @@ export default class PessoaController {
       });
       return res.status(200).json(pessoa);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -96,7 +96,7 @@ export default class PessoaController {
       });
       return res.status(200).json(pessoa);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -198,7 +198,7 @@ export default class PessoaController {
       });
     } catch (error: any) {
       await transaction.rollback();
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -339,7 +339,7 @@ export default class PessoaController {
       });
     } catch (error: any) {
       await transaction.rollback();
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -350,7 +350,7 @@ export default class PessoaController {
       await Pessoa.destroy({ where: { id: Number(id) } });
       return res.status(202).json("Pessoa apagada");
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -362,7 +362,7 @@ export default class PessoaController {
       const pessoaUpdated = await Pessoa.findOne({ where: { id: Number(id) } });
       return res.status(202).json(pessoaUpdated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -382,7 +382,7 @@ export default class PessoaController {
         return res.status(200).send(true);
       }
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }

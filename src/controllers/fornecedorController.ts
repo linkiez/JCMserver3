@@ -38,7 +38,7 @@ export default class FornecedorController {
       
       return res.status(200).json(resultado);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -53,7 +53,7 @@ export default class FornecedorController {
       });
       return res.status(200).json(fornecedor);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -68,7 +68,7 @@ export default class FornecedorController {
       const fornecedorCreated = await Fornecedor.create(fornecedor);
       return res.status(201).json(fornecedorCreated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -88,7 +88,7 @@ export default class FornecedorController {
       });
       return res.status(202).json(fornecedorUpdated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -99,7 +99,7 @@ export default class FornecedorController {
       await Fornecedor.destroy({ where: { id: Number(id) } });
       return res.status(202).json({ message: `Fornecedor apagado` });
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -113,7 +113,7 @@ export default class FornecedorController {
       });
       return res.status(200).json(fornecedor);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -127,7 +127,7 @@ export default class FornecedorController {
       });
       return res.status(202).json(fornecedorUpdated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }

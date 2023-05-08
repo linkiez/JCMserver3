@@ -56,7 +56,7 @@ export default class EmpresaController {
 
       return res.status(200).json(resultado);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -71,7 +71,7 @@ export default class EmpresaController {
       });
       return res.status(200).json(empresa);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -86,7 +86,7 @@ export default class EmpresaController {
       const empresaCreated = await Empresa.create(empresa);
       return res.status(201).json(empresaCreated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -106,7 +106,7 @@ export default class EmpresaController {
       });
       return res.status(202).json(empresaUpdated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -117,7 +117,7 @@ export default class EmpresaController {
       await Empresa.destroy({ where: { id: Number(id) } });
       return res.status(202).json({ message: `Empresa apagado` });
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -131,7 +131,7 @@ export default class EmpresaController {
       });
       return res.status(200).json(empresa);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -145,7 +145,7 @@ export default class EmpresaController {
       });
       return res.status(202).json(empresaUpdated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }

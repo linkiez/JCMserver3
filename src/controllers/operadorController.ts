@@ -11,7 +11,7 @@ export default class OperadorController {
       }));
       return res.status(200).json(operador);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -26,7 +26,7 @@ export default class OperadorController {
       }));
       return res.status(200).json(operador);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -43,7 +43,7 @@ export default class OperadorController {
       ));
       return res.status(201).json(operadorCreated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -63,7 +63,7 @@ export default class OperadorController {
       }));
       return res.status(202).json(operadorUpdated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -74,7 +74,7 @@ export default class OperadorController {
       await Operador.destroy({ where: { id: Number(id) } });
       return res.status(202).json({ message: `Operador apagado` });
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -88,7 +88,7 @@ export default class OperadorController {
       });
       return res.status(200).json(operador);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -102,7 +102,7 @@ export default class OperadorController {
       });
       return res.status(202).json(operadorUpdated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }

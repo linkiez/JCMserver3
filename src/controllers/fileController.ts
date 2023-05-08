@@ -9,7 +9,7 @@ export default class FileController {
       const files = await FileDb.findAll();
       return res.status(200).json(files);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -22,7 +22,7 @@ export default class FileController {
       });
       return res.status(200).json(file);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -41,7 +41,7 @@ export default class FileController {
         return res.status(404);
       }
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -67,7 +67,7 @@ export default class FileController {
         return res.status(202).json(fileCreated);
       });
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -83,7 +83,7 @@ export default class FileController {
       await FileDb.destroy({ where: { id: Number(id) } });
       return res.status(202).json({ message: `File apagado` });
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -93,7 +93,7 @@ export default class FileController {
       const files = await FileDb.scope("deleted").findAll({ paranoid: false });
       return res.status(200).json(files);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
@@ -105,7 +105,7 @@ export default class FileController {
       const fileUpdated = await FileDb.findOne({ where: { id: Number(id) } });
       return res.status(202).json(fileUpdated);
     } catch (error: any) {
-      console.log(error);
+      console.log("Resquest: ", req.body, "Erro: ", error)
       return res.status(500).json(error.message);
     }
   }
