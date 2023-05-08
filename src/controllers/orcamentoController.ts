@@ -117,7 +117,7 @@ export default class OrcamentoController {
       delete orcamento.produto;
 
       if (!orcamento.id)
-        orcamento.id = ((await Orcamento.max("id")) as number) + 1;
+        orcamento.id = ((await Orcamento.max("id", {paranoid: false})) as number) + 1;
 
       let orcamentoCreated: Orcamento = await Orcamento.create(orcamento, {
         transaction: transaction,
