@@ -24,6 +24,7 @@ ListaGenericaItem.init(
       type: DataTypes.BIGINT,
     },
     valor: DataTypes.TEXT,
+    valor2: DataTypes.CITEXT,
     deletedAt: DataTypes.DATE,
   },
   {

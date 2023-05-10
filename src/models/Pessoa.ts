@@ -80,12 +80,12 @@ export default class Pessoa extends Model {
 
   static associate() {
     // define association here
-    Pessoa.hasOne(Fornecedor, { foreignKey: "id_pessoa" });
-    Pessoa.hasOne(Usuario, { foreignKey: "id_pessoa" });
-    Pessoa.hasOne(Vendedor, { foreignKey: "id_pessoa" });
-    Pessoa.hasOne(Empresa, { foreignKey: "id_pessoa" });
+    Pessoa.hasOne(Fornecedor, { foreignKey: "id_pessoa", onDelete: "CASCADE" });
+    Pessoa.hasOne(Usuario, { foreignKey: "id_pessoa", onDelete: "CASCADE" });
+    Pessoa.hasOne(Vendedor, { foreignKey: "id_pessoa", onDelete: "CASCADE" });
+    Pessoa.hasOne(Empresa, { foreignKey: "id_pessoa", onDelete: "CASCADE" });
     Pessoa.belongsToMany(Empresa, { through: "pessoa_empresa" })
-    Pessoa.hasOne(Operador, { foreignKey: "id_pessoa" });
+    Pessoa.hasOne(Operador, { foreignKey: "id_pessoa", onDelete: "CASCADE" });
     Pessoa.hasMany(RegistroInspecaoRecebimento, { foreignKey: "id_pessoa" });
     Pessoa.hasMany(Orcamento, { foreignKey: "id_pessoa" });
     Pessoa.belongsToMany(File, { through: "pessoa_file" });

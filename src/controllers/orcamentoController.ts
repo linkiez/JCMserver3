@@ -8,7 +8,7 @@ import Contato from "../models/Contato";
 import Pessoa from "../models/Pessoa";
 import Vendedor from "../models/Vendedor";
 import Produto from "../models/Produto";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 import Empresa from "../models/Empresa";
 import Pessoa_Empresa from "../models/Pessoa_Empresa";
 import VendaTiny from "../models/VendaTiny";
@@ -16,6 +16,8 @@ import momentBussiness from "moment-business-days";
 import OrdemProducao from "../models/OrdemProducao";
 import OrdemProducaoItem from "../models/OrdemProducaoItem";
 import OrdemProducaoItemProcesso from "../models/OrdemProducaoItemProcesso";
+import PedidoCompraItem from "../models/PedidoCompraItem";
+import PedidoCompra from "../models/PedidoCompra";
 
 export default class OrcamentoController {
   static async findAllOrcamento(req: Request, res: Response) {
@@ -81,7 +83,55 @@ export default class OrcamentoController {
   static async findOneOrcamento(req: Request, res: Response) {
     const { id } = req.params;
     try {
-      let orcamento = await orcamentoFindByPk(id);
+      let orcamento = await Orcamento.findOne({
+        where: { id: id },
+        include: [
+          Contato,
+          Empresa,
+          Pessoa,
+          Vendedor,
+          VendaTiny,
+          {
+            model: OrcamentoItem,
+            include: [
+              {
+                model: Produto,
+                include: [{
+                  model: PedidoCompraItem,
+                  attributes: {
+                    include: [
+                      [Sequelize.literal("(preco*(ipi+1))"), "precoComIpi"],
+                      // [Sequelize.fn('max', Sequelize.col('pedido_compra_item.updatedAt')), 'atualizado']
+                    ],
+                  },
+                  order: [["updatedAt", "DESC"]],
+                  limit: 1,
+                  separate: true,
+                  include: [
+                    {
+                      model: PedidoCompra,
+                      required: true,
+                      where: {
+                        status: {
+                          [Op.and]: [
+                            { [Op.not]: "Cancelado" },
+                            { [Op.not]: "Orçamento" },
+
+                          ],
+                        },
+                        // data_emissao: {
+                        //   [Op.gte]: new Date((new Date()).getTime() - 120 * 24 * 60 * 60 * 1000) // 120 days ago
+                        // }
+                      },
+                    },
+                  ],
+                },],
+              },
+              FileDb,
+            ],
+          }
+        ]
+      });
       return res.status(200).json(orcamento);
     } catch (error: any) {
       console.log("Resquest: ", req.body, "Erro: ", error)
