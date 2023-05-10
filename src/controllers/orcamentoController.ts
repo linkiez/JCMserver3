@@ -347,7 +347,7 @@ export default class OrcamentoController {
 
       if (pessoa_Empresa == null || !pessoa_Empresa.id_tinyerp) {
         const verificaPessoa = await TinyERP.getPessoaPorCNPJ_CPF(
-          orcamento?.pessoa.cnpj_cpf!,
+          orcamento?.pessoa.cnpj_cpf,
           orcamento?.empresa.token_tiny
         );
 
