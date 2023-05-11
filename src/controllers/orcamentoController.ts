@@ -89,7 +89,7 @@ export default class OrcamentoController {
           Contato,
           Empresa,
           Pessoa,
-          Vendedor,
+          {model: Vendedor, include: [Pessoa]},
           VendaTiny,
           {
             model: OrcamentoItem,
