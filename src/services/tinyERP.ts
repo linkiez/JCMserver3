@@ -134,6 +134,7 @@ export class TinyERP {
         numero_ordem_compra: orcamento.pc_cliente,
         situacao: "Aberto",
         obs: orcamento.observacao + "/n Orçamento: " + orcamento.id,
+        nome_vendedor: orcamento.vendedor.pessoa.nome,
       },
     };
 
@@ -199,6 +200,7 @@ export class TinyERP {
         numero_ordem_compra: orcamento.pc_cliente,
         situacao: "Aberto",
         obs: orcamento.observacao  + "/n Orçamento: " + orcamento.id,
+        nome_vendedor: orcamento.vendedor.pessoa.nome,
       },
     };
 

@@ -15,7 +15,7 @@ COPY . .
 EXPOSE 3000
 
 # Healthcheck
-HEALTHCHECK --interval=30s CMD curl -f http://localhost:2486/health || exit 1
+HEALTHCHECK --interval=30s CMD curl -f http://localhost:3000/health || exit 1
 
 # Start server when container starts
 CMD ["npm", "start"]
