@@ -63,7 +63,7 @@ export default class OrcamentoController {
 
       return res.status(200).json(resultado);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -75,7 +75,7 @@ export default class OrcamentoController {
       });
       return res.status(200).json(orçamentos);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -89,52 +89,53 @@ export default class OrcamentoController {
           Contato,
           Empresa,
           Pessoa,
-          {model: Vendedor, include: [Pessoa]},
+          { model: Vendedor, include: [Pessoa] },
           VendaTiny,
           {
             model: OrcamentoItem,
             include: [
               {
                 model: Produto,
-                include: [{
-                  model: PedidoCompraItem,
-                  attributes: {
+                include: [
+                  {
+                    model: PedidoCompraItem,
+                    attributes: {
+                      include: [
+                        [Sequelize.literal("(preco*(ipi+1))"), "precoComIpi"],
+                        // [Sequelize.fn('max', Sequelize.col('pedido_compra_item.updatedAt')), 'atualizado']
+                      ],
+                    },
+                    order: [["updatedAt", "DESC"]],
+                    limit: 1,
+                    separate: true,
                     include: [
-                      [Sequelize.literal("(preco*(ipi+1))"), "precoComIpi"],
-                      // [Sequelize.fn('max', Sequelize.col('pedido_compra_item.updatedAt')), 'atualizado']
+                      {
+                        model: PedidoCompra,
+                        required: true,
+                        where: {
+                          status: {
+                            [Op.and]: [
+                              { [Op.not]: "Cancelado" },
+                              { [Op.not]: "Orçamento" },
+                            ],
+                          },
+                          // data_emissao: {
+                          //   [Op.gte]: new Date((new Date()).getTime() - 120 * 24 * 60 * 60 * 1000) // 120 days ago
+                          // }
+                        },
+                      },
                     ],
                   },
-                  order: [["updatedAt", "DESC"]],
-                  limit: 1,
-                  separate: true,
-                  include: [
-                    {
-                      model: PedidoCompra,
-                      required: true,
-                      where: {
-                        status: {
-                          [Op.and]: [
-                            { [Op.not]: "Cancelado" },
-                            { [Op.not]: "Orçamento" },
-
-                          ],
-                        },
-                        // data_emissao: {
-                        //   [Op.gte]: new Date((new Date()).getTime() - 120 * 24 * 60 * 60 * 1000) // 120 days ago
-                        // }
-                      },
-                    },
-                  ],
-                },],
+                ],
               },
               FileDb,
             ],
-          }
-        ]
+          },
+        ],
       });
       return res.status(200).json(orcamento);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -167,7 +168,8 @@ export default class OrcamentoController {
       delete orcamento.produto;
 
       if (!orcamento.id)
-        orcamento.id = ((await Orcamento.max("id", {paranoid: false})) as number) + 1;
+        orcamento.id =
+          ((await Orcamento.max("id", { paranoid: false })) as number) + 1;
 
       let orcamentoCreated: Orcamento = await Orcamento.create(orcamento, {
         transaction: transaction,
@@ -213,7 +215,7 @@ export default class OrcamentoController {
       });
     } catch (error: any) {
       await transaction.rollback;
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -294,7 +296,7 @@ export default class OrcamentoController {
       });
     } catch (error: any) {
       await transaction.rollback;
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -305,7 +307,7 @@ export default class OrcamentoController {
       await Orcamento.destroy({ where: { id: Number(id) } });
       return res.status(202).json({ message: `Orcamento apagado` });
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -319,7 +321,7 @@ export default class OrcamentoController {
       });
       return res.status(202).json(orcamentoUpdated);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -329,7 +331,7 @@ export default class OrcamentoController {
     try {
       const transaction = await sequelize.transaction();
 
-      let orcamento = await orcamentoFindByPk(id)
+      let orcamento = await orcamentoFindByPk(id);
 
       if (!orcamento) throw new Error("Orçamento não encontrado");
       if (!orcamento.pessoa) throw new Error("Pessoa não encontrada");
@@ -435,7 +437,8 @@ export default class OrcamentoController {
 
       if (createVenda.retorno.status === "OK") {
         let ordemProducao = await OrdemProducao.create(
-          { id: createVenda.retorno.registros.registro.numero,
+          {
+            id: createVenda.retorno.registros.registro.numero,
             id_orcamento: orcamento!.id,
             id_vendedor: orcamento!.vendedor.id,
             data_prazo: momentBussiness()
@@ -505,7 +508,7 @@ export default class OrcamentoController {
       orcamento = await orcamentoFindByPk(id);
       return res.status(200).json(orcamento);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
