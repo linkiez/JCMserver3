@@ -52,6 +52,14 @@ if (cluster.isPrimary) {
   // This event is firs when worker died
   cluster.on("exit", (worker: any, code: any, signal: any) => {
     console.log(`worker ${worker.process.pid} died`);
+  
+    // Check if all workers have exited
+    if (!cluster.workers || Object.keys(cluster.workers).length === 0) {
+      console.log("All workers have died, restarting...");
+    
+      // Exit the master process to trigger a restart
+      process.exit();
+    }
   });
 }
 
