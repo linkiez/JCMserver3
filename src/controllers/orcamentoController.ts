@@ -232,6 +232,11 @@ export default class OrcamentoController {
       if (orcamento.pessoa) orcamento.id_pessoa = orcamento.pessoa.id;
       if (orcamento.contato.id) {
         orcamento.id_contato = orcamento.contato.id;
+        delete orcamento.contato.id;
+        Contato.update(orcamento.contato, {
+          where: { id: orcamento.id_contato },
+          transaction: transaction,
+        });
       } else {
         if (orcamento.contato.nome && orcamento.contato.valor) {
           let contato = await Contato.create(orcamento.contato, {
@@ -432,7 +437,7 @@ export default class OrcamentoController {
       }
 
       if (createVenda.retorno.status === "Erro") {
-        console.log(createVenda.retorno)
+        console.log(createVenda.retorno);
         throw new Error(createVenda.retorno.erros[0].erro);
       }
 
