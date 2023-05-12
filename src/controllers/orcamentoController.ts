@@ -432,6 +432,7 @@ export default class OrcamentoController {
       }
 
       if (createVenda.retorno.status === "Erro") {
+        console.log(createVenda.retorno)
         throw new Error(createVenda.retorno.erros[0].erro);
       }
 
