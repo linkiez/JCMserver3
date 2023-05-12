@@ -243,6 +243,8 @@ export default class OrcamentoController {
             transaction: transaction,
           });
           orcamento.id_contato = contato.id;
+        } else {
+          throw new Error("Contato sem nome ou valor");
         }
       }
       if (orcamento.vendedor) orcamento.id_vendedor = orcamento.vendedor.id;
