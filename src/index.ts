@@ -22,7 +22,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(helmet());
-app.use(express.json(), express.urlencoded({ extended: true }));
+app.use(express.json({limit: '50mb'}), express.urlencoded({limit: '50mb', extended: true }));
 
 models();
 await routes(app);
