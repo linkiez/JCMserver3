@@ -360,8 +360,6 @@ export default class OrcamentoController {
           orcamento?.empresa.token_tiny
         );
 
-        console.log(verificaPessoa);
-
         if (verificaPessoa.retorno.status === "OK") {
           await Pessoa_Empresa.create(
             {
@@ -369,7 +367,7 @@ export default class OrcamentoController {
               empresaId: orcamento.empresa.id,
               id_tinyerp: verificaPessoa.retorno.contatos[0].contato.id,
             },
-            { transaction: transaction }
+            // { transaction: transaction }
           );
 
           orcamento = await orcamentoFindByPk(id);
