@@ -31,7 +31,6 @@ export class TinyERP {
   }
 
   static async getPessoaPorCNPJ_CPF(cnpj_cpf: string, token: string) {
-    let request = {};
     return this.postData(
       "https://api.tiny.com.br/api2/contatos.pesquisa.php?token=" +
         token +
@@ -86,6 +85,12 @@ export class TinyERP {
     const codigoCliente = await Pessoa_Empresa.findOne({
       where: { pessoaId: orcamento.pessoa.id, empresaId: orcamento.empresa.id },
     });
+    if (!codigoCliente) {
+      throw new Error("Cliente do tinyERP não encontrado");
+    }
+    if(!codigoCliente.id_tinyerp||codigoCliente.id_tinyerp===""||codigoCliente.id_tinyerp===null||codigoCliente.id_tinyerp==='undefined'){
+      throw new Error("Cliente do tinyERP cadastrado com código vazio");
+    }
     let request = {
       "pedido": {
         "data_pedido": moment().format("DD/MM/YYYY"),
@@ -93,7 +98,7 @@ export class TinyERP {
           .businessAdd(orcamento.prazo_emdias)
           .format("DD/MM/YYYY"),
         "cliente": {
-          "codigo":  (codigoCliente?.id_tinyerp == undefined || codigoCliente?.id_tinyerp == "undefined") ? "" : codigoCliente?.id_tinyerp,
+          "codigo":  codigoCliente?.id_tinyerp,
           "nome": orcamento.pessoa.nome,
           "sequencia": "1",
           "tipo_pessoa": orcamento.pessoa.pessoa_juridica ? "J" : "F",
@@ -151,6 +156,12 @@ export class TinyERP {
     const codigoCliente = await Pessoa_Empresa.findOne({
       where: { pessoaId: orcamento.pessoa.id, empresaId: orcamento.empresa.id },
     });
+    if (!codigoCliente) {
+      throw new Error("Cliente do tinyERP não encontrado");
+    }
+    if(!codigoCliente.id_tinyerp||codigoCliente.id_tinyerp===""||codigoCliente.id_tinyerp===null||codigoCliente.id_tinyerp==='undefined'){
+      throw new Error("Cliente do tinyERP cadastrado com código vazio");
+    }
     let request = {
       "pedido": {
         "data_pedido": moment().format("DD/MM/YYYY"),
