@@ -145,6 +145,7 @@ export class TinyERP {
           "situacao": "A",
           "obs": orcamento.pessoa.descricao,
           "contribuinte": "1",
+          "atualizar_cliente": "N",
         },
         "itens": orcamento.orcamento_items.map((item, index) => {
           return {
@@ -232,6 +233,7 @@ export class TinyERP {
           "situacao": "A",
           "obs": orcamento.pessoa.descricao,
           "contribuinte": "1",
+          "atualizar_cliente": "N",
         },
         "itens": orcamento.orcamento_items.map((item, index) => {
           return {
