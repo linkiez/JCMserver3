@@ -5,6 +5,7 @@ import Orcamento from "./Orcamento";
 import OrdemProducao from "./OrdemProducao";
 import VendaTiny from "./VendaTiny";
 import File from "./File";
+import Vendedor from "./Vendedor";
 
 export default class Empresa extends Model {
   declare id: number;
@@ -20,7 +21,7 @@ export default class Empresa extends Model {
     // define association here
     Empresa.belongsTo(Pessoa, { foreignKey: "id_pessoa" });
     Empresa.belongsToMany(Pessoa, { through: "pessoa_empresa" })
-
+    Empresa.belongsToMany(Vendedor, { through: "vendedor_empresa" })
     Empresa.hasMany(Orcamento, { foreignKey: "id_empresa" });
     Empresa.hasMany(VendaTiny, { foreignKey: "id_empresa" })
 

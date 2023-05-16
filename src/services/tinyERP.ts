@@ -142,7 +142,11 @@ export class TinyERP {
         "nome_vendedor": orcamento.vendedor.pessoa.nome,
       },
     };
-    console.log("Request Create Venda: ", JSON.stringify(request));
+    console.log("Request Create Venda: ", "https://api.tiny.com.br/api2/pedido.incluir.php?token=" +
+    token +
+    "&formato=JSON&pedido=" +
+    JSON.stringify(request));
+    
     return this.postData(
       "https://api.tiny.com.br/api2/pedido.incluir.php?token=" +
         token +

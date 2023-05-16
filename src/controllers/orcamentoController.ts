@@ -347,58 +347,7 @@ export default class OrcamentoController {
       if (!orcamento.pessoa.cnpj_cpf)
         throw new Error("CNPJ/CPF da Pessoa não encontrado");
 
-      const pessoa_Empresa = await Pessoa_Empresa.findOne({
-        where: {
-          pessoaId: orcamento.pessoa.id,
-          empresaId: orcamento.empresa.id,
-        },
-      });
-
-      if (pessoa_Empresa == null || !pessoa_Empresa.id_tinyerp) {
-        const verificaPessoa = await TinyERP.getPessoaPorCNPJ_CPF(
-          orcamento?.pessoa.cnpj_cpf,
-          orcamento?.empresa.token_tiny
-        );
-
-        if (verificaPessoa.retorno.status === "OK") {
-          await Pessoa_Empresa.create(
-            {
-              pessoaId: orcamento.pessoa.id,
-              empresaId: orcamento.empresa.id,
-              id_tinyerp: verificaPessoa.retorno.contatos[0].contato.id,
-            },
-            // { transaction: transaction }
-          );
-
-          orcamento = await orcamentoFindByPk(id);
-        } else if (
-          verificaPessoa.retorno.erros[0].erro ==
-          "A consulta não retornou registros"
-        ) {
-          const response = await TinyERP.createPessoa(
-            orcamento.pessoa,
-            orcamento.empresa.token_tiny
-          );
-
-          if (response.retorno.status === "Erro")
-            throw new Error(response.retorno.erros[0].erro);
-
-          if (response.retorno.status === "OK") {
-            await Pessoa_Empresa.create(
-              {
-                pessoaId: orcamento.pessoa.id,
-                empresaId: orcamento.empresa.id,
-                id_tinyerp: response.retorno.registros[0].registro.id,
-              },
-              // { transaction: transaction }
-            );
-          }
-
-          orcamento = await orcamentoFindByPk(id);
-        } else {
-          throw new Error(verificaPessoa.retorno.erros[0].erro);
-        }
-      }
+      verificaPessoaTinyERP(orcamento);
 
       let createVenda: any = null;
 
@@ -553,4 +502,59 @@ function orcamentoFindByPk(id: string) {
       exclude: ["id_pessoa", "id_vendedor", "id_contato", "id_empresa"],
     },
   });
+}
+
+async function verificaPessoaTinyERP(orcamento: Orcamento) {
+  const pessoa_Empresa = await Pessoa_Empresa.findOne({
+    where: {
+      pessoaId: orcamento.pessoa.id,
+      empresaId: orcamento.empresa.id,
+    },
+  });
+
+  if (pessoa_Empresa == null || !pessoa_Empresa.id_tinyerp) {
+    const verificaPessoa = await TinyERP.getPessoaPorCNPJ_CPF(
+      orcamento?.pessoa.cnpj_cpf,
+      orcamento?.empresa.token_tiny
+    );
+
+    if (verificaPessoa.retorno.status === "OK") {
+      await Pessoa_Empresa.create(
+        {
+          pessoaId: orcamento.pessoa.id,
+          empresaId: orcamento.empresa.id,
+          id_tinyerp: verificaPessoa.retorno.contatos[0].contato.id,
+        }
+        // { transaction: transaction }
+      );
+    } else if (
+      verificaPessoa.retorno.erros[0].erro ==
+      "A consulta não retornou registros"
+    ) {
+      const response = await TinyERP.createPessoa(
+        orcamento.pessoa,
+        orcamento.empresa.token_tiny
+      );
+
+      if (response.retorno.status === "Erro")
+        throw new Error(response.retorno.erros[0].erro);
+
+      if (response.retorno.status === "OK") {
+        await Pessoa_Empresa.create(
+          {
+            pessoaId: orcamento.pessoa.id,
+            empresaId: orcamento.empresa.id,
+            id_tinyerp: response.retorno.registros[0].registro.id,
+          }
+          // { transaction: transaction }
+        );
+      }
+    } else {
+      throw new Error(verificaPessoa.retorno.erros[0].erro);
+    }
+  }
+}
+
+async function verificaVendedorTinyERP(orcamento: Orcamento){
+  
 }
