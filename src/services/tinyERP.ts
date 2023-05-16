@@ -4,6 +4,7 @@ import moment from "moment";
 import momentBussiness from "moment-business-days";
 import Pessoa_Empresa from "../models/Pessoa_Empresa";
 import Produto from "../models/Produto";
+import Vendedor_Empresa from "../models/Vendedor_Empresa";
 export class TinyERP {
   constructor() {}
 
@@ -36,6 +37,15 @@ export class TinyERP {
         token +
         "&formato=JSON&cpf_cnpj=" +
         cnpj_cpf
+    );
+  }
+
+  static async getVendedorPorNome(nome: string, token: string) {
+    return this.postData(
+      "https://api.tiny.com.br/api2/vendedores.pesquisa.php?token=" +
+        token +
+        "&formato=JSON&pesquisa=" +
+        nome
     );
   }
 
@@ -91,6 +101,18 @@ export class TinyERP {
     if(!codigoCliente.id_tinyerp||codigoCliente.id_tinyerp===""||codigoCliente.id_tinyerp===null||codigoCliente.id_tinyerp==='undefined'){
       throw new Error("Cliente do tinyERP cadastrado com código vazio");
     }
+
+    const codigoVendedor = await Vendedor_Empresa.findOne({
+      where: { vendedorId: orcamento.vendedor.id, empresaId: orcamento.empresa.id },
+    });
+
+    if (!codigoVendedor) {
+      throw new Error("Vendedor do tinyERP não encontrado");
+    }
+    if(!codigoVendedor.id_tinyerp||codigoVendedor.id_tinyerp===""||codigoVendedor.id_tinyerp===null||codigoVendedor.id_tinyerp==='undefined'){
+      throw new Error("Vendedor do tinyERP cadastrado com código vazio");
+    }
+
     let request = {
       "pedido": {
         "data_pedido": moment().format("DD/MM/YYYY"),
@@ -98,7 +120,7 @@ export class TinyERP {
           .businessAdd(orcamento.prazo_emdias)
           .format("DD/MM/YYYY"),
         "cliente": {
-          "codigo":  codigoCliente?.id_tinyerp,
+          "codigo":  codigoCliente.id_tinyerp,
           "nome": orcamento.pessoa.nome,
           "sequencia": "1",
           "tipo_pessoa": orcamento.pessoa.pessoa_juridica ? "J" : "F",
@@ -139,14 +161,14 @@ export class TinyERP {
         "numero_ordem_compra": !orcamento.pc_cliente? "" : orcamento.pc_cliente,
         "situacao": "Aberto",
         "obs": orcamento.observacao + "/n Orçamento: " + orcamento.id,
-        "nome_vendedor": orcamento.vendedor.pessoa.nome,
+        "id_vendedor": codigoVendedor.id_tinyerp,
       },
     };
     console.log("Request Create Venda: ", "https://api.tiny.com.br/api2/pedido.incluir.php?token=" +
     token +
     "&formato=JSON&pedido=" +
     JSON.stringify(request));
-    
+
     return this.postData(
       "https://api.tiny.com.br/api2/pedido.incluir.php?token=" +
         token +
@@ -166,6 +188,18 @@ export class TinyERP {
     if(!codigoCliente.id_tinyerp||codigoCliente.id_tinyerp===""||codigoCliente.id_tinyerp===null||codigoCliente.id_tinyerp==='undefined'){
       throw new Error("Cliente do tinyERP cadastrado com código vazio");
     }
+
+    const codigoVendedor = await Vendedor_Empresa.findOne({
+      where: { vendedorId: orcamento.vendedor.id, empresaId: orcamento.empresa.id },
+    });
+
+    if (!codigoVendedor) {
+      throw new Error("Vendedor do tinyERP não encontrado");
+    }
+    if(!codigoVendedor.id_tinyerp||codigoVendedor.id_tinyerp===""||codigoVendedor.id_tinyerp===null||codigoVendedor.id_tinyerp==='undefined'){
+      throw new Error("Vendedor do tinyERP cadastrado com código vazio");
+    }
+
     let request = {
       "pedido": {
         "data_pedido": moment().format("DD/MM/YYYY"),
@@ -173,7 +207,7 @@ export class TinyERP {
           .businessAdd(orcamento.prazo_emdias)
           .format("DD/MM/YYYY"),
         "cliente": {
-          "codigo": (codigoCliente?.id_tinyerp == undefined || codigoCliente?.id_tinyerp == "undefined") ? "" : codigoCliente?.id_tinyerp,
+          "codigo": codigoCliente.id_tinyerp,
           "nome": orcamento.pessoa.nome,
           "sequencia": "1",
           "tipo_pessoa": orcamento.pessoa.pessoa_juridica ? "J" : "F",
@@ -215,7 +249,7 @@ export class TinyERP {
         "numero_ordem_compra": !orcamento.pc_cliente? "" : orcamento.pc_cliente,
         "situacao": "Aberto",
         "obs": orcamento.observacao  + "/n Orçamento: " + orcamento.id,
-        "nome_vendedor": orcamento.vendedor.pessoa.nome,
+        "id_vendedor": codigoVendedor.id_tinyerp,
       },
     };
 

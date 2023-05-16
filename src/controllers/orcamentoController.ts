@@ -18,6 +18,7 @@ import OrdemProducaoItem from "../models/OrdemProducaoItem";
 import OrdemProducaoItemProcesso from "../models/OrdemProducaoItemProcesso";
 import PedidoCompraItem from "../models/PedidoCompraItem";
 import PedidoCompra from "../models/PedidoCompra";
+import Vendedor_Empresa from "../models/Vendedor_Empresa";
 
 export default class OrcamentoController {
   static async findAllOrcamento(req: Request, res: Response) {
@@ -349,6 +350,8 @@ export default class OrcamentoController {
 
       verificaPessoaTinyERP(orcamento);
 
+      verificaVendedorTinyERP(orcamento);
+
       let createVenda: any = null;
 
       if (orcamento?.empresa.pessoa.cnpj_cpf == "42768425000195") {
@@ -556,5 +559,30 @@ async function verificaPessoaTinyERP(orcamento: Orcamento) {
 }
 
 async function verificaVendedorTinyERP(orcamento: Orcamento){
-  
+  const vendedor_Empresa = await Vendedor_Empresa.findOne({
+    where: {
+      vendedorId: orcamento.vendedor.id,
+      empresaId: orcamento.empresa.id,
+    },
+  });
+
+  if (vendedor_Empresa == null || !vendedor_Empresa.id_tinyerp) {
+    const verificaVendedor = await TinyERP.getVendedorPorNome(
+      orcamento?.vendedor.pessoa.nome,
+      orcamento?.empresa.token_tiny
+    );
+
+    if (verificaVendedor.retorno.status === "OK") {
+      await Vendedor_Empresa.create(
+        {
+          vendedorId: orcamento.vendedor.id,
+          empresaId: orcamento.empresa.id,
+          id_tinyerp: verificaVendedor.retorno.vendedores[0].vendedor.id,
+        }
+        // { transaction: transaction }
+      );
+    } else {
+      throw new Error(verificaVendedor.retorno.erros[0].erro);
+    }
+  }
 }

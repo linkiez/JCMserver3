@@ -27,6 +27,7 @@ import RegistroInspecaoRecebimento_File from './RIR_File';
 import Usuario from './Usuario';
 import VendaTiny from './VendaTiny';
 import Vendedor from './Vendedor';
+import Vendedor_Empresa from './Vendedor_Empresa';
 
 export function models() {
   Contato.associate();
@@ -58,4 +59,5 @@ export function models() {
   Usuario.associate();
   VendaTiny.associate();
   Vendedor.associate();
+  Vendedor_Empresa.associate();
 }
