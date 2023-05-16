@@ -121,7 +121,7 @@ export class TinyERP {
           .format("DD/MM/YYYY"),
         "cliente": {
           "codigo":  codigoCliente.id_tinyerp,
-          "nome": orcamento.pessoa.nome,
+          "nome": orcamento.pessoa.pessoa_juridica?orcamento.pessoa.razao_social:orcamento.pessoa.nome,
           "sequencia": "1",
           "tipo_pessoa": orcamento.pessoa.pessoa_juridica ? "J" : "F",
           "cpf_cnpj": orcamento.pessoa.cnpj_cpf,
@@ -208,7 +208,7 @@ export class TinyERP {
           .format("DD/MM/YYYY"),
         "cliente": {
           "codigo": codigoCliente.id_tinyerp,
-          "nome": orcamento.pessoa.nome,
+          "nome": orcamento.pessoa.pessoa_juridica?orcamento.pessoa.razao_social:orcamento.pessoa.nome,
           "sequencia": "1",
           "tipo_pessoa": orcamento.pessoa.pessoa_juridica ? "J" : "F",
           "cpf_cnpj": orcamento.pessoa.cnpj_cpf,
