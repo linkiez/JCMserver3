@@ -55,7 +55,7 @@ export class TinyERP {
         {
           contato: {
             sequencia: "1",
-            nome: pessoa.nome,
+            nome: pessoa.pessoa_juridica?pessoa.razao_social:pessoa.nome,
             tipo_pessoa: pessoa.pessoa_juridica ? "J" : "F",
             cpf_cnpj: pessoa.cnpj_cpf,
             ie: pessoa.pessoa_juridica ? pessoa.ie_rg : "",

@@ -128,7 +128,7 @@ export default class ProdutosController {
   }
 
   static async findProdutoByName(req: Request, res: Response) {
-    const { nome } = req.params;
+    const { nome } = req.body;
     try {
       const produto = await Produto.findOne({
         where: { nome: nome },

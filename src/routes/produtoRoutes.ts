@@ -16,8 +16,8 @@ router
     Authentication.verificaAcesso(["produto", "findOne"]),
     ProdutosController.findOneProduto
   )
-  .get(
-    "/produto/nome/:nome",
+  .post(
+    "/produto/nome/",
     Authentication.verificaLogin,
     Authentication.verificaAcesso(["produto", "findByName"]),
     ProdutosController.findProdutoByName
