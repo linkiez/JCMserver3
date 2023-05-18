@@ -19,6 +19,7 @@ import OrdemProducaoItemProcesso from "../models/OrdemProducaoItemProcesso";
 import PedidoCompraItem from "../models/PedidoCompraItem";
 import PedidoCompra from "../models/PedidoCompra";
 import Vendedor_Empresa from "../models/Vendedor_Empresa";
+import Pessoa_Contato from "../models/Pessoa_Contato";
 
 export default class OrcamentoController {
   static async findAllOrcamento(req: Request, res: Response) {
@@ -152,12 +153,18 @@ export default class OrcamentoController {
       if (orcamento.pessoa) orcamento.id_pessoa = orcamento.pessoa.id;
       if (orcamento.contato.id) {
         orcamento.id_contato = orcamento.contato.id;
+        await Pessoa_Contato.findOrCreate({
+          where: { contatoId: orcamento.id_contato, pessoaId: orcamento.id_pessoa },
+        })
       } else {
         if (orcamento.contato.nome && orcamento.contato.valor) {
           let contato = await Contato.create(orcamento.contato, {
             transaction: transaction,
           });
           orcamento.id_contato = contato.id;
+          await Pessoa_Contato.findOrCreate({
+            where: { contatoId: orcamento.id_contato, pessoaId: orcamento.id_pessoa },
+          })
         }
       }
       if (orcamento.vendedor) orcamento.id_vendedor = orcamento.vendedor.id;
@@ -238,12 +245,18 @@ export default class OrcamentoController {
           where: { id: orcamento.id_contato },
           transaction: transaction,
         });
+        await Pessoa_Contato.findOrCreate({
+          where: { contatoId: orcamento.id_contato, pessoaId: orcamento.id_pessoa },
+        })
       } else {
         if (orcamento.contato.nome && orcamento.contato.valor) {
           let contato = await Contato.create(orcamento.contato, {
             transaction: transaction,
           });
           orcamento.id_contato = contato.id;
+          await Pessoa_Contato.findOrCreate({
+            where: { contatoId: orcamento.id_contato, pessoaId: orcamento.id_pessoa },
+          })
         } else {
           throw new Error("Contato sem nome ou valor");
         }
