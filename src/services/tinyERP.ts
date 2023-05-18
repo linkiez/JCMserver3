@@ -55,7 +55,7 @@ export class TinyERP {
         {
           contato: {
             sequencia: "1",
-            nome: pessoa.pessoa_juridica?pessoa.razao_social:pessoa.nome,
+            nome: pessoa.pessoa_juridica ? pessoa.razao_social : pessoa.nome,
             tipo_pessoa: pessoa.pessoa_juridica ? "J" : "F",
             cpf_cnpj: pessoa.cnpj_cpf,
             ie: pessoa.pessoa_juridica ? pessoa.ie_rg : "",
@@ -98,33 +98,48 @@ export class TinyERP {
     if (!codigoCliente) {
       throw new Error("Cliente do tinyERP não encontrado");
     }
-    if(!codigoCliente.id_tinyerp||codigoCliente.id_tinyerp===""||codigoCliente.id_tinyerp===null||codigoCliente.id_tinyerp==='undefined'){
+    if (
+      !codigoCliente.id_tinyerp ||
+      codigoCliente.id_tinyerp === "" ||
+      codigoCliente.id_tinyerp === null ||
+      codigoCliente.id_tinyerp === "undefined"
+    ) {
       throw new Error("Cliente do tinyERP cadastrado com código vazio");
     }
 
     const codigoVendedor = await Vendedor_Empresa.findOne({
-      where: { vendedorId: orcamento.vendedor.id, empresaId: orcamento.empresa.id },
+      where: {
+        vendedorId: orcamento.vendedor.id,
+        empresaId: orcamento.empresa.id,
+      },
     });
 
     if (!codigoVendedor) {
       throw new Error("Vendedor do tinyERP não encontrado");
     }
-    if(!codigoVendedor.id_tinyerp||codigoVendedor.id_tinyerp===""||codigoVendedor.id_tinyerp===null||codigoVendedor.id_tinyerp==='undefined'){
+    if (
+      !codigoVendedor.id_tinyerp ||
+      codigoVendedor.id_tinyerp === "" ||
+      codigoVendedor.id_tinyerp === null ||
+      codigoVendedor.id_tinyerp === "undefined"
+    ) {
       throw new Error("Vendedor do tinyERP cadastrado com código vazio");
     }
 
     let request = {
-      "pedido": {
-        "data_pedido": moment().format("DD/MM/YYYY"),
-        "data_prevista": momentBussiness()
+      pedido: {
+        data_pedido: moment().format("DD/MM/YYYY"),
+        data_prevista: momentBussiness()
           .businessAdd(orcamento.prazo_emdias)
           .format("DD/MM/YYYY"),
-        "cliente": {
+        cliente: {
           // "codigo":  codigoCliente.id_tinyerp,
-          "nome": orcamento.pessoa.pessoa_juridica?orcamento.pessoa.razao_social:orcamento.pessoa.nome,
-          "sequencia": "1",
+          nome: orcamento.pessoa.pessoa_juridica
+            ? orcamento.pessoa.razao_social
+            : orcamento.pessoa.nome,
+          sequencia: "1",
           // "tipo_pessoa": orcamento.pessoa.pessoa_juridica ? "J" : "F",
-          "cpf_cnpj": orcamento.pessoa.cnpj_cpf,
+          cpf_cnpj: orcamento.pessoa.cnpj_cpf,
           // "ie": orcamento.pessoa.pessoa_juridica ? orcamento.pessoa.ie_rg : "",
           // "rg": !orcamento.pessoa.pessoa_juridica ? orcamento.pessoa.ie_rg : "",
           // "im": "",
@@ -145,30 +160,33 @@ export class TinyERP {
           // "situacao": "A",
           // "obs": orcamento.pessoa.descricao,
           // "contribuinte": "1",
-          "atualizar_cliente": "N",
+          atualizar_cliente: "N",
         },
-        "itens": orcamento.orcamento_items.map((item, index) => {
+        itens: orcamento.orcamento_items.map((item, index) => {
           return {
-            "item": {
-              "descricao": `${item.produto.nome} - ${item.descricao} - ${item.largura}x${item.altura}mm ${item.quantidade}PC`,
-              "unidade": "UN",
-              "quantidade": item.quantidade,
-              "valor_unitario": item.total / item.quantidade,
+            item: {
+              descricao: `${item.produto.nome} - ${item.descricao} - ${item.largura}x${item.altura}mm ${item.quantidade}PC`,
+              unidade: "UN",
+              quantidade: item.quantidade,
+              valor_unitario: item.total / item.quantidade,
             },
           };
         }),
-        "valor_frete": orcamento.frete,
-        "valor_desconto": orcamento.desconto,
-        "numero_ordem_compra": !orcamento.pc_cliente? "" : orcamento.pc_cliente,
-        "situacao": "Aberto",
-        "obs": orcamento.observacao + "/n Orçamento: " + orcamento.id,
-        "id_vendedor": codigoVendedor.id_tinyerp,
+        valor_frete: orcamento.frete,
+        valor_desconto: orcamento.desconto,
+        numero_ordem_compra: !orcamento.pc_cliente ? "" : orcamento.pc_cliente,
+        situacao: "Aberto",
+        obs: orcamento.observacao + "/n Orçamento: " + orcamento.id,
+        id_vendedor: codigoVendedor.id_tinyerp,
       },
     };
-    console.log("Request Create Venda: ", "https://api.tiny.com.br/api2/pedido.incluir.php?token=" +
-    token +
-    "&formato=JSON&pedido=" +
-    JSON.stringify(request));
+    console.log(
+      "Request Create Venda: ",
+      "https://api.tiny.com.br/api2/pedido.incluir.php?token=" +
+        token +
+        "&formato=JSON&pedido=" +
+        JSON.stringify(request)
+    );
 
     return this.postData(
       "https://api.tiny.com.br/api2/pedido.incluir.php?token=" +
@@ -186,33 +204,48 @@ export class TinyERP {
     if (!codigoCliente) {
       throw new Error("Cliente do tinyERP não encontrado");
     }
-    if(!codigoCliente.id_tinyerp||codigoCliente.id_tinyerp===""||codigoCliente.id_tinyerp===null||codigoCliente.id_tinyerp==='undefined'){
+    if (
+      !codigoCliente.id_tinyerp ||
+      codigoCliente.id_tinyerp === "" ||
+      codigoCliente.id_tinyerp === null ||
+      codigoCliente.id_tinyerp === "undefined"
+    ) {
       throw new Error("Cliente do tinyERP cadastrado com código vazio");
     }
 
     const codigoVendedor = await Vendedor_Empresa.findOne({
-      where: { vendedorId: orcamento.vendedor.id, empresaId: orcamento.empresa.id },
+      where: {
+        vendedorId: orcamento.vendedor.id,
+        empresaId: orcamento.empresa.id,
+      },
     });
 
     if (!codigoVendedor) {
       throw new Error("Vendedor do tinyERP não encontrado");
     }
-    if(!codigoVendedor.id_tinyerp||codigoVendedor.id_tinyerp===""||codigoVendedor.id_tinyerp===null||codigoVendedor.id_tinyerp==='undefined'){
+    if (
+      !codigoVendedor.id_tinyerp ||
+      codigoVendedor.id_tinyerp === "" ||
+      codigoVendedor.id_tinyerp === null ||
+      codigoVendedor.id_tinyerp === "undefined"
+    ) {
       throw new Error("Vendedor do tinyERP cadastrado com código vazio");
     }
 
     let request = {
-      "pedido": {
-        "data_pedido": moment().format("DD/MM/YYYY"),
-        "data_prevista": momentBussiness()
+      pedido: {
+        data_pedido: moment().format("DD/MM/YYYY"),
+        data_prevista: momentBussiness()
           .businessAdd(orcamento.prazo_emdias)
           .format("DD/MM/YYYY"),
-        "cliente": {
+        cliente: {
           // "codigo": codigoCliente.id_tinyerp,
-          "nome": orcamento.pessoa.pessoa_juridica?orcamento.pessoa.razao_social:orcamento.pessoa.nome,
-          "sequencia": "1",
+          nome: orcamento.pessoa.pessoa_juridica
+            ? orcamento.pessoa.razao_social
+            : orcamento.pessoa.nome,
+          sequencia: "1",
           // "tipo_pessoa": orcamento.pessoa.pessoa_juridica ? "J" : "F",
-          "cpf_cnpj": orcamento.pessoa.cnpj_cpf,
+          cpf_cnpj: orcamento.pessoa.cnpj_cpf,
           // "ie": orcamento.pessoa.pessoa_juridica ? orcamento.pessoa.ie_rg : "",
           // "rg": !orcamento.pessoa.pessoa_juridica ? orcamento.pessoa.ie_rg : "",
           // "im": "",
@@ -233,25 +266,25 @@ export class TinyERP {
           // "situacao": "A",
           // "obs": orcamento.pessoa.descricao,
           // "contribuinte": "1",
-          "atualizar_cliente": "N",
+          atualizar_cliente: "N",
         },
-        "itens": orcamento.orcamento_items.map((item, index) => {
+        itens: orcamento.orcamento_items.map((item, index) => {
           return {
-            "item": {
-              "codigo": item.produto.id_tiny,
-              "descricao": item.produto.nome,
-              "unidade": "KG",
-              "quantidade": item.total_peso,
-              "valor_unitario": item.total / item.total_peso,
+            item: {
+              codigo: item.produto.id_tiny,
+              descricao: item.produto.nome,
+              unidade: "KG",
+              quantidade: item.total_peso,
+              valor_unitario: item.total / item.total_peso,
             },
           };
         }),
-        "valor_frete": orcamento.frete,
-        "valor_desconto": orcamento.desconto,
-        "numero_ordem_compra": !orcamento.pc_cliente? "" : orcamento.pc_cliente,
-        "situacao": "Aberto",
-        "obs": orcamento.observacao  + "/n Orçamento: " + orcamento.id,
-        "id_vendedor": codigoVendedor.id_tinyerp,
+        valor_frete: orcamento.frete,
+        valor_desconto: orcamento.desconto,
+        numero_ordem_compra: !orcamento.pc_cliente ? "" : orcamento.pc_cliente,
+        situacao: "Aberto",
+        obs: orcamento.observacao + "/n Orçamento: " + orcamento.id,
+        id_vendedor: codigoVendedor.id_tinyerp,
       },
     };
 
@@ -271,6 +304,19 @@ export class TinyERP {
         produto.nome
     );
   }
+
+  static alterarSituacaoVenda(id: string, token: string, situacao: string) {
+    return this.postData(
+      "https://api.tiny.com.br/api2/pedido.alterar.situacao?token=" +
+        token +
+        "&formato=JSON&numero_pedido=" +
+        id +
+        "&situacao=" +
+        situacao
+    );
+  }
+
+  
 }
 
 function timeout(ms: number) {

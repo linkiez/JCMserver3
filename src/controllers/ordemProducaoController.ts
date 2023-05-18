@@ -6,7 +6,6 @@ import OrdemProducaoItemProcesso from "../models/OrdemProducaoItemProcesso";
 import Vendedor from "../models/Vendedor";
 import FileDb from "../models/File";
 import Orcamento from "../models/Orcamento";
-import Empresa from "../models/Empresa";
 import Pessoa from "../models/Pessoa";
 import Produto from "../models/Produto";
 import { Op } from "sequelize";
@@ -14,6 +13,7 @@ import VendaTiny from "../models/VendaTiny";
 import OrdemProducaoHistorico from "../models/OrdemProducaoHistorico";
 import Usuario from "../models/Usuario";
 import OrcamentoItem from "../models/OrcamentoItem";
+import OrdemProducaoItem_File from "../models/OrdemProducaoItem_File";
 
 export default class OrdemProducaoController {
   static async findAllOrdemProducao(req: Request, res: Response) {
@@ -31,21 +31,19 @@ export default class OrdemProducaoController {
           totalRecords: 0,
         };
 
-      let queryWhere: any = {
-      };
+      let queryWhere: any = {};
 
       if (consulta.searchValue) {
         if (!isNaN(Number(consulta.searchValue)))
           queryWhere.id = Number(consulta.searchValue);
       }
 
-      console.log(queryWhere);
-      if (consulta.status !== "undefined" && consulta.status !== '') {
+      if (consulta.status !== "undefined" && consulta.status !== "") {
         queryWhere.status = consulta.status;
       }
 
       if (req.query.deleted === "true")
-        queryWhere.deletedAt = { [Op.not]: null } ;
+        queryWhere.deletedAt = { [Op.not]: null };
 
       resultado.ordemProducao = await OrdemProducao.findAll({
         limit: consulta.pageCount,
@@ -91,7 +89,7 @@ export default class OrdemProducaoController {
 
       return res.status(200).json(resultado);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -103,7 +101,7 @@ export default class OrdemProducaoController {
       });
       return res.status(200).json(orçamentos);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -152,7 +150,7 @@ export default class OrdemProducaoController {
 
       return res.status(201).json(ordemProducao);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -270,7 +268,7 @@ export default class OrdemProducaoController {
       });
     } catch (error: any) {
       await transaction.rollback;
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -300,6 +298,120 @@ export default class OrdemProducaoController {
         where: { id: Number(id) },
         transaction: transaction,
       });
+
+      let oldItens = await OrdemProducaoItem.findAll({
+        where: { id_ordem_producao: Number(id) },
+      });
+
+      updatePromises = updatePromises.concat(
+        oldItens.map(async (item) => {
+          let search = ordemProducaoItens.find(
+            (item: OrdemProducaoItem) => item.id == item.id
+          );
+          if (!search) {
+            await OrdemProducaoItem.destroy({
+              where: { id: item.id },
+              transaction: transaction,
+            });
+          }
+        })
+      );
+
+      updatePromises = updatePromises.concat(
+        ordemProducaoItens.map(async (ordemProducaoItem: OrdemProducaoItem) => {
+          let files = ordemProducaoItem.files;
+          delete ordemProducaoItem.files;
+
+          if (ordemProducaoItem.produto) {
+            ordemProducaoItem.id_produto = ordemProducaoItem.produto.id;
+            delete ordemProducaoItem.produto;
+          }
+
+          if (ordemProducaoItem.rir) {
+            ordemProducaoItem.id_rir = ordemProducaoItem.rir.id;
+            delete ordemProducaoItem.rir;
+          }
+
+          ordemProducaoItem.id_ordem_producao = Number(id);
+
+          let ordemProducaoItemProcessos:
+            | OrdemProducaoItemProcesso[]
+            | Promise<any>[] = [];
+          if (ordemProducaoItem.ordem_producao_item_processos) {
+            ordemProducaoItemProcessos =
+              ordemProducaoItem.ordem_producao_item_processos;
+            delete ordemProducaoItem.ordem_producao_item_processos;
+          }
+
+          if (ordemProducaoItem.id) {
+            await OrdemProducaoItem.update(ordemProducaoItem, {
+              where: { id: ordemProducaoItem.id },
+              transaction: transaction,
+            });
+          } else {
+            ordemProducaoItem = await OrdemProducaoItem.create(
+              ordemProducaoItem as any,
+              { transaction: transaction }
+            );
+          }
+
+          if (files) {
+            const oldFiles = await OrdemProducaoItem_File.findAll({
+              where: { ordemProducaoItemId: ordemProducaoItem.id },
+            });
+
+            for (let oldFile of oldFiles) {
+              let search = files.find((file: any) => file.id == oldFile.fileId);
+              if (!search) {
+                await OrdemProducaoItem_File.destroy({
+                  where: { id: oldFile.fileId },
+                  // transaction: transaction,
+                });
+              }
+            }
+
+            for (let file of files) {
+              let search = oldFiles.find(
+                (oldFile: any) => oldFile.fileId == file.id
+              );
+              if (!search) {
+                await OrdemProducaoItem_File.create(
+                  {
+                    ordemProducaoItemId: ordemProducaoItem.id,
+                    fileId: file.id,
+                  },
+                  // { transaction: transaction }
+                );
+              }
+            }
+          }
+
+          ordemProducaoItemProcessos = ordemProducaoItemProcessos.map(
+            async (ordemProducaoItemProcesso: any) => {
+              ordemProducaoItemProcesso.id_ordem_producao_item =
+                ordemProducaoItem.id;
+
+              if (ordemProducaoItemProcesso.id) {
+                await OrdemProducaoItemProcesso.update(
+                  ordemProducaoItemProcesso,
+                  {
+                    where: { id: ordemProducaoItemProcesso.id },
+                    // transaction: transaction,
+                  }
+                );
+              } else {
+                ordemProducaoItemProcesso =
+                  await OrdemProducaoItemProcesso.create(
+                    ordemProducaoItemProcesso,
+                    // { transaction: transaction }
+                  );
+                return ordemProducaoItemProcesso;
+              }
+            }
+          );
+          return ordemProducaoItem;
+        })
+      );
 
       let oldHistoricos = await OrdemProducaoHistorico.findAll({
         where: { id_ordem_producao: Number(id) },
@@ -363,18 +475,18 @@ export default class OrdemProducaoController {
               include: [Pessoa],
               attributes: { exclude: ["id_pessoa"] },
             },
-            // {
-            //   model: OrdemProducaoItem,
-            //   include: [
-            //     FileDb,
-            //     {
-            //       model: OrdemProducaoItemProcesso,
-            //       attributes: { exclude: ["id_ordem_producao_item"] },
-            //     },
-            //     Produto,
-            //   ],
-            //   attributes: { exclude: ["id_ordem_producao", "id_produto"] },
-            // },
+            {
+              model: OrdemProducaoItem,
+              include: [
+                FileDb,
+                {
+                  model: OrdemProducaoItemProcesso,
+                  attributes: { exclude: ["id_ordem_producao_item"] },
+                },
+                Produto,
+              ],
+              attributes: { exclude: ["id_ordem_producao", "id_produto"] },
+            },
           ],
           attributes: { exclude: ["id_vendedor", "id_orcamento"] },
         });
@@ -382,7 +494,7 @@ export default class OrdemProducaoController {
       });
     } catch (error: any) {
       await transaction.rollback;
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -393,7 +505,7 @@ export default class OrdemProducaoController {
       await OrdemProducao.destroy({ where: { id: Number(id) } });
       return res.status(202).json({ message: `OrdemProducao apagado` });
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -407,7 +519,7 @@ export default class OrdemProducaoController {
       });
       return res.status(202).json(orcamentoUpdated);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }

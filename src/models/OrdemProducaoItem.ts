@@ -22,16 +22,18 @@ import OrdemProducaoItemProcesso from "./OrdemProducaoItemProcesso";
 export default class OrdemProducaoItem extends Model {
   declare id: number;
   declare descricao: string;
-  declare produto: Produto;
+  declare produto?: Produto;
   declare id_produto: number;
   declare quantidade: number;
-  declare rir: RegistroInspecaoRecebimento;
+  declare rir?: RegistroInspecaoRecebimento;
   declare id_rir: number;
   declare observacao: string;
   declare deletedAt: Date;
   declare updatedAt: Date;
   declare createdAt: Date;
-  declare files: Array<FileDb>;
+  declare files?: Array<FileDb>;
+  declare id_ordem_producao: number;
+  declare ordem_producao_item_processos?: Array<OrdemProducaoItemProcesso>;
 
   declare getFiles: HasManyGetAssociationsMixin<File>; //
   declare addFile: HasManyAddAssociationMixin<File, number>;
