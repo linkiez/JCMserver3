@@ -303,7 +303,7 @@ export default class OrdemProducaoController {
         where: { id_ordem_producao: Number(id) },
       });
 
-      updatePromises = updatePromises.concat(
+      if (ordemProducaoItens) updatePromises = updatePromises.concat(
         oldItens.map(async (item) => {
           let search = ordemProducaoItens.find(
             (item: OrdemProducaoItem) => item.id == item.id
@@ -317,7 +317,7 @@ export default class OrdemProducaoController {
         })
       );
 
-      updatePromises = updatePromises.concat(
+      if (ordemProducaoItens) updatePromises = updatePromises.concat(
         ordemProducaoItens.map(async (ordemProducaoItem: OrdemProducaoItem) => {
           let files = ordemProducaoItem.files;
           delete ordemProducaoItem.files;

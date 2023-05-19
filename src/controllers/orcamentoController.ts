@@ -243,7 +243,7 @@ export default class OrcamentoController {
         delete orcamento.contato.id;
         Contato.update(orcamento.contato, {
           where: { id: orcamento.id_contato },
-          transaction: transaction,
+          // transaction: transaction,
         });
         await Pessoa_Contato.findOrCreate({
           where: { contatoId: orcamento.id_contato, pessoaId: orcamento.id_pessoa },
@@ -251,7 +251,7 @@ export default class OrcamentoController {
       } else {
         if (orcamento.contato.nome && orcamento.contato.valor) {
           let contato = await Contato.create(orcamento.contato, {
-            transaction: transaction,
+            // transaction: transaction,
           });
           orcamento.id_contato = contato.id;
           await Pessoa_Contato.findOrCreate({
