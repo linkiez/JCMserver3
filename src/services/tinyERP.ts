@@ -8,7 +8,7 @@ import Vendedor_Empresa from "../models/Vendedor_Empresa";
 export class TinyERP {
   constructor() {}
 
-  static async postData(url = "") {
+  static async postData(url = "", dados?: string) {
     // Default options are marked with *
     const response = await fetch(url, {
       method: "POST", // *GET, POST, PUT, DELETE, etc.
@@ -16,12 +16,12 @@ export class TinyERP {
       cache: "default", // *default, no-cache, reload, force-cache, only-if-cached
       credentials: "same-origin", // include, *same-origin, omit
       headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
+        // "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       redirect: "follow", // manual, *follow, error
       referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      //body: JSON.stringify(dados), // body data type must match "Content-Type" header
+      body: dados, // body data type must match "Content-Type" header
     });
 
     if (!response.ok) {
@@ -82,6 +82,7 @@ export class TinyERP {
         },
       ],
     };
+
     return this.postData(
       "https://api.tiny.com.br/api2/contato.incluir.php?token=" +
         token +
@@ -180,19 +181,15 @@ export class TinyERP {
         id_vendedor: codigoVendedor.id_tinyerp,
       },
     };
-    console.log(
-      "Request Create Venda: ",
-      "https://api.tiny.com.br/api2/pedido.incluir.php?token=" +
-        token +
-        "&formato=JSON&pedido=" +
-        JSON.stringify(request)
-    );
+
+    const params = new URLSearchParams();
+    params.append("pedido", JSON.stringify(request));
 
     return this.postData(
       "https://api.tiny.com.br/api2/pedido.incluir.php?token=" +
         token +
-        "&formato=JSON&pedido=" +
-        JSON.stringify(request)
+        "&formato=JSON",
+      params.toString()
     );
   }
 
@@ -288,11 +285,14 @@ export class TinyERP {
       },
     };
 
+    const params = new URLSearchParams();
+    params.append("pedido", JSON.stringify(request));
+
     return this.postData(
       "https://api.tiny.com.br/api2/pedido.incluir.php?token=" +
         token +
-        "&formato=JSON&pedido=" +
-        JSON.stringify(request)
+        "&formato=JSON",
+      params.toString()
     );
   }
 
@@ -315,8 +315,6 @@ export class TinyERP {
         situacao
     );
   }
-
-  
 }
 
 function timeout(ms: number) {
