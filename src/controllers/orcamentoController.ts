@@ -153,18 +153,24 @@ export default class OrcamentoController {
       if (orcamento.pessoa) orcamento.id_pessoa = orcamento.pessoa.id;
       if (orcamento.contato.id) {
         orcamento.id_contato = orcamento.contato.id;
-        await Pessoa_Contato.findOrCreate({
-          where: { contatoId: orcamento.id_contato, pessoaId: orcamento.id_pessoa },
-        })
+        if (orcamento.id_pessoa && orcamento.id_contato) await Pessoa_Contato.findOrCreate({
+          where: {
+            contatoId: orcamento.id_contato,
+            pessoaId: orcamento.id_pessoa,
+          },
+        });
       } else {
         if (orcamento.contato.nome && orcamento.contato.valor) {
           let contato = await Contato.create(orcamento.contato, {
             transaction: transaction,
           });
           orcamento.id_contato = contato.id;
-          await Pessoa_Contato.findOrCreate({
-            where: { contatoId: orcamento.id_contato, pessoaId: orcamento.id_pessoa },
-          })
+          if (orcamento.id_pessoa && orcamento.id_contato) await Pessoa_Contato.findOrCreate({
+            where: {
+              contatoId: orcamento.id_contato,
+              pessoaId: orcamento.id_pessoa,
+            },
+          });
         }
       }
       if (orcamento.vendedor) orcamento.id_vendedor = orcamento.vendedor.id;
@@ -245,18 +251,28 @@ export default class OrcamentoController {
           where: { id: orcamento.id_contato },
           // transaction: transaction,
         });
-        await Pessoa_Contato.findOrCreate({
-          where: { contatoId: orcamento.id_contato, pessoaId: orcamento.id_pessoa },
-        })
+        if (orcamento.id_pessoa && orcamento.id_contato) {
+          await Pessoa_Contato.findOrCreate({
+            where: {
+              contatoId: orcamento.id_contato,
+              pessoaId: orcamento.id_pessoa,
+            },
+          });
+        }
       } else {
         if (orcamento.contato.nome && orcamento.contato.valor) {
           let contato = await Contato.create(orcamento.contato, {
             // transaction: transaction,
           });
           orcamento.id_contato = contato.id;
-          await Pessoa_Contato.findOrCreate({
-            where: { contatoId: orcamento.id_contato, pessoaId: orcamento.id_pessoa },
-          })
+          if (orcamento.id_pessoa && orcamento.id_contato) {
+            await Pessoa_Contato.findOrCreate({
+              where: {
+                contatoId: orcamento.id_contato,
+                pessoaId: orcamento.id_pessoa,
+              },
+            });
+          }
         } else {
           throw new Error("Contato sem nome ou valor");
         }
@@ -571,7 +587,7 @@ async function verificaPessoaTinyERP(orcamento: Orcamento) {
   }
 }
 
-async function verificaVendedorTinyERP(orcamento: Orcamento){
+async function verificaVendedorTinyERP(orcamento: Orcamento) {
   const vendedor_Empresa = await Vendedor_Empresa.findOne({
     where: {
       vendedorId: orcamento.vendedor.id,
