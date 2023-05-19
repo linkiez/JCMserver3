@@ -89,7 +89,7 @@ export default class OrcamentoController {
         where: { id: id },
         include: [
           Contato,
-          Empresa,
+          { model: Empresa, attributes: { exclude: ["token_tiny"] } },
           Pessoa,
           { model: Vendedor, include: [Pessoa] },
           VendaTiny,
