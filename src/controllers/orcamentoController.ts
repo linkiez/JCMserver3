@@ -35,31 +35,42 @@ export default class OrcamentoController {
         totalRecords: 0,
       };
 
-      let queryWhere: any = {
-        // [Op.or]: [{ id: { [Op.like]: "%" + consulta.searchValue + "%" } }],
-      };
+      let queryWhere: any = {};
+
+      if (consulta.searchValue !== "undefined" && consulta.searchValue !== "") {
+        if (!isNaN(Number(consulta.searchValue)))
+          queryWhere.id = consulta.searchValue;
+        // else queryWhere["$Pessoa.nome$"] = { [Op.like]: "%" + consulta.searchValue + "%" }
+      }
+
+      let wherePessoa = undefined;
+      if (isNaN(Number(consulta.searchValue)))
+        wherePessoa = { nome: { [Op.like]: "%" + consulta.searchValue + "%" } };
 
       if (req.query.deleted === "true")
         queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
 
+      const include = [
+        {
+          model: Vendedor,
+          include: [{ model: Pessoa }],
+        },
+        { model: Pessoa, required: true, where: wherePessoa },
+        Contato,
+      ];
+
       resultado.orcamento = await Orcamento.findAll({
         limit: consulta.pageCount,
         offset: consulta.pageCount * consulta.page,
-        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
+        where: queryWhere,
         paranoid: req.query.deleted === "true" ? false : true,
-        include: [
-          {
-            model: Vendedor,
-            include: [{ model: Pessoa }],
-          },
-          Pessoa,
-          Contato,
-        ],
+        include: include,
         order: [["id", "DESC"]],
       });
 
       resultado.totalRecords = await Orcamento.count({
-        where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
+        where: queryWhere,
+        include: include,
         paranoid: req.query.deleted === "true" ? false : true,
       });
 
@@ -153,24 +164,26 @@ export default class OrcamentoController {
       if (orcamento.pessoa) orcamento.id_pessoa = orcamento.pessoa.id;
       if (orcamento.contato.id) {
         orcamento.id_contato = orcamento.contato.id;
-        if (orcamento.id_pessoa && orcamento.id_contato) await Pessoa_Contato.findOrCreate({
-          where: {
-            contatoId: orcamento.id_contato,
-            pessoaId: orcamento.id_pessoa,
-          },
-        });
+        if (orcamento.id_pessoa && orcamento.id_contato)
+          await Pessoa_Contato.findOrCreate({
+            where: {
+              contatoId: orcamento.id_contato,
+              pessoaId: orcamento.id_pessoa,
+            },
+          });
       } else {
         if (orcamento.contato.nome && orcamento.contato.valor) {
           let contato = await Contato.create(orcamento.contato, {
             transaction: transaction,
           });
           orcamento.id_contato = contato.id;
-          if (orcamento.id_pessoa && orcamento.id_contato) await Pessoa_Contato.findOrCreate({
-            where: {
-              contatoId: orcamento.id_contato,
-              pessoaId: orcamento.id_pessoa,
-            },
-          });
+          if (orcamento.id_pessoa && orcamento.id_contato)
+            await Pessoa_Contato.findOrCreate({
+              where: {
+                contatoId: orcamento.id_contato,
+                pessoaId: orcamento.id_pessoa,
+              },
+            });
         }
       }
       if (orcamento.vendedor) orcamento.id_vendedor = orcamento.vendedor.id;
