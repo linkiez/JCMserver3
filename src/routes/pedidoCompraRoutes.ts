@@ -22,6 +22,12 @@ router
     PedidoCompraController.findAllPedidoCompra
   )
   .get(
+    "/pedidocompra/item",
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["pedidoCompra", "findAll"]),
+    PedidoCompraController.findAllPedidoCompraItem
+  )
+  .get(
     "/pedidocompra/:id",
     Authentication.verificaLogin,
     Authentication.verificaAcesso(["pedidoCompra", "findOne"]),

@@ -51,7 +51,7 @@ export default class PedidoCompraController {
 
       return res.status(201).json(pedidoCompraCreated2);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -105,7 +105,7 @@ export default class PedidoCompraController {
 
       return res.status(200).json(resultado);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -127,7 +127,7 @@ export default class PedidoCompraController {
 
       return res.status(200).json(pedidoCompra);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -192,7 +192,7 @@ export default class PedidoCompraController {
       return res.status(201).json(pedidoCompraCreated2);
     } catch (error: any) {
       await transaction.rollback();
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -212,7 +212,7 @@ export default class PedidoCompraController {
       return res.status(202).json({ message: `Pedido de compra apagado` });
     } catch (error: any) {
       await t.rollback();
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -294,7 +294,57 @@ export default class PedidoCompraController {
       });
     } catch (error: any) {
       await transaction.rollback();
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async findAllPedidoCompraItem(req: Request, res: Response) {
+    try {
+      let consulta: any = {
+        pageCount: Number(req.query.pageCount) || 10,
+        page: Number(req.query.page) || 0,
+        produto: req.query.produto,
+        fornecedor: req.query.fornecedor,
+      };
+
+      let resultado: {
+        pedidosCompraItem: PedidoCompraItem[];
+        totalRecords: Number;
+      } = {
+        pedidosCompraItem: [],
+        totalRecords: 0,
+      };
+
+      const include = [
+          {
+            model: PedidoCompra,
+            required: true,
+            where: {id_fornecedor: consulta.fornecedor !== "undefined" ? consulta.fornecedor : undefined}
+          },
+          {
+            model: Produto,
+            required: true,
+            where: {id: consulta.produto !== "undefined" ? consulta.produto : undefined}
+          },
+        ]
+
+      resultado.pedidosCompraItem = await PedidoCompraItem.findAll({
+        limit: consulta.pageCount,
+        offset: consulta.pageCount * consulta.page,
+        paranoid: req.query.deleted === "true" ? false : true,
+        include: include,
+        order: [["id", "DESC"]],
+      });
+
+      resultado.totalRecords = await PedidoCompraItem.count({
+        include: include,
+        paranoid: req.query.deleted === "true" ? false : true,
+      });
+
+      return res.status(200).json(resultado);
+    } catch (error: any) {
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
