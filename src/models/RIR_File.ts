@@ -1,7 +1,12 @@
 import sequelize from "../config/connPostgre";
 import { Model } from "sequelize";
 
-export default class RegistroInspecaoRecebimento_File extends Model {
+export default class RegistroInspecaoRecebimento_File extends 
+Model {
+  declare id: number;
+  declare registroInspecaoRecebimentoId: number;
+  declare fileId: number;
+  
   static associate() {
     // define association here
   }

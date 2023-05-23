@@ -174,7 +174,7 @@ export default class OrcamentoController {
       } else {
         if (orcamento.contato.nome && orcamento.contato.valor) {
           let contato = await Contato.create(orcamento.contato, {
-            transaction: transaction,
+            // transaction: transaction,
           });
           orcamento.id_contato = contato.id;
           if (orcamento.id_pessoa && orcamento.id_contato)
