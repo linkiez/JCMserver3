@@ -55,7 +55,7 @@ export default class OrcamentoController {
           model: Vendedor,
           include: [{ model: Pessoa }],
         },
-        { model: Pessoa, required: true, where: wherePessoa },
+        { model: Pessoa, required: false, where: wherePessoa },
         Contato,
       ];
 

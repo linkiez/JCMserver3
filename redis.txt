@@ -1,1 +1,1 @@
-docker run -d --name redis -p 6379:6379 -v <volume-name>:/data --restart unless-stopped redis redis-server --appendonly yes --requirepass '__@picker-redis'
+docker run -d --name redis -p 6379:6379 -v redis_volume:/data --restart unless-stopped redis redis-server --appendonly yes --requirepass '__@picker-redis'

@@ -22,7 +22,10 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(helmet());
-app.use(express.json({limit: '50mb'}), express.urlencoded({limit: '50mb', extended: true }));
+app.use(
+  express.json({ limit: "50mb" }),
+  express.urlencoded({ limit: "50mb", extended: true })
+);
 
 models();
 await routes(app);
@@ -39,7 +42,7 @@ if (cluster.isPrimary) {
       force: JSON.parse(process.env.SEQUELIZE_FORCE ?? "false"),
     })
     .then(() => {
-      if(JSON.parse(process.env.SEQUELIZE_SEED ?? "false")){
+      if (JSON.parse(process.env.SEQUELIZE_SEED ?? "false")) {
         seed();
       }
     });
@@ -52,11 +55,11 @@ if (cluster.isPrimary) {
   // This event is firs when worker died
   cluster.on("exit", (worker: any, code: any, signal: any) => {
     console.log(`worker ${worker.process.pid} died`);
-  
+
     // Check if all workers have exited
     if (!cluster.workers || Object.keys(cluster.workers).length === 0) {
       console.log("All workers have died, restarting...");
-    
+
       // Exit the master process to trigger a restart
       process.exit();
     }
@@ -71,3 +74,6 @@ else {
     console.log(`Worker ${process.pid} started`);
   });
 }
+cluster.on('error', (error) => {
+  console.error('Cluster error:', error);
+});
