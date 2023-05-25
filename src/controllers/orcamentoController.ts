@@ -55,7 +55,14 @@ export default class OrcamentoController {
           model: Vendedor,
           include: [{ model: Pessoa }],
         },
-        { model: Pessoa, required: false, where: wherePessoa },
+        {
+          model: Pessoa,
+          required:
+            isNaN(Number(consulta.searchValue)) &&
+            consulta.searchValue !== "undefined" &&
+            consulta.searchValue !== "",
+          where: wherePessoa,
+        },
         Contato,
       ];
 
@@ -173,10 +180,12 @@ export default class OrcamentoController {
           });
       } else {
         if (orcamento.contato.nome && orcamento.contato.valor) {
-          let contato = await Contato.create(orcamento.contato, {
+          let contato = await Contato.findOrCreate({
+            where: {valor: orcamento.contato.valor},
+            defaults: orcamento.contato,
             // transaction: transaction,
           });
-          orcamento.id_contato = contato.id;
+          orcamento.id_contato = contato[0].id;
           if (orcamento.id_pessoa && orcamento.id_contato)
             await Pessoa_Contato.findOrCreate({
               where: {

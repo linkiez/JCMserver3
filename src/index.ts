@@ -52,6 +52,10 @@ if (cluster.isPrimary) {
     cluster.fork();
   }
 
+  cluster.on('error', (error) => {
+    console.error('Cluster error:', error);
+  });
+  
   // This event is firs when worker died
   cluster.on("exit", (worker: any, code: any, signal: any) => {
     console.log(`worker ${worker.process.pid} died`);
@@ -74,6 +78,3 @@ else {
     console.log(`Worker ${process.pid} started`);
   });
 }
-cluster.on('error', (error) => {
-  console.error('Cluster error:', error);
-});
