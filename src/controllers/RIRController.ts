@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import Operador from "../models/Operador";
 import Pessoa from "../models/Pessoa";
 import Produto from "../models/Produto";
@@ -7,6 +7,7 @@ import FileDb from "../models/File";
 import PedidoCompraItem from "../models/PedidoCompraItem";
 import RegistroInspecaoRecebimento_File from "../models/RIR_File";
 import { Op } from "sequelize";
+import PedidoCompra from "../models/PedidoCompra";
 
 export default class RIRController {
   static async findAllRIRs(req: Request, res: Response) {
@@ -41,9 +42,13 @@ export default class RIRController {
       const include = [
         Pessoa,
         { model: Produto, where: whereProduto, required: false },
-        Operador,
+        {
+          model: Operador,
+          include: [Pessoa],
+          attributes: { exclude: ["id_pessoa"] },
+        },
         FileDb,
-        PedidoCompraItem,
+        { model: PedidoCompraItem, include: [PedidoCompra] },
       ];
 
       resultado.rirs = await RIR.findAll({
@@ -121,8 +126,8 @@ export default class RIRController {
 
       const rirCreated = await RIR.create(rir);
 
-      if (rir.file) {
-        for (let file of rir.file) {
+      if (rir.files) {
+        for (let file of rir.files) {
           await RegistroInspecaoRecebimento_File.create({
             fileId: file.id,
             registroInspecaoRecebimentoId: rirCreated.id,
@@ -132,7 +137,17 @@ export default class RIRController {
 
       rir = await RIR.findOne({
         where: { id: rirCreated.id },
-        include: [Pessoa, Produto, Operador, FileDb, PedidoCompraItem],
+        include: [
+          Pessoa,
+          { model: Produto },
+          {
+            model: Operador,
+            include: [Pessoa],
+            attributes: { exclude: ["id_pessoa"] },
+          },
+          FileDb,
+          { model: PedidoCompraItem, include: [PedidoCompra] },
+        ],
         attributes: {
           exclude: [
             "id_pessoa",
@@ -169,9 +184,9 @@ export default class RIRController {
         rir.id_pedido_compra_item = rir.pedido_compra_item.id;
         delete rir.pedido_compra_item;
       }
-      delete rir.id;
+      
 
-      if (rir.file) {
+      if (rir.files) {
         let filesOld = await RegistroInspecaoRecebimento_File.findAll({
           where: { registroInspecaoRecebimentoId: Number(id) },
         });
@@ -183,11 +198,11 @@ export default class RIRController {
             });
           }
         }
-        for (let file of rir.file) {
+        for (let file of rir.files) {
           await RegistroInspecaoRecebimento_File.findOrCreate({
             where: {
               fileId: file.id,
-              registroInspecaoRecebimentoId: rir.id,
+              registroInspecaoRecebimentoId: id,
             },
           });
         }
@@ -196,7 +211,17 @@ export default class RIRController {
       await RIR.update(rir, { where: { id: Number(id) } });
       const rirUpdated = await RIR.findOne({
         where: { id: Number(id) },
-        include: [Pessoa, Produto, Operador, FileDb, PedidoCompraItem],
+        include: [
+          Pessoa,
+          { model: Produto },
+          {
+            model: Operador,
+            include: [Pessoa],
+            attributes: { exclude: ["id_pessoa"] },
+          },
+          FileDb,
+          { model: PedidoCompraItem, include: [PedidoCompra] },
+        ],
         attributes: {
           exclude: [
             "id_pessoa",

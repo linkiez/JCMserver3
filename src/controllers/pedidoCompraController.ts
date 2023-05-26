@@ -156,17 +156,16 @@ export default class PedidoCompraController {
       });
 
       if (pedidoCompraItem) {
-        pedidoCompraItem.map(async (item: any) => {
+        for (let item of pedidoCompraItem) {
           item.id_pedido = pedidoCompraCreated.id;
 
           item.id_produto = item.produto!.id;
           delete item.produto;
 
-          let itemCreated = await PedidoCompraItem.create(item, {
+          await PedidoCompraItem.create(item, {
             transaction: transaction,
           });
-          return itemCreated;
-        });
+        }
       }
 
       if (files) {
@@ -317,17 +316,24 @@ export default class PedidoCompraController {
       };
 
       const include = [
-          {
-            model: PedidoCompra,
-            required: true,
-            where: {id_fornecedor: consulta.fornecedor !== "undefined" ? consulta.fornecedor : undefined}
+        {
+          model: PedidoCompra,
+          required: true,
+          where: {
+            id_fornecedor:
+              consulta.fornecedor !== "undefined"
+                ? consulta.fornecedor
+                : undefined,
           },
-          {
-            model: Produto,
-            required: true,
-            where: {id: consulta.produto !== "undefined" ? consulta.produto : undefined}
+        },
+        {
+          model: Produto,
+          required: true,
+          where: {
+            id: consulta.produto !== "undefined" ? consulta.produto : undefined,
           },
-        ]
+        },
+      ];
 
       resultado.pedidosCompraItem = await PedidoCompraItem.findAll({
         limit: consulta.pageCount,
