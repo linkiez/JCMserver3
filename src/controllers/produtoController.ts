@@ -27,11 +27,9 @@ export default class ProdutosController {
           // { espessura: { [Op.like]: "%" + consulta.searchValue + "%" } },
         ],
       };
-      if (Number.isFinite(Number(consulta.searchValue)) && consulta.searchValue !== '') {
+      if (!isNaN(Number(consulta.searchValue)) && consulta.searchValue !== "") {
         queryWhere[Op.or].push({
-          espessura: {
-            [Op.like]: "%" + Number(consulta.searchValue).toFixed(2) + "%",
-          },
+          espessura: consulta.searchValue,
         });
       }
 
@@ -80,7 +78,7 @@ export default class ProdutosController {
 
       return res.status(200).json(resultado);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -122,7 +120,7 @@ export default class ProdutosController {
       });
       return res.status(200).json(produto);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -135,7 +133,7 @@ export default class ProdutosController {
       });
       return res.status(200).json(produto);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -174,7 +172,7 @@ export default class ProdutosController {
         return res.status(201).json(produtoCreated2);
       });
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -210,7 +208,7 @@ export default class ProdutosController {
       });
       return res.status(202).json(produtoUpdated);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -221,7 +219,7 @@ export default class ProdutosController {
       await Produto.destroy({ where: { id: Number(id) } });
       return res.status(202).json({ message: `Produto apagado` });
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -235,7 +233,7 @@ export default class ProdutosController {
       });
       return res.status(202).json(produtoUpdated);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
