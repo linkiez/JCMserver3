@@ -27,9 +27,9 @@ export default class ProdutosController {
           // { espessura: { [Op.like]: "%" + consulta.searchValue + "%" } },
         ],
       };
-      if (!isNaN(Number(consulta.searchValue)) && consulta.searchValue !== "") {
+      if (!isNaN(Number((consulta.searchValue).replace(',','.'))) && consulta.searchValue !== "") {
         queryWhere[Op.or].push({
-          espessura: consulta.searchValue,
+          espessura: (consulta.searchValue).replace(',','.'),
         });
       }
 
