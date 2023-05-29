@@ -181,7 +181,7 @@ export default class OrcamentoController {
       } else {
         if (orcamento.contato.nome && orcamento.contato.valor) {
           let contato = await Contato.findOrCreate({
-            where: {valor: orcamento.contato.valor},
+            where: { valor: orcamento.contato.valor },
             defaults: orcamento.contato,
             // transaction: transaction,
           });
@@ -409,23 +409,37 @@ export default class OrcamentoController {
         orcamento.orcamento_items = orcamento.orcamento_items.map(
           (item: any) => {
             if (!item.produto.id_tiny) {
-              let produtoRetorno = TinyERP.getProduto(
-                item.produto,
-                orcamento!.empresa.token_tiny
-              );
-
-              produtoRetorno.then((retorno: any) => {
-                if (retorno.retorno.status === "OK") {
-                  item.produto.id_tiny = retorno.retorno.produtos[0].produto.id;
-                  Produto.update(
-                    { id_tiny: retorno.retorno.produtos[0].produto.id },
-                    { where: { id: item.produto.id } }
-                  );
-                  return item;
-                }
-                if (retorno.retorno.status === "Erro")
-                  throw new Error(retorno.retorno.erros[0].erro);
+              const find = orcamento?.orcamento_items.find((itemFind) => {
+                !itemFind.produto.id_tiny &&
+                  itemFind.produto.id == item.produto.id;
               });
+
+              if (find) {
+                item.produto.id_tiny = find.produto.id_tiny;
+                Produto.update(
+                  { id_tiny: find.produto.id_tiny },
+                  { where: { id: item.produto.id } }
+                );
+                return item;
+              } else {
+                let produtoRetorno = TinyERP.getProduto(
+                  item.produto,
+                  orcamento!.empresa.token_tiny
+                );
+                produtoRetorno.then((retorno) => {
+                  if (retorno.retorno.status === "OK") {
+                    item.produto.id_tiny =
+                      retorno.retorno.produtos[0].produto.id;
+                    Produto.update(
+                      { id_tiny: retorno.retorno.produtos[0].produto.id },
+                      { where: { id: item.produto.id } }
+                    );
+                    return item;
+                  }
+                  if (retorno.retorno.status === "Erro")
+                    throw new Error(retorno.retorno.erros[0].erro);
+                });
+              }
             }
             return item;
           }
