@@ -455,7 +455,7 @@ async function createVendaForOrcamento(orcamento: any): Promise<any> {
 
   if (orcamento?.empresa.pessoa.cnpj_cpf == "42768425000195") {
     orcamento.orcamento_items = await Promise.all(
-      orcamento.orcamento_items.map(async (item: any) => {
+      orcamento.orcamento_items.map(async (item: OrcamentoItem) => {
         if (!item.produto.id_tiny) {
           const find = orcamento?.orcamento_items.find(
             (itemFind: OrcamentoItem) => {

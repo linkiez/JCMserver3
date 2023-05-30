@@ -40,6 +40,7 @@ Produto.init(
     espessura: DataTypes.FLOAT,
     peso: DataTypes.FLOAT,
     deletedAt: DataTypes.DATE,
+    id_tiny: DataTypes.STRING,
   },
   {
     sequelize,
