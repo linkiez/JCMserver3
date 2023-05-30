@@ -110,7 +110,7 @@ export default class OrcamentoController {
           Contato,
           {
             model: Empresa,
-            attributes: { exclude: ["token_tiny"] },
+            attributes: { exclude: ["token_tiny", "id_file", "id_pessoa"] },
             include: [Pessoa, File],
           },
           Pessoa,
