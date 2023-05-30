@@ -45,46 +45,49 @@ export default class OrdemProducaoController {
       if (req.query.deleted === "true")
         queryWhere.deletedAt = { [Op.not]: null };
 
+      const include = [
+        {
+          model: Vendedor,
+          include: [{ model: Pessoa }],
+        },
+        {
+          model: Orcamento,
+          include: [
+            {
+              model: Pessoa,
+              where:
+                isNaN(Number(consulta.searchValue)) ||
+                consulta.searchValue !== "undefined"
+                  ? { nome: { [Op.like]: "%" + consulta.searchValue + "%" } }
+                  : undefined,
+            },
+          ],
+        },
+        VendaTiny,
+        {
+          model: OrdemProducaoHistorico,
+          include: [
+            {
+              model: Usuario,
+              include: [Pessoa],
+            },
+          ],
+        },
+      ]
+
       resultado.ordemProducao = await OrdemProducao.findAll({
         limit: consulta.pageCount,
         offset: consulta.pageCount * consulta.page,
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
         paranoid: req.query.deleted === "true" ? false : true,
-        include: [
-          {
-            model: Vendedor,
-            include: [{ model: Pessoa }],
-          },
-          {
-            model: Orcamento,
-            include: [
-              {
-                model: Pessoa,
-                where:
-                  isNaN(Number(consulta.searchValue)) ||
-                  consulta.searchValue !== "undefined"
-                    ? { nome: { [Op.like]: "%" + consulta.searchValue + "%" } }
-                    : undefined,
-              },
-            ],
-          },
-          VendaTiny,
-          {
-            model: OrdemProducaoHistorico,
-            include: [
-              {
-                model: Usuario,
-                include: [Pessoa],
-              },
-            ],
-          },
-        ],
+        include: include,
         order: [["id", "DESC"]],
       });
 
       resultado.totalRecords = await OrdemProducao.count({
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
         paranoid: req.query.deleted === "true" ? false : true,
+        include: include,
       });
 
       return res.status(200).json(resultado);
