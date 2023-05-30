@@ -20,6 +20,7 @@ import PedidoCompraItem from "../models/PedidoCompraItem";
 import PedidoCompra from "../models/PedidoCompra";
 import Vendedor_Empresa from "../models/Vendedor_Empresa";
 import Pessoa_Contato from "../models/Pessoa_Contato";
+import File from "../models/File";
 
 export default class OrcamentoController {
   static async findAllOrcamento(req: Request, res: Response) {
@@ -107,7 +108,11 @@ export default class OrcamentoController {
         where: { id: id },
         include: [
           Contato,
-          { model: Empresa, attributes: { exclude: ["token_tiny"] } },
+          {
+            model: Empresa,
+            attributes: { exclude: ["token_tiny"] },
+            include: [Pessoa, File],
+          },
           Pessoa,
           { model: Vendedor, include: [Pessoa] },
           VendaTiny,
@@ -385,158 +390,196 @@ export default class OrcamentoController {
     }
   }
 
-  static async aprovarOrcamento(req: Request, res: Response) {
+  static async aprovarOrcamento(
+    req: Request,
+    res: Response
+  ): Promise<Response> {
     const { id } = req.params;
+
     try {
-      const transaction = await sequelize.transaction();
+      const orcamento = await orcamentoFindByPk(id);
 
-      let orcamento = await orcamentoFindByPk(id);
-
-      if (!orcamento) throw new Error("Orçamento não encontrado");
-      if (!orcamento.pessoa) throw new Error("Pessoa não encontrada");
-      if (!orcamento.empresa)
-        throw new Error("Empresa para faturamento não encontrada");
-      if (!orcamento.pessoa.cnpj_cpf)
-        throw new Error("CNPJ/CPF da Pessoa não encontrado");
-
-      verificaPessoaTinyERP(orcamento);
-
-      verificaVendedorTinyERP(orcamento);
-
-      let createVenda: any = null;
-
-      if (orcamento?.empresa.pessoa.cnpj_cpf == "42768425000195") {
-        orcamento.orcamento_items = orcamento.orcamento_items.map(
-          (item: any) => {
-            if (!item.produto.id_tiny) {
-              const find = orcamento?.orcamento_items.find((itemFind) => {
-                !itemFind.produto.id_tiny &&
-                  itemFind.produto.id == item.produto.id;
-              });
-
-              if (find) {
-                item.produto.id_tiny = find.produto.id_tiny;
-                Produto.update(
-                  { id_tiny: find.produto.id_tiny },
-                  { where: { id: item.produto.id } }
-                );
-                return item;
-              } else {
-                let produtoRetorno = TinyERP.getProduto(
-                  item.produto,
-                  orcamento!.empresa.token_tiny
-                );
-                produtoRetorno.then((retorno) => {
-                  if (retorno.retorno.status === "OK") {
-                    item.produto.id_tiny =
-                      retorno.retorno.produtos[0].produto.id;
-                    Produto.update(
-                      { id_tiny: retorno.retorno.produtos[0].produto.id },
-                      { where: { id: item.produto.id } }
-                    );
-                    return item;
-                  }
-                  if (retorno.retorno.status === "Erro")
-                    throw new Error(retorno.retorno.erros[0].erro);
-                });
-              }
-            }
-            return item;
-          }
-        );
-        createVenda = await TinyERP.createVendaFmoreno(
-          orcamento!,
-          orcamento!.empresa.token_tiny
-        );
-      } else {
-        createVenda = await TinyERP.createVenda(
-          orcamento!,
-          orcamento!.empresa.token_tiny
-        );
+      if (!orcamento) {
+        throw new Error("Orçamento não encontrado");
       }
 
+      if (!orcamento.pessoa) {
+        throw new Error("Pessoa não encontrada");
+      }
+
+      if (!orcamento.empresa) {
+        throw new Error("Empresa para faturamento não encontrada");
+      }
+
+      if (!orcamento.pessoa.cnpj_cpf) {
+        throw new Error("CNPJ/CPF da Pessoa não encontrado");
+      }
+
+      verificaPessoaTinyERP(orcamento);
+      verificaVendedorTinyERP(orcamento);
+
+      const createVenda = await createVendaForOrcamento(orcamento);
+
       if (createVenda.retorno.status === "Erro") {
-        console.log(createVenda.retorno);
         throw new Error(createVenda.retorno.erros[0].erro);
       }
 
-      if (createVenda.retorno.status === "OK") {
-        let ordemProducao = await OrdemProducao.create(
-          {
-            id: createVenda.retorno.registros.registro.numero,
-            id_orcamento: orcamento!.id,
-            id_vendedor: orcamento!.vendedor.id,
-            data_prazo: momentBussiness()
-              .businessAdd(orcamento!.prazo_emdias)
-              .toDate(),
-            venda: createVenda.retorno.registros.registro.numero,
-            status: "Aguardando",
-          },
-          { transaction: transaction }
-        );
-
-        orcamento?.orcamento_items?.forEach(async (item) => {
-          const ordemProducaoItem = await OrdemProducaoItem.create(
-            {
-              descricao: item.descricao,
-              quantidade: item.quantidade,
-              id_ordem_producao: ordemProducao.id,
-              id_produto: item.produto.id,
-            },
-            { transaction: transaction }
-          );
-
-          ordemProducaoItem.setFiles(item.files);
-
-          item.processo.push("Inspeção");
-
-          if (
-            item.processo.includes("Laser") ||
-            item.processo.includes("Plasma")
-          ) {
-            item.processo.push("Programação");
-          }
-
-          item.processo.forEach(async (processo) => {
-            const ordemProducaoProcesso =
-              await OrdemProducaoItemProcesso.create(
-                {
-                  id_ordem_producao_item: ordemProducaoItem.id,
-                  processo: processo,
-                },
-                { transaction: transaction }
-              );
-          });
-        });
-
-        const { aprovacao } = req.body;
-
-        const venda = await VendaTiny.create(
-          {
-            venda: createVenda.retorno.registros.registro.numero,
-            id_orcamento: orcamento!.id,
-            id_ordem_producao: ordemProducao.id,
-            aprovacao: aprovacao,
-            id_empresa: orcamento?.empresa.id,
-          },
-          { transaction: transaction }
-        );
-      }
-
-      await Orcamento.update(
-        { status: "Aprovado", aprovado: true },
-        { where: { id: Number(id) }, transaction: transaction }
+      const ordemProducao = await createOrdemProducaoForOrcamento(
+        orcamento,
+        createVenda
       );
 
-      transaction.commit();
+      const { aprovacao } = req.body;
 
-      orcamento = await orcamentoFindByPk(id);
-      return res.status(200).json(orcamento);
+      const venda = await createVendaTinyForOrcamento(
+        orcamento,
+        ordemProducao,
+        createVenda,
+        aprovacao
+      );
+
+      await updateOrcamentoStatus(id, "Aprovado");
+
+      const updatedOrcamento = await orcamentoFindByPk(id);
+
+      return res.status(200).json(updatedOrcamento);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error);
+      console.log("Request: ", req.body, "Error: ", error);
       return res.status(500).json(error.message);
     }
   }
+}
+
+async function createVendaForOrcamento(orcamento: any): Promise<any> {
+  let createVenda: any = null;
+
+  if (orcamento?.empresa.pessoa.cnpj_cpf == "42768425000195") {
+    orcamento.orcamento_items = await Promise.all(
+      orcamento.orcamento_items.map(async (item: any) => {
+        if (!item.produto.id_tiny) {
+          const find = orcamento?.orcamento_items.find(
+            (itemFind: OrcamentoItem) => {
+              itemFind.produto.id_tiny &&
+                itemFind.produto.id == item.produto.id;
+            }
+          );
+
+          if (find) {
+            item.produto.id_tiny = find.produto.id_tiny;
+            await Produto.update(
+              { id_tiny: find.produto.id_tiny },
+              { where: { id: item.produto.id } }
+            );
+            return item;
+          } else {
+            const produtoRetorno = await TinyERP.getProduto(
+              item.produto,
+              orcamento!.empresa.token_tiny
+            );
+
+            if (produtoRetorno.retorno.status === "OK") {
+              item.produto.id_tiny =
+                produtoRetorno.retorno.produtos[0].produto.id;
+              await Produto.update(
+                { id_tiny: produtoRetorno.retorno.produtos[0].produto.id },
+                { where: { id: item.produto.id } }
+              );
+              return item;
+            }
+
+            if (produtoRetorno.retorno.status === "Erro") {
+              throw new Error(produtoRetorno.retorno.erros[0].erro);
+            }
+          }
+        }
+
+        return item;
+      })
+    );
+
+    createVenda = await TinyERP.createVendaFmoreno(
+      orcamento!,
+      orcamento!.empresa.token_tiny
+    );
+  } else {
+    createVenda = await TinyERP.createVenda(
+      orcamento!,
+      orcamento!.empresa.token_tiny
+    );
+  }
+
+  return createVenda;
+}
+
+async function createOrdemProducaoForOrcamento(
+  orcamento: any,
+  createVenda: any
+): Promise<any> {
+  const ordemProducao = await OrdemProducao.create({
+    id: createVenda.retorno.registros.registro.numero,
+    id_orcamento: orcamento!.id,
+    id_vendedor: orcamento!.vendedor.id,
+    data_prazo: momentBussiness().businessAdd(orcamento!.prazo_emdias).toDate(),
+    venda: createVenda.retorno.registros.registro.numero,
+    status: "Aguardando",
+  });
+
+  await Promise.all(
+    orcamento?.orcamento_items?.map(async (item: OrcamentoItem) => {
+      const ordemProducaoItem = await OrdemProducaoItem.create({
+        descricao: item.descricao,
+        quantidade: item.quantidade,
+        id_ordem_producao: ordemProducao.id,
+        id_produto: item.produto.id,
+      });
+
+      await ordemProducaoItem.setFiles(item.files);
+
+      item.processo.push("Inspeção");
+
+      if (item.processo.includes("Laser") || item.processo.includes("Plasma")) {
+        item.processo.push("Programação");
+      }
+
+      await Promise.all(
+        item.processo.map(async (processo) => {
+          await OrdemProducaoItemProcesso.create({
+            id_ordem_producao_item: ordemProducaoItem.id,
+            processo: processo,
+          });
+        })
+      );
+    })
+  );
+
+  return ordemProducao;
+}
+
+async function createVendaTinyForOrcamento(
+  orcamento: any,
+  ordemProducao: any,
+  createVenda: any,
+  aprovacao: any
+): Promise<any> {
+  const venda = await VendaTiny.create({
+    venda: createVenda.retorno.registros.registro.numero,
+    id_orcamento: orcamento!.id,
+    id_ordem_producao: ordemProducao.id,
+    aprovacao: aprovacao,
+    id_empresa: orcamento?.empresa.id,
+  });
+
+  return venda;
+}
+
+async function updateOrcamentoStatus(
+  id: string,
+  status: string
+): Promise<void> {
+  await Orcamento.update(
+    { status: status, aprovado: true },
+    { where: { id: Number(id) } }
+  );
 }
 
 function orcamentoFindByPk(id: string) {

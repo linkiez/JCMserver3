@@ -39,7 +39,7 @@ export default class EmpresaController {
           File
         ],
         paranoid: req.query.deleted === "true" ? false : true,
-        attributes: { exclude: ["id_pessoa","id_file"] },
+        attributes: { exclude: ["id_pessoa","id_file", "token_tiny"] },
       });
       resultado.totalRecords = await Empresa.count({
         include: [
