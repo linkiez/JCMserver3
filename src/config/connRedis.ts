@@ -48,6 +48,5 @@ if (process.env.REDIS_URL) {
   };
   client = redis.createClient(clientOptions);
 }
-client.connect();
 
 export default client;
