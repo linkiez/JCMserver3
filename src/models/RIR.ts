@@ -27,6 +27,8 @@ export default class RegistroInspecaoRecebimento extends Model {
   declare id_pedido_compra_item: number;
   declare observacoes: string;
   declare file: FileDb[];
+  static id: number;
+
 
   static associate() {
     RegistroInspecaoRecebimento.belongsTo(Produto, {
@@ -52,7 +54,7 @@ RegistroInspecaoRecebimento.init(
   {
     id: {
       allowNull: false,
-      autoIncrement: true,
+      autoIncrement: false,
       primaryKey: true,
       type: DataTypes.BIGINT,
     },

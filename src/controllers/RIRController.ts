@@ -124,6 +124,10 @@ export default class RIRController {
         delete rir.pedido_compra_item;
       }
 
+      if (!RIR.id)
+        RIR.id =
+          ((await RIR.max("id", { paranoid: false })) as number) + 1;
+
       const rirCreated = await RIR.create(rir);
 
       if (rir.files) {
