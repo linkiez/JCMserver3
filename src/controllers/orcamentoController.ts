@@ -524,33 +524,29 @@ async function createOrdemProducaoForOrcamento(
     status: "Aguardando",
   });
 
-  await Promise.all(
-    orcamento?.orcamento_items?.map(async (item: OrcamentoItem) => {
-      const ordemProducaoItem = await OrdemProducaoItem.create({
-        descricao: item.descricao,
-        quantidade: item.quantidade,
-        id_ordem_producao: ordemProducao.id,
-        id_produto: item.produto.id,
+  for (let item of orcamento.orcamento_items) {
+    const ordemProducaoItem = await OrdemProducaoItem.create({
+      descricao: item.descricao,
+      quantidade: item.quantidade,
+      id_ordem_producao: ordemProducao.id,
+      id_produto: item.produto.id,
+    });
+
+    await ordemProducaoItem.setFiles(item.files);
+
+    item.processo.push("Inspeção");
+
+    if (item.processo.includes("Laser") || item.processo.includes("Plasma")) {
+      item.processo.push("Programação");
+    }
+
+    for (let processo of item.processo) {
+      await OrdemProducaoItemProcesso.create({
+        id_ordem_producao_item: ordemProducaoItem.id,
+        processo: processo,
       });
-
-      await ordemProducaoItem.setFiles(item.files);
-
-      item.processo.push("Inspeção");
-
-      if (item.processo.includes("Laser") || item.processo.includes("Plasma")) {
-        item.processo.push("Programação");
-      }
-
-      await Promise.all(
-        item.processo.map(async (processo) => {
-          await OrdemProducaoItemProcesso.create({
-            id_ordem_producao_item: ordemProducaoItem.id,
-            processo: processo,
-          });
-        })
-      );
-    })
-  );
+    }
+  }
 
   return ordemProducao;
 }
