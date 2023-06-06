@@ -11,7 +11,9 @@ export default class TokenRefresh {
   }
 
   static async renova(token: string) {
-    await redis.connect();
+    if (!redis.isOpen) {
+      await redis.connect();
+    }
     let id = await redis.get(token);
     await redis.del(token);
     const response = await this.cria(id);
@@ -20,7 +22,9 @@ export default class TokenRefresh {
   }
 
   static async salva(token: any, id: number) {
-    await redis.connect(); 
+    if (!redis.isOpen) {
+      await redis.connect();
+    } 
     await redis.set(token, id);
     redis.expireAt(
       token,
@@ -30,20 +34,26 @@ export default class TokenRefresh {
   }
 
   static async apaga(token: string) {
-    await redis.connect();
+    if (!redis.isOpen) {
+      await redis.connect();
+    }
     redis.del(token);
     redis.disconnect();
   }
 
   static async existe(token: string) {
-    await redis.connect();
+    if (!redis.isOpen) {
+      await redis.connect();
+    }
     const response = await redis.exists(token);
     redis.disconnect();
     return response;
   }
 
   static async id(token: string) {
-    await redis.connect();
+    if (!redis.isOpen) {
+      await redis.connect();
+    }
     const response = await redis.get(token);
     redis.disconnect();
     return response;

@@ -34,14 +34,18 @@ export default class TokenAccess {
   }
 
   static async salva(token: any) {
-    await redis.connect();
+    if (!redis.isOpen) {
+      await redis.connect();
+    }
     await redis.set(token, "");
     redis.expire(token, Number(process.env.ACCESS_TOKEN_EXPIRE_IN || 900));
     redis.disconnect();
   }
 
   static async existe(token: string) {
-    await redis.connect();
+    if (!redis.isOpen) {
+      await redis.connect();
+    }
     const response = await redis.exists(token);
     redis.disconnect();
     return response;
