@@ -81,7 +81,7 @@ export default class OrdemProducaoController {
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
         paranoid: req.query.deleted === "true" ? false : true,
         include: include,
-        order: [["id", "DESC"]],
+        order: [["createdAt", "DESC"]],
       });
 
       resultado.totalRecords = await OrdemProducao.count({
