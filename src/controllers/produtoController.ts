@@ -36,6 +36,9 @@ export default class ProdutosController {
       if (req.query.deleted === "true")
         queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
 
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
       resultado.produtos = await Produto.findAll({
         limit: consulta.pageCount,
         offset: consulta.pageCount * consulta.page,
@@ -51,7 +54,7 @@ export default class ProdutosController {
               ],
             },
             order: [["updatedAt", "DESC"]],
-            // limit: 1,
+            limit: 1,
             separate: true,
             include: [
               {
@@ -64,6 +67,9 @@ export default class ProdutosController {
                       { [Op.not]: "Orçamento" },
                     ],
                   },
+                  data_emissao: {
+                    [Op.gte]: sixMonthsAgo
+                  }
                 },
               },
             ],
