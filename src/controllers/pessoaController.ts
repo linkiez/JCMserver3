@@ -49,6 +49,7 @@ export default class PessoaController {
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
         include: queryIncludes,
         paranoid: req.query.deleted === "true" ? false : true,
+        order: [["nome", "ASC"]],
       });
       resultado.totalRecords = await Pessoa.count({
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
