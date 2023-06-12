@@ -104,6 +104,9 @@ export default class OrcamentoController {
   static async findOneOrcamento(req: Request, res: Response) {
     const { id } = req.params;
     try {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
       let orcamento = await Orcamento.findOne({
         where: { id: id },
         include: [
@@ -144,9 +147,9 @@ export default class OrcamentoController {
                               { [Op.not]: "Orçamento" },
                             ],
                           },
-                          // data_emissao: {
-                          //   [Op.gte]: new Date((new Date()).getTime() - 120 * 24 * 60 * 60 * 1000) // 120 days ago
-                          // }
+                          data_emissao: {
+                            [Op.gte]: sixMonthsAgo,
+                          },
                         },
                       },
                     ],
