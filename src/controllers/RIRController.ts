@@ -104,6 +104,30 @@ export default class RIRController {
     }
   }
 
+  static async findAllRIRsByPessoaAndProduto(req: Request, res: Response){
+    try{
+      const { id_pessoa, id_produto } = req.params;
+      const rirs = await RIR.findAll({
+        where: { id_pessoa: Number(id_pessoa), id_produto: Number(id_produto) },
+        include: [Pessoa, Produto, Operador, FileDb, PedidoCompraItem],
+        attributes: {
+          exclude: [
+            "id_pessoa",
+            "id_produto",
+            "id_operador",
+            "id_file",
+            "id_pedido_compra_item",
+          ],
+        },
+      });
+      return res.status(200).json(rirs);
+    }catch(error: any){
+      console.log("Resquest: ", req.body, "Erro: ", error);
+      return res.status(500).json(error.message);
+    }
+
+  }
+
   static async createRIR(req: Request, res: Response) {
     try {
       let rir = req.body;

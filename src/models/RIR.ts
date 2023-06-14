@@ -6,6 +6,7 @@ import Pessoa from "./Pessoa";
 import Operador from "./Operador";
 import FileDb from "./File";
 import OrdemProducaoItem from "./OrdemProducaoItem";
+import OrcamentoItem from "./OrcamentoItem";
 
 export default class RegistroInspecaoRecebimento extends Model {
   declare id: number;
@@ -46,6 +47,9 @@ export default class RegistroInspecaoRecebimento extends Model {
     });
 
     RegistroInspecaoRecebimento.hasOne(OrdemProducaoItem, {
+      foreignKey: "id_rir",
+    });
+    RegistroInspecaoRecebimento.hasOne(OrcamentoItem, {
       foreignKey: "id_rir",
     });
   }

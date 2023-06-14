@@ -45,6 +45,12 @@ router
     Authentication.verificaLogin,
     Authentication.verificaAcesso(["rir", "destroy"]),
     RIRController.destroyRIR
-  );
+  )
+  .get(
+    "/rir/pessoa/:id_pessoa/produto/:id_produto",
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["rir", "findAll"]),
+    RIRController.findAllRIRsByPessoaAndProduto
+  )
 
 export default router;

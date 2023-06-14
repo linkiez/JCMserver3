@@ -21,6 +21,7 @@ import PedidoCompra from "../models/PedidoCompra";
 import Vendedor_Empresa from "../models/Vendedor_Empresa";
 import Pessoa_Contato from "../models/Pessoa_Contato";
 import File from "../models/File";
+import RegistroInspecaoRecebimento from "../models/RIR";
 
 export default class OrcamentoController {
   static async findAllOrcamento(req: Request, res: Response) {
@@ -157,6 +158,7 @@ export default class OrcamentoController {
                 ],
               },
               FileDb,
+              RegistroInspecaoRecebimento,
             ],
           },
         ],
@@ -229,6 +231,9 @@ export default class OrcamentoController {
         } else {
           throw new Error("Produto não encontrado");
         }
+
+        if (orcamentoItem.registro_inspecao_recebimento) orcamentoItem.id_rir = orcamentoItem.registro_inspecao_recebimento.id;
+        delete orcamentoItem.registro_inspecao_recebimento;
 
         orcamentoItem.id_orcamento = orcamentoCreated.id;
 
@@ -335,6 +340,9 @@ export default class OrcamentoController {
         } else {
           throw new Error("Produto não encontrado");
         }
+
+        if (orcamentoItem.registro_inspecao_recebimento) orcamentoItem.id_rir = orcamentoItem.registro_inspecao_recebimento.id;
+        delete orcamentoItem.registro_inspecao_recebimento;
 
         delete orcamentoItem.id;
 
@@ -533,6 +541,7 @@ async function createOrdemProducaoForOrcamento(
       quantidade: item.quantidade,
       id_ordem_producao: ordemProducao.id,
       id_produto: item.produto.id,
+      id_rir: item.registro_inspecao_recebimento.id,
     });
 
     await ordemProducaoItem.setFiles(item.files);
@@ -587,7 +596,7 @@ function orcamentoFindByPk(id: string) {
     include: [
       {
         model: OrcamentoItem,
-        include: [FileDb, Produto],
+        include: [FileDb, Produto, RegistroInspecaoRecebimento],
         attributes: { exclude: ["id_orcamento", "id_produto"] },
       },
       Contato,

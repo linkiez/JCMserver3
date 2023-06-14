@@ -17,6 +17,7 @@ import {
 import Orcamento from "./Orcamento";
 import Produto from "./Produto";
 import FileDb from "./File";
+import RegistroInspecaoRecebimento from "./RIR";
 
 export default class OrcamentoItem extends Model {
   declare id: number;
@@ -53,6 +54,9 @@ export default class OrcamentoItem extends Model {
   declare countFiles: HasManyCountAssociationsMixin;
 
   static associate() {
+    OrcamentoItem.belongsTo(RegistroInspecaoRecebimento, {
+      foreignKey: "id_rir",
+    });
     OrcamentoItem.belongsTo(Orcamento, { foreignKey: "id_orcamento" });
     OrcamentoItem.belongsTo(Produto, { foreignKey: "id_produto" });
     OrcamentoItem.belongsToMany(FileDb, { through: "orcamento_file" });
