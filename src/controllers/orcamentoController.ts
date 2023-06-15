@@ -541,7 +541,7 @@ async function createOrdemProducaoForOrcamento(
       quantidade: item.quantidade,
       id_ordem_producao: ordemProducao.id,
       id_produto: item.produto.id,
-      id_rir: item.registro_inspecao_recebimento.id,
+      id_rir: item.registro_inspecao_recebimento?.id,
     });
 
     await ordemProducaoItem.setFiles(item.files);
