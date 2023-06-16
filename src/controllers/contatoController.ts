@@ -28,7 +28,8 @@ export default class ContatoController {
         limit: consulta.pageCount,
         offset: consulta.pageCount * consulta.page,
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
-        paranoid: req.query.deleted==='true'?false:true
+        paranoid: req.query.deleted==='true'?false:true,
+        order: [["nome", "ASC"]],
       });
 
       resultado.totalRecords = await Contato.count({

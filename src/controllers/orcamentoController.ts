@@ -232,7 +232,8 @@ export default class OrcamentoController {
           throw new Error("Produto não encontrado");
         }
 
-        if (orcamentoItem.registro_inspecao_recebimento) orcamentoItem.id_rir = orcamentoItem.registro_inspecao_recebimento.id;
+        if (orcamentoItem.registro_inspecao_recebimento)
+          orcamentoItem.id_rir = orcamentoItem.registro_inspecao_recebimento.id;
         delete orcamentoItem.registro_inspecao_recebimento;
 
         orcamentoItem.id_orcamento = orcamentoCreated.id;
@@ -341,7 +342,8 @@ export default class OrcamentoController {
           throw new Error("Produto não encontrado");
         }
 
-        if (orcamentoItem.registro_inspecao_recebimento) orcamentoItem.id_rir = orcamentoItem.registro_inspecao_recebimento.id;
+        if (orcamentoItem.registro_inspecao_recebimento)
+          orcamentoItem.id_rir = orcamentoItem.registro_inspecao_recebimento.id;
         delete orcamentoItem.registro_inspecao_recebimento;
 
         delete orcamentoItem.id;
@@ -432,7 +434,8 @@ export default class OrcamentoController {
       const createVenda = await createVendaForOrcamento(orcamento);
 
       if (createVenda.retorno.status === "Erro") {
-        throw new Error(createVenda.retorno.erros[0].erro);
+        console.log(JSON.stringify(createVenda));
+          throw new Error(createVenda.retorno.erros[0].erro);
       }
 
       const ordemProducao = await createOrdemProducaoForOrcamento(
