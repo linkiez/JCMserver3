@@ -29,8 +29,11 @@ export default class OrcamentoController {
       let consulta: any = {
         pageCount: Number(req.query.pageCount) || 10,
         page: Number(req.query.page) || 0,
-        searchValue: req.query.searchValue,
+        searchValue: req.query.searchValue=='""'?'':req.query.searchValue,
+        vendedor: JSON.parse(req.query.vendedor as string),
       };
+
+      console.log("Consulta: ", consulta);
 
       let resultado: { orcamento: Orcamento[]; totalRecords: Number } = {
         orcamento: [],
@@ -56,6 +59,7 @@ export default class OrcamentoController {
         {
           model: Vendedor,
           include: [{ model: Pessoa }],
+          where: consulta.vendedor.id?{ id: consulta.vendedor.id }:undefined,
         },
         {
           model: Pessoa,
@@ -85,7 +89,7 @@ export default class OrcamentoController {
 
       return res.status(200).json(resultado);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error);
+      console.log("Request: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -435,7 +439,7 @@ export default class OrcamentoController {
 
       if (createVenda.retorno.status === "Erro") {
         console.log(JSON.stringify(createVenda));
-          throw new Error(createVenda.retorno.erros[0].erro);
+        throw new Error(createVenda.retorno.erros[0].erro);
       }
 
       const ordemProducao = await createOrdemProducaoForOrcamento(
