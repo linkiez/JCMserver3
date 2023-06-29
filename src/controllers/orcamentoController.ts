@@ -29,7 +29,7 @@ export default class OrcamentoController {
       let consulta: any = {
         pageCount: Number(req.query.pageCount) || 10,
         page: Number(req.query.page) || 0,
-        searchValue: req.query.searchValue=='""'?'':req.query.searchValue,
+        searchValue: req.query.searchValue=='""'?'':JSON.parse(req.query.searchValue as string),
         vendedor: req.query.vendedor!=='undefined'?JSON.parse(req.query.vendedor as string):undefined,
       };
 
