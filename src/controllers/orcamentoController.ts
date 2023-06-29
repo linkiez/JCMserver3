@@ -30,7 +30,7 @@ export default class OrcamentoController {
         pageCount: Number(req.query.pageCount) || 10,
         page: Number(req.query.page) || 0,
         searchValue: req.query.searchValue=='""'?'':req.query.searchValue,
-        vendedor: JSON.parse(req.query.vendedor as string),
+        vendedor: req.query.vendedor!=='undefined'?JSON.parse(req.query.vendedor as string):undefined,
       };
 
       console.log("Consulta: ", consulta);
@@ -59,7 +59,7 @@ export default class OrcamentoController {
         {
           model: Vendedor,
           include: [{ model: Pessoa }],
-          where: consulta.vendedor.id?{ id: consulta.vendedor.id }:undefined,
+          where: consulta.vendedor?{ id: consulta.vendedor.id }:undefined,
         },
         {
           model: Pessoa,
