@@ -33,8 +33,6 @@ export default class OrcamentoController {
         vendedor: req.query.vendedor!=='undefined'?JSON.parse(req.query.vendedor as string):undefined,
       };
 
-      console.log("Consulta: ", consulta);
-
       let resultado: { orcamento: Orcamento[]; totalRecords: Number } = {
         orcamento: [],
         totalRecords: 0,
@@ -439,7 +437,7 @@ export default class OrcamentoController {
 
       if (createVenda.retorno.status === "Erro") {
         console.log(JSON.stringify(createVenda));
-        throw new Error(createVenda.retorno.erros[0].erro);
+        throw new Error(createVenda.retorno.registros.registro.erros[0].erro);
       }
 
       const ordemProducao = await createOrdemProducaoForOrcamento(
