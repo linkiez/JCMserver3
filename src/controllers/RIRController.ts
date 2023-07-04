@@ -8,6 +8,11 @@ import PedidoCompraItem from "../models/PedidoCompraItem";
 import RegistroInspecaoRecebimento_File from "../models/RIR_File";
 import { Op } from "sequelize";
 import PedidoCompra from "../models/PedidoCompra";
+import Fornecedor from "../models/Fornecedor";
+import OrcamentoItem from "../models/OrcamentoItem";
+import Orcamento from "../models/Orcamento";
+import OrdemProducao from "../models/OrdemProducao";
+import OrdemProducaoItem from "../models/OrdemProducaoItem";
 
 export default class RIRController {
   static async findAllRIRs(req: Request, res: Response) {
@@ -40,7 +45,7 @@ export default class RIRController {
         queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
 
       const include = [
-        Pessoa,
+        { model: Pessoa, include: [Fornecedor] },
         { model: Produto, where: whereProduto, required: false },
         {
           model: Operador,
@@ -49,6 +54,7 @@ export default class RIRController {
         },
         FileDb,
         { model: PedidoCompraItem, include: [PedidoCompra] },
+        { model: OrdemProducaoItem, include: []}
       ];
 
       resultado.rirs = await RIR.findAll({
@@ -86,7 +92,13 @@ export default class RIRController {
     try {
       const rir = await RIR.findOne({
         where: { id: Number(id) },
-        include: [Pessoa, Produto, Operador, FileDb, PedidoCompraItem],
+        include: [
+          { model: Pessoa, include: [Fornecedor] },
+          Produto,
+          Operador,
+          FileDb,
+          PedidoCompraItem,
+        ],
         attributes: {
           exclude: [
             "id_pessoa",
@@ -104,8 +116,8 @@ export default class RIRController {
     }
   }
 
-  static async findAllRIRsByPessoaAndProduto(req: Request, res: Response){
-    try{
+  static async findAllRIRsByPessoaAndProduto(req: Request, res: Response) {
+    try {
       const { id_pessoa, id_produto } = req.params;
       const rirs = await RIR.findAll({
         where: { id_pessoa: Number(id_pessoa), id_produto: Number(id_produto) },
@@ -121,11 +133,10 @@ export default class RIRController {
         },
       });
       return res.status(200).json(rirs);
-    }catch(error: any){
+    } catch (error: any) {
       console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
-
   }
 
   static async createRIR(req: Request, res: Response) {
@@ -149,8 +160,7 @@ export default class RIRController {
       }
 
       if (!rir.id)
-        rir.id =
-          ((await RIR.max("id", { paranoid: false })) as number) + 1;
+        rir.id = ((await RIR.max("id", { paranoid: false })) as number) + 1;
 
       const rirCreated = await RIR.create(rir);
 
@@ -212,18 +222,19 @@ export default class RIRController {
         rir.id_pedido_compra_item = rir.pedido_compra_item.id;
         delete rir.pedido_compra_item;
       }
-      
 
       if (rir.files) {
         let filesOld = await RegistroInspecaoRecebimento_File.findAll({
           where: { registroInspecaoRecebimentoId: Number(id) },
         });
-        for (let file of filesOld) {
-          let search = rir.file.find((item: FileDb) => item.id === file.fileId);
-          if (!search) {
-            await RegistroInspecaoRecebimento_File.destroy({
-              where: { fileId: file.fileId },
-            });
+        if (filesOld.length > 0){
+          for (let file of filesOld) {
+            let search = rir.files.find((item: FileDb) => item.id === file.fileId);
+            if (!search) {
+              await RegistroInspecaoRecebimento_File.destroy({
+                where: { fileId: file.fileId },
+              });
+            }
           }
         }
         for (let file of rir.files) {
