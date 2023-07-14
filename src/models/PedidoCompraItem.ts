@@ -40,7 +40,7 @@ PedidoCompraItem.init(
     quantidade: DataTypes.FLOAT,
     peso: DataTypes.FLOAT,
     preco: DataTypes.FLOAT,
-    ipi: DataTypes.DECIMAL(5, 2),
+    ipi: DataTypes.FLOAT, 
     prazo: DataTypes.DATE,
     deletedAt: DataTypes.DATE,
   },
