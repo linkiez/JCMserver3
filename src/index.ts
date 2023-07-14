@@ -17,7 +17,15 @@ const PORT = process.env.PORT || 3000;
 const app: Express = express();
 
 const corsOptions = {
-  origin: process.env.CORS || "*",
+  origin: function (origin: string | undefined, callback: Function) {
+    const allowedOrigins = ['http://192.168.0.2', 'http://linkiez.ddns.net'];
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
 };
 
 app.use(cors(corsOptions));
