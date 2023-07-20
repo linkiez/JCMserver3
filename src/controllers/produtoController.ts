@@ -107,7 +107,7 @@ export default class ProdutosController {
               ],
             },
             order: [["updatedAt", "DESC"]],
-            limit: 5,
+            limit: 10,
             separate: true,
             include: [
               {
