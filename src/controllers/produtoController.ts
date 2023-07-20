@@ -6,6 +6,7 @@ import PedidoCompra from "../models/PedidoCompra";
 import FileDb from "../models/File";
 import Produto_File from "../models/Produto_File";
 import sequelize from "../config/connPostgre";
+import RegistroInspecaoRecebimento from "../models/RIR";
 
 export default class ProdutosController {
   static async findAllProdutos(req: Request, res: Response) {
@@ -121,6 +122,12 @@ export default class ProdutosController {
                   },
                 },
               },
+              {
+                model: RegistroInspecaoRecebimento,
+                required: true,
+                limit: 1,
+                order: [["createdAt", "DESC"]],
+              }
             ],
           },
         ],
