@@ -246,13 +246,6 @@ export default class PedidoCompraController {
         })
       );
 
-      fila.push(
-        PedidoCompraItem.destroy({
-          where: { id_pedido: Number(id) },
-          transaction: transaction,
-        })
-      );
-
       files.forEach(async (file: File) => {
         fila.push(
           PedidoCompra_File.findOrCreate({
@@ -263,15 +256,40 @@ export default class PedidoCompraController {
       });
 
       if (pedidoCompraItem) {
+        let pedidoCompraItemDeleted = await PedidoCompraItem.findAll({
+          where: { id_pedido: Number(id) },
+        });
+
+        for (let ItemToFind of pedidoCompraItemDeleted) {
+          if (
+            !pedidoCompraItem.find((item: any) => item.id === ItemToFind.id)
+          ) {
+            fila.push(
+              PedidoCompraItem.destroy({
+                where: { id: ItemToFind.id },
+                transaction: transaction,
+              })
+            );
+          }
+        }
+
         pedidoCompraItem.forEach((item: any) => {
           item.id_pedido = Number(id);
           item.id_produto = item.produto!.id;
           delete item.produto;
-          delete item.id;
 
-          fila.push(
-            PedidoCompraItem.create(item, { transaction: transaction })
-          );
+          if (item.id) {
+            fila.push(
+              PedidoCompraItem.update(item, {
+                where: { id: item.id },
+                transaction: transaction,
+              })
+            );
+          } else {
+            fila.push(
+              PedidoCompraItem.create(item, { transaction: transaction })
+            );
+          }
         });
       }
 
