@@ -23,7 +23,7 @@ export default class PedidoCompraItem extends Model {
     // define association here
     PedidoCompraItem.belongsTo(PedidoCompra, { foreignKey: "id_pedido" });
     PedidoCompraItem.belongsTo(Produto, { foreignKey: "id_produto" });
-    PedidoCompraItem.hasOne(RegistroInspecaoRecebimento, {
+    PedidoCompraItem.hasMany(RegistroInspecaoRecebimento, {
       foreignKey: "id_pedido_compra_item",
     });
   }
