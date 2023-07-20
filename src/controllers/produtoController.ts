@@ -124,8 +124,6 @@ export default class ProdutosController {
               },
               {
                 model: RegistroInspecaoRecebimento,
-                required: true,
-                limit: 1,
                 order: [["createdAt", "DESC"]],
               }
             ],
