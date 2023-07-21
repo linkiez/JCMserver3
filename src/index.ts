@@ -9,11 +9,14 @@ import { seed } from "./seed/index.js";
 import cluster from "cluster";
 import os from "os";
 import http from "http";
+import https from "https";
+import fs from "fs";
 const numCPUs = os.cpus().length;
 
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
+const PORT_SSL = process.env.PORT_SSL || 3001;
 const app: Express = express();
 
 const corsOptions = {
@@ -38,9 +41,15 @@ app.use(
 models();
 await routes(app);
 
-const server = http.createServer(app);
-server.keepAliveTimeout = 60 * 1000 + 1000;
-server.headersTimeout = 60 * 1000 + 2000;
+const httpServer = http.createServer(app);
+httpServer.keepAliveTimeout = 60 * 1000 + 1000;
+httpServer.headersTimeout = 60 * 1000 + 2000;
+
+const httpsServer = https.createServer({
+  key: fs.readFileSync('./ssl/linkiez_ddns_net.key'),
+  cert: fs.readFileSync('./ssl/linkiez_ddns_net.crt'),
+}, app);
+
 // For Master process
 if (cluster.isPrimary) {
   console.log(`Master ${process.pid} is running`);
@@ -82,7 +91,10 @@ if (cluster.isPrimary) {
 else {
   // Workers can share any TCP connection
   // In this case it is an HTTP server
-  server.listen(PORT, () => {
+  httpServer.listen(PORT, () => {
     console.log(`Worker ${process.pid} started`);
+  });
+  httpsServer.listen(PORT_SSL, () => {
+    console.log(`Worker SSL ${process.pid} started`);
   });
 }
