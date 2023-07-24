@@ -56,8 +56,7 @@ export default class OrdemProducaoController {
             {
               model: Pessoa,
               where:
-                isNaN(Number(consulta.searchValue)) ||
-                consulta.searchValue !== "undefined"
+                isNaN(Number(consulta.searchValue))
                   ? { nome: { [Op.like]: "%" + consulta.searchValue + "%" } }
                   : undefined,
             },
