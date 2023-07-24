@@ -23,7 +23,11 @@ export default class OrdemProducaoController {
         page: Number(req.query.page) || 0,
         searchValue: req.query.searchValue,
         status: req.query.status,
+        id_vendedor: req.query.id_vendedor,
+        id_pessoa: req.query.id_pessoa,
+        data_prazo: req.query.data_prazo,
       };
+      console.log(consulta);
 
       let resultado: { ordemProducao: OrdemProducao[]; totalRecords: Number } =
         {
@@ -36,6 +40,28 @@ export default class OrdemProducaoController {
       if (consulta.searchValue) {
         if (!isNaN(Number(consulta.searchValue)))
           queryWhere.id = Number(consulta.searchValue);
+      }
+
+      if (consulta.id_vendedor && consulta.id_vendedor !== "undefined") {
+        queryWhere.id_vendedor = consulta.id_vendedor;
+      }
+
+      if (consulta.data_prazo && consulta.data_prazo !== "undefined") {
+        if (typeof consulta.data_prazo === "string") {
+          const data_prazoDate = new Date(consulta.data_prazo);
+          const data_prazoString =
+            data_prazoDate.getFullYear() +
+            "-" +
+            (data_prazoDate.getMonth() + 1).toString().padStart(2, "0") +
+            "-" +
+            data_prazoDate.getDate().toString().padStart(2, "0");
+
+          queryWhere.data_prazo = sequelize.where(
+            sequelize.fn("date", sequelize.col("data_prazo")),
+            "=",
+            data_prazoString
+          );
+        }
       }
 
       if (consulta.status !== "undefined" && consulta.status !== "") {
@@ -55,12 +81,13 @@ export default class OrdemProducaoController {
           include: [
             {
               model: Pessoa,
-              where:
-                isNaN(Number(consulta.searchValue))
-                  ? { nome: { [Op.like]: "%" + consulta.searchValue + "%" } }
-                  : undefined,
+              where: isNaN(Number(consulta.searchValue))
+                ? { nome: { [Op.like]: "%" + consulta.searchValue + "%" } }
+                : undefined,
+              required: true,
             },
-          ]
+          ],
+          required: true,
         },
         VendaTiny,
         {
