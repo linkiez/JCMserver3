@@ -14,6 +14,7 @@ import OrdemProducaoHistorico from "../models/OrdemProducaoHistorico";
 import Usuario from "../models/Usuario";
 import OrcamentoItem from "../models/OrcamentoItem";
 import OrdemProducaoItem_File from "../models/OrdemProducaoItem_File";
+import RegistroInspecaoRecebimento from "../models/RIR";
 
 export default class OrdemProducaoController {
   static async findAllOrdemProducao(req: Request, res: Response) {
@@ -159,6 +160,7 @@ export default class OrdemProducaoController {
                 attributes: { exclude: ["id_ordem_producao_item"] },
               },
               Produto,
+              RegistroInspecaoRecebimento
             ],
             attributes: { exclude: ["id_ordem_producao", "id_produto"] },
           },
@@ -359,9 +361,9 @@ export default class OrdemProducaoController {
                 delete ordemProducaoItem.produto;
               }
 
-              if (ordemProducaoItem.rir) {
-                ordemProducaoItem.id_rir = ordemProducaoItem.rir.id;
-                delete ordemProducaoItem.rir;
+              if (ordemProducaoItem.registro_inspecao_recebimento) {
+                ordemProducaoItem.id_rir = ordemProducaoItem.registro_inspecao_recebimento.id;
+                delete ordemProducaoItem.registro_inspecao_recebimento;
               }
 
               ordemProducaoItem.id_ordem_producao = Number(id);

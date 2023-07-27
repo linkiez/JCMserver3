@@ -34,6 +34,7 @@ export default class OrdemProducaoItem extends Model {
   declare files?: Array<FileDb>;
   declare id_ordem_producao: number;
   declare ordem_producao_item_processos?: Array<OrdemProducaoItemProcesso>;
+  declare registro_inspecao_recebimento?: RegistroInspecaoRecebimento;
 
   declare getFiles: HasManyGetAssociationsMixin<File>; //
   declare addFile: HasManyAddAssociationMixin<File, number>;
