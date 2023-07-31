@@ -40,8 +40,10 @@ export default class OrcamentoItem extends Model {
   declare deletedAt: Date;
   declare updatedAt: Date;
   declare createdAt: Date;
-  declare files: File[];
+  declare files: FileDb[];
   declare total: number;
+  declare registro_inspecao_recebimento: RegistroInspecaoRecebimento;
+  declare id_rir: number;
 
   declare getFiles: HasManyGetAssociationsMixin<File>; //
   declare addFile: HasManyAddAssociationMixin<File, number>;

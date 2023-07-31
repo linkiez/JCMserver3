@@ -29,8 +29,14 @@ export default class OrcamentoController {
       let consulta: any = {
         pageCount: Number(req.query.pageCount) || 10,
         page: Number(req.query.page) || 0,
-        searchValue: req.query.searchValue=='""'?'':JSON.parse(req.query.searchValue as string),
-        vendedor: req.query.vendedor!=='undefined'?JSON.parse(req.query.vendedor as string):undefined,
+        searchValue:
+          req.query.searchValue == '""'
+            ? ""
+            : JSON.parse(req.query.searchValue as string),
+        vendedor:
+          req.query.vendedor !== "undefined"
+            ? JSON.parse(req.query.vendedor as string)
+            : undefined,
       };
 
       let resultado: { orcamento: Orcamento[]; totalRecords: Number } = {
@@ -57,7 +63,7 @@ export default class OrcamentoController {
         {
           model: Vendedor,
           include: [{ model: Pessoa }],
-          where: consulta.vendedor?{ id: consulta.vendedor.id }:undefined,
+          where: consulta.vendedor ? { id: consulta.vendedor.id } : undefined,
         },
         {
           model: Pessoa,
@@ -266,7 +272,7 @@ export default class OrcamentoController {
         return res.status(201).json(orcamentoCreated2);
       });
     } catch (error: any) {
-      await transaction.rollback;
+      transaction.rollback();
       console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
@@ -277,8 +283,7 @@ export default class OrcamentoController {
     try {
       const { id } = req.params;
       let orcamento = req.body;
-      let orcamentoItens: Array<OrcamentoItem> | Array<Promise<OrcamentoItem>> =
-        orcamento.orcamento_items;
+      let orcamentoItens: Array<OrcamentoItem> = orcamento.orcamento_items;
       delete orcamento.orcamento_items;
 
       if (orcamento.pessoa) orcamento.id_pessoa = orcamento.pessoa.id;
@@ -328,53 +333,70 @@ export default class OrcamentoController {
         transaction: transaction,
       });
 
-      await OrcamentoItem.destroy({
+      const orcamentoItemsOld: OrcamentoItem[] = await OrcamentoItem.findAll({
         where: { id_orcamento: Number(id) },
         transaction: transaction,
       });
 
-      orcamentoItens = orcamentoItens.map(async (orcamentoItem: any) => {
-        let files = orcamentoItem.files;
-        delete orcamentoItem.files;
+      for (const orcamentoItemOld of orcamentoItemsOld) {
+        if (
+          !(orcamentoItens as OrcamentoItem[]).find(
+            (orcamentoItem: any) => orcamentoItem.id === orcamentoItemOld.id
+          )
+        ) {
+          await OrcamentoItem.destroy({
+            where: { id: orcamentoItemOld.id },
+            transaction: transaction,
+          });
+        }
+      }
+
+      for (let orcamentoItem of orcamentoItens) {
+        let files: FileDb[] = orcamentoItem.files;
 
         if (orcamentoItem.produto) {
           orcamentoItem.id_produto = orcamentoItem.produto.id;
-          delete orcamentoItem.produto;
         } else {
           throw new Error("Produto não encontrado");
         }
 
         if (orcamentoItem.registro_inspecao_recebimento)
           orcamentoItem.id_rir = orcamentoItem.registro_inspecao_recebimento.id;
-        delete orcamentoItem.registro_inspecao_recebimento;
 
-        delete orcamentoItem.id;
+        orcamentoItem.id_orcamento = +id;
 
-        orcamentoItem.id_orcamento = id;
+        let orcamentoItemNew: any = undefined;
 
-        let orcamentoItemCreated = await OrcamentoItem.create(orcamentoItem, {
-          transaction: transaction,
-        });
-
-        if (files) {
-          await orcamentoItemCreated.setFiles(
-            files.map((item: any) => item.id),
-            { transaction: transaction }
+        if (orcamentoItem.id) {
+          await OrcamentoItem.update(orcamentoItem, {
+            where: { id: orcamentoItem.id },
+            transaction: transaction,
+          });
+          orcamentoItemNew = await OrcamentoItem.findByPk(orcamentoItem.id);
+        } else {
+          orcamentoItemNew = await OrcamentoItem.create(
+            { ...orcamentoItem },
+            {
+              transaction: transaction,
+            }
           );
         }
 
-        return orcamentoItemCreated;
-      });
+        if (files) {
+          await orcamentoItemNew.setFiles(
+            files.map((item: FileDb) => item.id),
+            { transaction: transaction }
+          );
+        }
+      }
 
-      Promise.all(orcamentoItens).then(async (orcamentoItem) => {
-        await transaction.commit();
+      await transaction.commit();
 
-        let orcamentoUpdated = await orcamentoFindByPk(id);
+      let orcamentoUpdated = await orcamentoFindByPk(id);
 
-        return res.status(201).json(orcamentoUpdated);
-      });
+      return res.status(201).json(orcamentoUpdated);
     } catch (error: any) {
-      await transaction.rollback;
+      transaction.rollback();
       console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
