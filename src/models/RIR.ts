@@ -46,10 +46,10 @@ export default class RegistroInspecaoRecebimento extends Model {
       through: "registro_inspecao_recebimento_file",
     });
 
-    RegistroInspecaoRecebimento.hasOne(OrdemProducaoItem, {
+    RegistroInspecaoRecebimento.hasMany(OrdemProducaoItem, {
       foreignKey: "id_rir",
     });
-    RegistroInspecaoRecebimento.hasOne(OrcamentoItem, {
+    RegistroInspecaoRecebimento.hasMany(OrcamentoItem, {
       foreignKey: "id_rir",
     });
   }

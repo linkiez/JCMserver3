@@ -62,7 +62,7 @@ export default class OrcamentoController {
       const include = [
         {
           model: Vendedor,
-          include: [{ model: Pessoa }],
+          include: [{ model: Pessoa, paranoid: false }],
           where: consulta.vendedor ? { id: consulta.vendedor.id } : undefined,
           paranoid: false
         },
