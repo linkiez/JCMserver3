@@ -509,7 +509,7 @@ export default class OrdemProducaoController {
             },
             {
               model: Orcamento,
-              include: [Pessoa],
+              include: [Pessoa, OrcamentoItem],
               attributes: { exclude: ["id_pessoa"] },
             },
             {
@@ -521,6 +521,7 @@ export default class OrdemProducaoController {
                   attributes: { exclude: ["id_ordem_producao_item"] },
                 },
                 Produto,
+                RegistroInspecaoRecebimento
               ],
               attributes: { exclude: ["id_ordem_producao", "id_produto"] },
             },
