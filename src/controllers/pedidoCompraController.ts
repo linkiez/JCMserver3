@@ -10,6 +10,7 @@ import Contato from "../models/Contato";
 import File from "../models/File";
 import PedidoCompra_File from "../models/PedidoCompra_File";
 import FileDb from "../models/File";
+import RegistroInspecaoRecebimento from "../models/RIR";
 
 export default class PedidoCompraController {
   static async importPedidoCompra(req: Request, res: Response) {
@@ -129,7 +130,7 @@ export default class PedidoCompraController {
             ],
             paranoid: false,
           },
-          { model: PedidoCompraItem, include: [Produto] },
+          { model: PedidoCompraItem, include: [{model:Produto, paranoid: false}, RegistroInspecaoRecebimento] },
           File,
         ],
       });
