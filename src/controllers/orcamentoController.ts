@@ -64,6 +64,7 @@ export default class OrcamentoController {
           model: Vendedor,
           include: [{ model: Pessoa }],
           where: consulta.vendedor ? { id: consulta.vendedor.id } : undefined,
+          paranoid: false
         },
         {
           model: Pessoa,
@@ -72,8 +73,9 @@ export default class OrcamentoController {
             consulta.searchValue !== "undefined" &&
             consulta.searchValue !== "",
           where: wherePessoa,
+          paranoid: false
         },
-        Contato,
+        {model: Contato, paranoid: false},
       ];
 
       resultado.orcamento = await Orcamento.findAll({
@@ -119,14 +121,15 @@ export default class OrcamentoController {
       let orcamento = await Orcamento.findOne({
         where: { id: id },
         include: [
-          Contato,
+          {model: Contato, paranoid: false},
           {
             model: Empresa,
             attributes: { exclude: ["token_tiny", "id_file", "id_pessoa"] },
             include: [Pessoa, File],
+            paranoid: false
           },
-          Pessoa,
-          { model: Vendedor, include: [Pessoa] },
+          {model:Pessoa, paranoid: false},
+          { model: Vendedor, include: [{model:Pessoa, paranoid: false}], paranoid: false },
           VendaTiny,
           {
             model: OrcamentoItem,
@@ -164,6 +167,7 @@ export default class OrcamentoController {
                     ],
                   },
                 ],
+                paranoid: false
               },
               FileDb,
               RegistroInspecaoRecebimento,
@@ -623,20 +627,22 @@ function orcamentoFindByPk(id: string) {
     include: [
       {
         model: OrcamentoItem,
-        include: [FileDb, Produto, RegistroInspecaoRecebimento],
+        include: [FileDb, {model:Produto, paranoid: false}, RegistroInspecaoRecebimento],
         attributes: { exclude: ["id_orcamento", "id_produto"] },
       },
-      Contato,
-      Pessoa,
+      {model:Contato, paranoid: false},
+      {model:Pessoa, paranoid: false},
       {
         model: Vendedor,
-        include: [Pessoa],
+        include: [{model:Pessoa, paranoid: false}],
         attributes: { exclude: ["id_pessoa"] },
+        paranoid: false
       },
       {
         model: Empresa,
-        include: [Pessoa, FileDb],
+        include: [{model:Pessoa, paranoid: false}, FileDb],
         attributes: { exclude: ["id_pessoa", "id_file"] },
+        paranoid: false
       },
       {
         model: VendaTiny,

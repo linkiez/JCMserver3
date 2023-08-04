@@ -28,7 +28,7 @@ export default class UsuarioController {
         limit: consulta.pageCount,
         offset: consulta.pageCount * consulta.page,
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
-        include: [Pessoa],
+        include: [{model:Pessoa, paranoid: false}],
         attributes: { exclude: ["id_pessoa", "senha", "acesso"] },
         paranoid: req.query.deleted === "true" ? false : true,
       });
@@ -50,7 +50,7 @@ export default class UsuarioController {
     try {
       const usuario = await Usuario.findOne({
         where: { id: Number(id) },
-        include: [Pessoa],
+        include: [{model: Pessoa, paranoid: false}],
         attributes: { exclude: ["id_pessoa", "senha"] },
       });
       return res.status(200).json(usuario);

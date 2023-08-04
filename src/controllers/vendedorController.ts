@@ -31,9 +31,8 @@ export default class VendedorController {
           {
             model: Pessoa,
             where:
-              consulta.searchValue !== "undefined"
-                ? queryWhere
-                : undefined,
+              consulta.searchValue !== "undefined" ? queryWhere : undefined,
+            paranoid: false,
           },
         ],
         paranoid: req.query.deleted === "true" ? false : true,
@@ -44,9 +43,7 @@ export default class VendedorController {
           {
             model: Pessoa,
             where:
-              consulta.searchValue !== "undefined"
-                ? queryWhere
-                : undefined,
+              consulta.searchValue !== "undefined" ? queryWhere : undefined,
           },
         ],
         paranoid: req.query.deleted === "true" ? false : true,
@@ -54,7 +51,7 @@ export default class VendedorController {
 
       return res.status(200).json(resultado);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -69,7 +66,7 @@ export default class VendedorController {
       });
       return res.status(200).json(vendedor);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -84,7 +81,7 @@ export default class VendedorController {
       const vendedorCreated = await Vendedor.create(vendedor);
       return res.status(201).json(vendedorCreated);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -104,7 +101,7 @@ export default class VendedorController {
       });
       return res.status(202).json(vendedorUpdated);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -115,7 +112,7 @@ export default class VendedorController {
       await Vendedor.destroy({ where: { id: Number(id) } });
       return res.status(202).json({ message: `Vendedor apagado` });
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -129,7 +126,7 @@ export default class VendedorController {
       });
       return res.status(200).json(vendedor);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -143,7 +140,7 @@ export default class VendedorController {
       });
       return res.status(202).json(vendedorUpdated);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }

@@ -27,12 +27,12 @@ export default class FornecedorController {
       resultado.fornecedores = await Fornecedor.findAll({
         limit: consulta.pageCount,
         offset: consulta.pageCount * consulta.page,
-        include: [{ model: Pessoa, required: true, where: queryWhere, order: [['nome', 'ASC']] }],
+        include: [{ model: Pessoa, required: true, where: queryWhere, order: [['nome', 'ASC']], paranoid: false }],
         attributes: { exclude: ["id_pessoa"] },
       });
 
       resultado.totalRecords = await Fornecedor.count({
-        include: [{ model: Pessoa, required: true, where: queryWhere }],
+        include: [{ model: Pessoa, required: true, where: queryWhere, paranoid: false }],
         attributes: { exclude: ["id_pessoa"] },
       });
       
@@ -48,7 +48,7 @@ export default class FornecedorController {
     try {
       const fornecedor = await Fornecedor.findOne({
         where: { id: Number(id) },
-        include: [Pessoa],
+        include: [{model:Pessoa, paranoid: false}],
         attributes: { exclude: ["id_pessoa"] },
       });
       return res.status(200).json(fornecedor);
@@ -108,7 +108,7 @@ export default class FornecedorController {
     try {
       const fornecedor = await Fornecedor.scope("deleted").findAll({
         paranoid: false,
-        include: [Pessoa],
+        include: [{model:Pessoa, paranoid: false}],
         attributes: { exclude: ["id_pessoa"] },
       });
       return res.status(200).json(fornecedor);

@@ -32,6 +32,7 @@ export default class OperadorController {
             where:
               consulta.searchValue !== "undefined" ? queryWhere : undefined,
           },
+          paranoid: false
         },
       ];
 
@@ -59,7 +60,7 @@ export default class OperadorController {
     try {
       const operador = await Operador.findOne({
         where: { id: Number(id) },
-        include: [Pessoa],
+        include: [{model: Pessoa, paranoid: false}],
         attributes: { exclude: ["id_pessoa"] },
       });
       return res.status(200).json(operador);
@@ -119,7 +120,7 @@ export default class OperadorController {
     try {
       const operador = await Operador.scope("deleted").findAll({
         paranoid: false,
-        include: [Pessoa],
+        include: [{model: Pessoa, paranoid: false}],
         attributes: { exclude: ["id_pessoa"] },
       });
       return res.status(200).json(operador);

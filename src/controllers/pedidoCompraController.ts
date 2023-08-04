@@ -91,8 +91,10 @@ export default class PedidoCompraController {
             include: [
               {
                 model: Pessoa,
+                paranoid: false,
               },
             ],
+            paranoid: false,
           },
         ],
         order: [["id", "DESC"]],
@@ -118,7 +120,14 @@ export default class PedidoCompraController {
         include: [
           {
             model: Fornecedor,
-            include: [{ model: Pessoa, include: [Contato] }],
+            include: [
+              {
+                model: Pessoa,
+                include: [{ model: Contato, paranoid: false }],
+                paranoid: false,
+              },
+            ],
+            paranoid: false,
           },
           { model: PedidoCompraItem, include: [Produto] },
           File,
@@ -301,7 +310,14 @@ export default class PedidoCompraController {
           include: [
             {
               model: Fornecedor,
-              include: [{ model: Pessoa, include: [Contato] }],
+              include: [
+                {
+                  model: Pessoa,
+                  include: [{ model: Contato, paranoid: false }],
+                  paranoid: false,
+                },
+              ],
+              paranoid: false,
             },
             { model: PedidoCompraItem, include: [Produto] },
           ],
@@ -310,7 +326,7 @@ export default class PedidoCompraController {
         return res.status(202).json(pedidoCompraUpdated);
       });
     } catch (error: any) {
-      await transaction.rollback();
+      transaction.rollback();
       console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
@@ -350,6 +366,7 @@ export default class PedidoCompraController {
           where: {
             id: consulta.produto !== "undefined" ? consulta.produto : undefined,
           },
+          paranoid: false
         },
       ];
 

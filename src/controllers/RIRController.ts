@@ -45,16 +45,25 @@ export default class RIRController {
         queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
 
       const include = [
-        { model: Pessoa, include: [Fornecedor] },
-        { model: Produto, where: whereProduto, required: false },
+        {
+          model: Pessoa,
+          include: [{ model: Fornecedor, paranoid: false }],
+          paranoid: false,
+        },
+        {
+          model: Produto,
+          where: whereProduto,
+          required: false,
+          paranoid: false,
+        },
         {
           model: Operador,
-          include: [Pessoa],
+          include: [{ model: Pessoa, paranoid: false }],
           attributes: { exclude: ["id_pessoa"] },
         },
         FileDb,
         { model: PedidoCompraItem, include: [PedidoCompra] },
-        { model: OrdemProducaoItem, include: []}
+        { model: OrdemProducaoItem, include: [] },
       ];
 
       resultado.rirs = await RIR.findAll({
@@ -93,9 +102,13 @@ export default class RIRController {
       const rir = await RIR.findOne({
         where: { id: Number(id) },
         include: [
-          { model: Pessoa, include: [Fornecedor] },
-          Produto,
-          Operador,
+          {
+            model: Pessoa,
+            include: [{ model: Fornecedor, paranoid: false }],
+            paranoid: false,
+          },
+          { model: Produto, paranoid: false },
+          { model: Operador, paranoid: false },
           FileDb,
           PedidoCompraItem,
         ],
@@ -121,7 +134,13 @@ export default class RIRController {
       const { id_pessoa, id_produto } = req.params;
       const rirs = await RIR.findAll({
         where: { id_pessoa: Number(id_pessoa), id_produto: Number(id_produto) },
-        include: [Pessoa, Produto, Operador, FileDb, PedidoCompraItem],
+        include: [
+          { model: Pessoa, paranoid: false },
+          { model: Produto, paranoid: false },
+          { model: Operador, paranoid: false },
+          FileDb,
+          PedidoCompraItem,
+        ],
         attributes: {
           exclude: [
             "id_pessoa",
@@ -227,9 +246,11 @@ export default class RIRController {
         let filesOld = await RegistroInspecaoRecebimento_File.findAll({
           where: { registroInspecaoRecebimentoId: Number(id) },
         });
-        if (filesOld.length > 0){
+        if (filesOld.length > 0) {
           for (let file of filesOld) {
-            let search = rir.files.find((item: FileDb) => item.id === file.fileId);
+            let search = rir.files.find(
+              (item: FileDb) => item.id === file.fileId
+            );
             if (!search) {
               await RegistroInspecaoRecebimento_File.destroy({
                 where: { fileId: file.fileId },
