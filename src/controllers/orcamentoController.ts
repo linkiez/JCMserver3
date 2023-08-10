@@ -49,7 +49,17 @@ export default class OrcamentoController {
       if (consulta.searchValue !== "undefined" && consulta.searchValue !== "") {
         if (!isNaN(Number(consulta.searchValue)))
           queryWhere.id = consulta.searchValue;
-        // else queryWhere["$Pessoa.nome$"] = { [Op.like]: "%" + consulta.searchValue + "%" }
+        else
+          queryWhere[Op.or] = [
+            {
+              "$contato.nome$": {
+                [Op.like]: "%" + consulta.searchValue + "%",
+              },
+            },
+            {
+              "$pessoa.nome$": { [Op.like]: "%" + consulta.searchValue + "%" },
+            },
+          ];
       }
 
       let wherePessoa = undefined;
@@ -64,18 +74,14 @@ export default class OrcamentoController {
           model: Vendedor,
           include: [{ model: Pessoa, paranoid: false }],
           where: consulta.vendedor ? { id: consulta.vendedor.id } : undefined,
-          paranoid: false
+          paranoid: false,
         },
         {
           model: Pessoa,
-          required:
-            isNaN(Number(consulta.searchValue)) &&
-            consulta.searchValue !== "undefined" &&
-            consulta.searchValue !== "",
-          where: wherePessoa,
-          paranoid: false
+          paranoid: false,
         },
-        {model: Contato, paranoid: false},
+        { model: Contato, 
+          paranoid: false },
       ];
 
       resultado.orcamento = await Orcamento.findAll({
@@ -121,15 +127,19 @@ export default class OrcamentoController {
       let orcamento = await Orcamento.findOne({
         where: { id: id },
         include: [
-          {model: Contato, paranoid: false},
+          { model: Contato, paranoid: false },
           {
             model: Empresa,
             attributes: { exclude: ["token_tiny", "id_file", "id_pessoa"] },
             include: [Pessoa, File],
-            paranoid: false
+            paranoid: false,
           },
-          {model:Pessoa, paranoid: false},
-          { model: Vendedor, include: [{model:Pessoa, paranoid: false}], paranoid: false },
+          { model: Pessoa, paranoid: false },
+          {
+            model: Vendedor,
+            include: [{ model: Pessoa, paranoid: false }],
+            paranoid: false,
+          },
           VendaTiny,
           {
             model: OrcamentoItem,
@@ -167,7 +177,7 @@ export default class OrcamentoController {
                     ],
                   },
                 ],
-                paranoid: false
+                paranoid: false,
               },
               FileDb,
               RegistroInspecaoRecebimento,
@@ -627,22 +637,26 @@ function orcamentoFindByPk(id: string) {
     include: [
       {
         model: OrcamentoItem,
-        include: [FileDb, {model:Produto, paranoid: false}, RegistroInspecaoRecebimento],
+        include: [
+          FileDb,
+          { model: Produto, paranoid: false },
+          RegistroInspecaoRecebimento,
+        ],
         attributes: { exclude: ["id_orcamento", "id_produto"] },
       },
-      {model:Contato, paranoid: false},
-      {model:Pessoa, paranoid: false},
+      { model: Contato, paranoid: false },
+      { model: Pessoa, paranoid: false },
       {
         model: Vendedor,
-        include: [{model:Pessoa, paranoid: false}],
+        include: [{ model: Pessoa, paranoid: false }],
         attributes: { exclude: ["id_pessoa"] },
-        paranoid: false
+        paranoid: false,
       },
       {
         model: Empresa,
-        include: [{model:Pessoa, paranoid: false}, FileDb],
+        include: [{ model: Pessoa, paranoid: false }, FileDb],
         attributes: { exclude: ["id_pessoa", "id_file"] },
-        paranoid: false
+        paranoid: false,
       },
       {
         model: VendaTiny,
