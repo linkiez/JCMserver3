@@ -74,10 +74,6 @@ export default class PedidoCompraController {
         [Op.or]: [{ pedido: { [Op.like]: "%" + consulta.searchValue + "%" } }],
       };
 
-      let queryWherePessoa = {
-        nome: { [Op.like]: "%" + consulta.searchValue + "%" },
-      };
-
       if (req.query.deleted === "true")
         queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
 
@@ -113,6 +109,113 @@ export default class PedidoCompraController {
     }
   }
 
+  static async findAllPedidoCompraIQF(req: Request, res: Response) {
+    try {
+      const consulta = {
+        fornecedor: req.query.fornecedor,
+        ano: new Date(`${req.query.ano}-01-01`),
+      };
+
+      let queryWhere: any = {
+        data_emissao: {
+          [Op.gte]: consulta.ano,
+          [Op.lte]: new Date(`${req.query.ano}-12-31`),
+        },
+        status: {
+          [Op.and]: { [Op.not]: ["Aprovado", "Orçamento"] },
+        },
+      };
+
+      if (
+        consulta.fornecedor !== undefined &&
+        consulta.fornecedor !== "undefined" &&
+        consulta.fornecedor !== ""
+      ) {
+        queryWhere = {
+          ...queryWhere,
+          id_fornecedor: consulta.fornecedor,
+        };
+      }
+
+      const pedidosCompra = await PedidoCompra.findAll({
+        where: queryWhere,
+        include: [
+          {
+            model: PedidoCompraItem,
+          },
+        ],
+        order: [["id", "DESC"]],
+      });
+
+      interface Resultado {
+        mes: number;
+        pedidosCompra: PedidoCompra[];
+        total: number;
+        peso: number;
+        pesoEntregue: number;
+      }
+
+      let resultados: Resultado[] = [];
+
+      for (let i = 1; i <= 12; i++) {
+        resultados.push({
+          mes: i,
+          pedidosCompra: [],
+          total: 0,
+          peso: 0,
+          pesoEntregue: 0,
+        });
+      }
+
+      function filterPedidosCompra(mes: number) {
+        return pedidosCompra.filter((pedidoCompra: PedidoCompra) => {
+          return new Date(pedidoCompra.data_emissao).getMonth() === mes - 1;
+        });
+      }
+
+      for (let resultado of resultados) {
+        resultado.pedidosCompra = filterPedidosCompra(resultado.mes);
+
+        resultado.peso = resultado.pedidosCompra.reduce(
+          (total: number, pedidoCompra: PedidoCompra) => {
+            return (
+              total +
+              pedidoCompra.pedido_compra_items.reduce(
+                (total: number, pedidoCompraItem: PedidoCompraItem) => {
+                  return total + pedidoCompraItem.peso;
+                },
+                0
+              )
+            );
+          },
+          0
+        );
+
+        resultado.pesoEntregue = resultado.pedidosCompra.reduce(
+          (total: number, pedidoCompra: PedidoCompra) => {
+            return (
+              total +
+              pedidoCompra.pedido_compra_items.reduce(
+                (total: number, pedidoCompraItem: PedidoCompraItem) => {
+                  return total + pedidoCompraItem.peso_entregue;
+                },
+                0
+              )
+            );
+          },
+          0
+        );
+
+        resultado.total = resultado.pesoEntregue / resultado.peso;
+      }
+
+      return res.status(200).json(resultados);
+    } catch (error: any) {
+      console.log("Resquest: ", req.body, "Erro: ", error);
+      return res.status(500).json(error.message);
+    }
+  }
+
   static async findOnePedidoCompra(req: Request, res: Response) {
     const { id } = req.params;
     try {
@@ -130,7 +233,13 @@ export default class PedidoCompraController {
             ],
             paranoid: false,
           },
-          { model: PedidoCompraItem, include: [{model:Produto, paranoid: false}, RegistroInspecaoRecebimento] },
+          {
+            model: PedidoCompraItem,
+            include: [
+              { model: Produto, paranoid: false },
+              RegistroInspecaoRecebimento,
+            ],
+          },
           File,
         ],
       });
@@ -367,7 +476,7 @@ export default class PedidoCompraController {
           where: {
             id: consulta.produto !== "undefined" ? consulta.produto : undefined,
           },
-          paranoid: false
+          paranoid: false,
         },
       ];
 
