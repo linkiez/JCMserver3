@@ -113,13 +113,13 @@ export default class PedidoCompraController {
     try {
       const consulta = {
         fornecedor: req.query.fornecedor,
-        ano: new Date(`${req.query.ano}-01-01`),
+        ano: req.query.ano?new Date(`${req.query.ano}-01-01`):new Date(),
       };
 
       let queryWhere: any = {
         data_emissao: {
           [Op.gte]: consulta.ano,
-          [Op.lte]: new Date(`${req.query.ano}-12-31`),
+          [Op.lte]: new Date(`${consulta.ano.getFullYear()}-12-31`),
         },
         status: {
           [Op.and]: { [Op.not]: ["Aprovado", "Orçamento"] },
