@@ -15,7 +15,7 @@ export default class PedidoCompra extends Model {
   declare deletedAt: Date;
   declare updatedAt: Date;
   declare createdAt: Date;
-  declare PedidoCompraItem: Array<PedidoCompraItem>;
+  declare pedido_compra_items: Array<PedidoCompraItem>;
   declare id_fornecedor: number;
   declare Fornecedor: Fornecedor;
   declare total: number;

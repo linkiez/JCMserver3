@@ -35,7 +35,7 @@ Produto.init(
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
-    nome: DataTypes.CITEXT,
+    nome: { type: DataTypes.CITEXT, unique: true },
     categoria: DataTypes.CITEXT,
     espessura: DataTypes.FLOAT,
     peso: DataTypes.FLOAT,

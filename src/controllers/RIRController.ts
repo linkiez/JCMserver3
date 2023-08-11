@@ -175,7 +175,7 @@ export default class RIRController {
       }
       if (rir.pedido_compra_item) {
         rir.id_pedido_compra_item = rir.pedido_compra_item.id;
-        delete rir.pedido_compra_item;
+        // delete rir.pedido_compra_item;
       }
 
       if (!rir.id)
@@ -191,6 +191,8 @@ export default class RIRController {
           });
         }
       }
+
+      await atualizarPesoEntreguePedidoDeCompraItem(rir.pedido_compra_item);
 
       rir = await RIR.findOne({
         where: { id: rirCreated.id },
@@ -239,7 +241,7 @@ export default class RIRController {
       }
       if (rir.pedido_compra_item) {
         rir.id_pedido_compra_item = rir.pedido_compra_item.id;
-        delete rir.pedido_compra_item;
+        // delete rir.pedido_compra_item;
       }
 
       if (rir.files) {
@@ -269,6 +271,9 @@ export default class RIRController {
       }
 
       await RIR.update(rir, { where: { id: Number(id) } });
+
+      await atualizarPesoEntreguePedidoDeCompraItem(rir.pedido_compra_item);
+
       const rirUpdated = await RIR.findOne({
         where: { id: Number(id) },
         include: [
@@ -344,4 +349,64 @@ export default class RIRController {
       return res.status(500).json(error.message);
     }
   }
+}
+
+async function atualizarPesoEntreguePedidoDeCompraItem(
+  pedido_compra_item: PedidoCompraItem
+) {
+  let pedidoCompra = await PedidoCompra.findOne({
+    where: { id: pedido_compra_item.id_pedido },
+    include: [{ model: PedidoCompraItem, include: [RIR] }],
+  });
+  for (let pedidoCompraItem of pedidoCompra?.pedido_compra_items || []) {
+    let peso_entregue = 0;
+    for (let rir of pedidoCompraItem.registro_inspecao_recebimentos || []) {
+      peso_entregue = peso_entregue + rir.quantidade;
+    }
+    let PCIStatus = "Aguardando";
+    if (peso_entregue > 0) {
+      PCIStatus = "Entregue Parcial";
+    }
+    if (peso_entregue >= (pedidoCompraItem.peso ?? 0) * 0.9) {
+      PCIStatus = "Entregue";
+    }
+
+    await PedidoCompraItem.update(
+      { peso_entregue, status: PCIStatus },
+      { where: { id: pedidoCompraItem.id } }
+    );
+  }
+
+  pedidoCompra = await PedidoCompra.findOne({
+    where: { id: pedido_compra_item.id_pedido },
+    include: [{ model: PedidoCompraItem, include: [RIR] }],
+  });
+
+  pedidoCompra!.status = "Aprovado";
+  const pedidoCompraItemStatus = pedidoCompra?.pedido_compra_items.map(
+    (item: PedidoCompraItem) => item.status
+  );
+  const countEntregue = pedidoCompraItemStatus?.filter(
+    (status: string) => status === "Entregue"
+  ).length;
+
+  const countEntregueParcial = pedidoCompraItemStatus?.filter(
+    (status: string) => status === "Entregue Parcial"
+  ).length;
+
+  let PCStatus = "Aprovado";
+
+  if (countEntregue === pedidoCompra?.pedido_compra_items.length)
+    PCStatus = "Entregue";
+  else if (
+    countEntregue &&
+    countEntregueParcial &&
+    (countEntregue > 0 || countEntregueParcial > 0)
+  )
+    PCStatus = "Entregue Parcial";
+
+  await PedidoCompra.update(
+    { status: PCStatus },
+    { where: { id: pedidoCompra?.id } }
+  );
 }

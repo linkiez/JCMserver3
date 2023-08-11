@@ -18,6 +18,9 @@ export default class PedidoCompraItem extends Model {
   declare id_pedido: number;
   declare id_produto: number;
   declare produto: Produto;
+  declare registro_inspecao_recebimentos: RegistroInspecaoRecebimento[];
+  declare status: string;
+  declare peso_entregue: number;
 
   static associate() {
     // define association here
@@ -40,9 +43,15 @@ PedidoCompraItem.init(
     quantidade: DataTypes.FLOAT,
     peso: DataTypes.FLOAT,
     preco: DataTypes.FLOAT,
-    ipi: DataTypes.FLOAT, 
+    ipi: DataTypes.FLOAT,
     prazo: DataTypes.DATE,
     deletedAt: DataTypes.DATE,
+    status: DataTypes.CITEXT,
+    peso_entregue: {
+      type: DataTypes.FLOAT,
+      defaultValue: 0,
+
+    },
   },
   {
     sequelize,

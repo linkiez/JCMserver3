@@ -100,7 +100,7 @@ Pessoa.init(
       primaryKey: true,
       type: DataTypes.BIGINT,
     },
-    nome: DataTypes.CITEXT,
+    nome: {type: DataTypes.CITEXT, unique: true},
     razao_social: DataTypes.CITEXT,
     pessoa_juridica: DataTypes.BOOLEAN,
     telefone: DataTypes.CITEXT,
