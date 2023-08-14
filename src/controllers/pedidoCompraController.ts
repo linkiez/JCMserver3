@@ -113,13 +113,13 @@ export default class PedidoCompraController {
     try {
       const consulta = {
         fornecedor: req.query.fornecedor,
-        ano: req.query.ano?new Date(`${req.query.ano}-01-01`):new Date(),
+        ano: req.query.ano ? new Date(`${req.query.ano}-01-01`) : new Date(),
       };
 
       let queryWhere: any = {
         data_emissao: {
           [Op.gte]: consulta.ano,
-          [Op.lte]: new Date(`${consulta.ano.getFullYear()}-12-31`),
+          [Op.lte]: new Date(`${consulta.ano.getFullYear() + 1}-12-31`),
         },
         status: {
           [Op.and]: { [Op.not]: ["Aprovado", "Orçamento"] },
@@ -145,6 +145,26 @@ export default class PedidoCompraController {
           },
         ],
         order: [["id", "DESC"]],
+        attributes: {
+          include: [
+            [
+              sequelize.fn("SUM", sequelize.col("pedido_compra_items.peso")),
+              "peso",
+            ],
+            [
+              sequelize.fn(
+                "SUM",
+                sequelize.col("pedido_compra_items.peso_entregue")
+              ),
+              "peso_entregue",
+            ],
+            [
+              sequelize.literal("(SUM(pedido_compra_items.peso_entregue) / SUM(pedido_compra_items.peso)) * 100"),
+              "percentual_entregue",
+            ]
+          ],
+        },
+        group: ["pedido_compra.id", "pedido_compra_items.id"],
       });
 
       interface Resultado {
@@ -169,7 +189,7 @@ export default class PedidoCompraController {
 
       function filterPedidosCompra(mes: number) {
         return pedidosCompra.filter((pedidoCompra: PedidoCompra) => {
-          return new Date(pedidoCompra.data_emissao).getMonth() === mes - 1;
+          return new Date(pedidoCompra.data_emissao).getMonth() === (mes);
         });
       }
 
@@ -494,6 +514,20 @@ export default class PedidoCompraController {
       });
 
       return res.status(200).json(resultado);
+    } catch (error: any) {
+      console.log("Resquest: ", req.body, "Erro: ", error);
+      return res.status(500).json(error.message);
+    }
+  }
+
+  static async restorePedidoCompra(req: Request, res: Response) {
+    const { id } = req.params;
+    try {
+      await PedidoCompra.restore({ where: { id: Number(id) } });
+      const pedidoCompraUpdated = await PedidoCompra.findOne({
+        where: { id: Number(id) },
+      });
+      return res.status(202).json(pedidoCompraUpdated);
     } catch (error: any) {
       console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);

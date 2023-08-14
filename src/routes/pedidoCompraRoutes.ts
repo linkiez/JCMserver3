@@ -45,6 +45,12 @@ router
     Authentication.verificaAcesso(["pedidoCompra", "destroy"]),
     PedidoCompraController.destroyPedidoCompra
   )
+  .post(
+    "/pedidocompra/restore/:id",
+    Authentication.verificaLogin,
+    Authentication.verificaAcesso(["pedidoCompra", "update"]),
+    PedidoCompraController.restorePedidoCompra
+  )
   .put(
     "/pedidocompra/:id",
     Authentication.verificaLogin,
