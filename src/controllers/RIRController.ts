@@ -354,6 +354,8 @@ export default class RIRController {
 async function atualizarPesoEntreguePedidoDeCompraItem(
   pedido_compra_item: PedidoCompraItem
 ) {
+  if(pedido_compra_item.id_pedido === undefined) return null;
+
   let pedidoCompra = await PedidoCompra.findOne({
     where: { id: pedido_compra_item.id_pedido },
     include: [{ model: PedidoCompraItem, include: [RIR] }],
