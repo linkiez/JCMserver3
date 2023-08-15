@@ -197,6 +197,8 @@ export default class RIRController {
 
       if(rir.pedido_compra_item)await atualizarPesoEntreguePedidoDeCompraItem(rir.pedido_compra_item, transaction!);
 
+      await transaction?.commit();
+
       rir = await RIR.findOne({
         where: { id: rirCreated.id },
         include: [
@@ -219,7 +221,7 @@ export default class RIRController {
           ],
         },
       });
-      transaction?.commit();
+
       return res.status(201).json(rir);
     } catch (error: any) {
       transaction?.rollback();
@@ -280,6 +282,8 @@ export default class RIRController {
 
       if(rir.pedido_compra_item)await atualizarPesoEntreguePedidoDeCompraItem(rir.pedido_compra_item, transaction!);
 
+      await transaction?.commit()
+
       const rirUpdated = await RIR.findOne({
         where: { id: Number(id) },
         include: [
@@ -302,7 +306,7 @@ export default class RIRController {
           ],
         },
       });
-      transaction?.commit()
+      
       return res.status(202).json(rirUpdated);
     } catch (error: any) {
       transaction?.rollback()
