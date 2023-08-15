@@ -9,10 +9,8 @@ import RegistroInspecaoRecebimento_File from "../models/RIR_File";
 import { Op, Transaction } from "sequelize";
 import PedidoCompra from "../models/PedidoCompra";
 import Fornecedor from "../models/Fornecedor";
-import OrcamentoItem from "../models/OrcamentoItem";
-import Orcamento from "../models/Orcamento";
-import OrdemProducao from "../models/OrdemProducao";
 import OrdemProducaoItem from "../models/OrdemProducaoItem";
+import { isNumber } from "lodash-es";
 
 export default class RIRController {
   static async findAllRIRs(req: Request, res: Response) {
@@ -31,15 +29,16 @@ export default class RIRController {
       let queryWhere: any = {};
 
       if (consulta.searchValue !== "undefined" && consulta.searchValue !== "") {
-        if (!isNaN(Number(consulta.searchValue)))
-          queryWhere.id = consulta.searchValue;
-      }
-
-      let whereProduto = undefined;
-      if (isNaN(Number(consulta.searchValue)))
-        whereProduto = {
-          nome: { [Op.like]: "%" + consulta.searchValue + "%" },
+        queryWhere = {
+          [Op.or]: [
+            { id: isFinite(+consulta.searchValue)?+consulta.searchValue:0 },
+            { descricao: { [Op.like]: `%${consulta.searchValue}%` } },
+            { '$produto.nome$': { [Op.like]: `%${consulta.searchValue}%` } },
+            { '$pessoa.nome$': { [Op.like]: `%${consulta.searchValue}%` } },
+          ],
+          
         };
+      }
 
       if (req.query.deleted === "true")
         queryWhere = { ...queryWhere, deletedAt: { [Op.not]: null } };
@@ -49,17 +48,18 @@ export default class RIRController {
           model: Pessoa,
           include: [{ model: Fornecedor, paranoid: false }],
           paranoid: false,
+          required: false,
         },
         {
           model: Produto,
-          where: whereProduto,
-          required: false,
           paranoid: false,
+          required: false,
         },
         {
           model: Operador,
           include: [{ model: Pessoa, paranoid: false }],
           attributes: { exclude: ["id_pessoa"] },
+          paranoid: false,
         },
         FileDb,
         { model: PedidoCompraItem, include: [PedidoCompra] },
@@ -82,12 +82,14 @@ export default class RIRController {
         },
         order: [["id", "DESC"]],
         paranoid: req.query.deleted === "true" ? false : true,
+        subQuery: false,
       });
 
       resultado.totalRecords = await RIR.count({
         where: consulta.searchValue !== "undefined" ? queryWhere : undefined,
         include: include,
         paranoid: req.query.deleted === "true" ? false : true,
+        
       });
       return res.status(200).json(resultado);
     } catch (error: any) {
@@ -387,6 +389,7 @@ async function atualizarPesoEntreguePedidoDeCompraItem(
   pedidoCompra = await PedidoCompra.findOne({
     where: { id: pedido_compra_item.id_pedido },
     include: [{ model: PedidoCompraItem, include: [RIR] }],
+    transaction
   });
 
   pedidoCompra!.status = "Aprovado";
@@ -406,9 +409,7 @@ async function atualizarPesoEntreguePedidoDeCompraItem(
   if (countEntregue === pedidoCompra?.pedido_compra_items.length)
     PCStatus = "Entregue";
   else if (
-    countEntregue &&
-    countEntregueParcial &&
-    (countEntregue > 0 || countEntregueParcial > 0)
+    ((countEntregue??0) > 0 || (countEntregueParcial??0) > 0)
   )
     PCStatus = "Entregue Parcial";
 
