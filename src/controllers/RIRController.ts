@@ -192,7 +192,7 @@ export default class RIRController {
         }
       }
 
-      await atualizarPesoEntreguePedidoDeCompraItem(rir.pedido_compra_item);
+      if(rir.pedido_compra_item)await atualizarPesoEntreguePedidoDeCompraItem(rir.pedido_compra_item);
 
       rir = await RIR.findOne({
         where: { id: rirCreated.id },
@@ -272,7 +272,7 @@ export default class RIRController {
 
       await RIR.update(rir, { where: { id: Number(id) } });
 
-      await atualizarPesoEntreguePedidoDeCompraItem(rir.pedido_compra_item);
+      if(rir.pedido_compra_item)await atualizarPesoEntreguePedidoDeCompraItem(rir.pedido_compra_item);
 
       const rirUpdated = await RIR.findOne({
         where: { id: Number(id) },
@@ -354,7 +354,6 @@ export default class RIRController {
 async function atualizarPesoEntreguePedidoDeCompraItem(
   pedido_compra_item: PedidoCompraItem
 ) {
-  if(pedido_compra_item.id_pedido === undefined) return null;
 
   let pedidoCompra = await PedidoCompra.findOne({
     where: { id: pedido_compra_item.id_pedido },
