@@ -161,7 +161,6 @@ export default class RIRController {
   }
 
   static async createRIR(req: Request, res: Response) {
-    const transaction = await RIR.sequelize?.transaction();
     try {
       let rir = req.body;
       if (rir.pessoa) {
@@ -184,7 +183,7 @@ export default class RIRController {
       if (!rir.id)
         rir.id = ((await RIR.max("id", { paranoid: false })) as number) + 1;
 
-      const rirCreated = await RIR.create(rir, { transaction });
+      const rirCreated = await RIR.create(rir);
 
       if (rir.files) {
         for (let file of rir.files) {
@@ -195,9 +194,7 @@ export default class RIRController {
         }
       }
 
-      if(rir.pedido_compra_item)await atualizarPesoEntreguePedidoDeCompraItem(rir.pedido_compra_item, transaction!);
-
-      await transaction?.commit();
+      if(rir.pedido_compra_item)await atualizarPesoEntreguePedidoDeCompraItem(rir.pedido_compra_item);
 
       rir = await RIR.findOne({
         where: { id: rirCreated.id },
@@ -224,14 +221,12 @@ export default class RIRController {
 
       return res.status(201).json(rir);
     } catch (error: any) {
-      transaction?.rollback();
       console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
 
   static async updateRIR(req: Request, res: Response) {
-    const transaction = await RIR.sequelize?.transaction();
     try {
       const { id } = req.params;
       let rir = req.body;
@@ -263,7 +258,7 @@ export default class RIRController {
             );
             if (!search) {
               await RegistroInspecaoRecebimento_File.destroy({
-                where: { fileId: file.fileId }, transaction
+                where: { fileId: file.fileId }
               });
             }
           }
@@ -273,16 +268,14 @@ export default class RIRController {
             where: {
               fileId: file.id,
               registroInspecaoRecebimentoId: id,
-            }, transaction
+            }
           });
         }
       }
 
-      await RIR.update(rir, { where: { id: Number(id) }, transaction });
+      await RIR.update(rir, { where: { id: Number(id) } });
 
-      if(rir.pedido_compra_item)await atualizarPesoEntreguePedidoDeCompraItem(rir.pedido_compra_item, transaction!);
-
-      await transaction?.commit()
+      if(rir.pedido_compra_item)await atualizarPesoEntreguePedidoDeCompraItem(rir.pedido_compra_item);
 
       const rirUpdated = await RIR.findOne({
         where: { id: Number(id) },
@@ -309,7 +302,6 @@ export default class RIRController {
       
       return res.status(202).json(rirUpdated);
     } catch (error: any) {
-      transaction?.rollback()
       console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
@@ -364,7 +356,7 @@ export default class RIRController {
 }
 
 async function atualizarPesoEntreguePedidoDeCompraItem(
-  pedido_compra_item: PedidoCompraItem, transaction: Transaction
+  pedido_compra_item: PedidoCompraItem
 ) {
 
   let pedidoCompra = await PedidoCompra.findOne({
@@ -386,14 +378,14 @@ async function atualizarPesoEntreguePedidoDeCompraItem(
 
     await PedidoCompraItem.update(
       { peso_entregue, status: PCIStatus },
-      { where: { id: pedidoCompraItem.id }, transaction }
+      { where: { id: pedidoCompraItem.id },  }
     );
   }
 
   pedidoCompra = await PedidoCompra.findOne({
     where: { id: pedido_compra_item.id_pedido },
     include: [{ model: PedidoCompraItem, include: [RIR] }],
-    transaction
+    
   });
 
   pedidoCompra!.status = "Aprovado";
@@ -419,6 +411,6 @@ async function atualizarPesoEntreguePedidoDeCompraItem(
 
   await PedidoCompra.update(
     { status: PCStatus },
-    { where: { id: pedidoCompra?.id }, transaction }
+    { where: { id: pedidoCompra?.id },  }
   );
 }
