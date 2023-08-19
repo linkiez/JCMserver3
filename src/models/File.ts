@@ -18,6 +18,7 @@ export default class File extends Model {
   declare deletedAt: Date;
   declare updatedAt: Date;
   declare createdAt: Date;
+  declare service: 'aws' | 'gcp' | undefined;
 
   static associate() {
     // define association here
@@ -44,9 +45,8 @@ File.init(
     originalFilename: DataTypes.CITEXT,
     newFilename: DataTypes.CITEXT,
     mimeType: DataTypes.CITEXT,
-    bucket: DataTypes.CITEXT,
-    region: DataTypes.CITEXT,
     deletedAt: DataTypes.DATE,
+    service: { type: DataTypes.ENUM("aws", "gcp"), defaultValue: "aws" },
   },
   {
     sequelize,
