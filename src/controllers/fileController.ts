@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import FileDb from "../models/File";
-import { S3 as S3Client } from "../services/AWS-S3";
 import { IncomingForm } from "formidable";
+import Bucket from "../services/Bucket";
 
 export default class FileController {
   static async findAllFiles(req: Request, res: Response) {
@@ -29,13 +29,15 @@ export default class FileController {
 
   static async getUrlFile(req: Request, res: Response) {
     const { id } = req.params;
+    
     try {
       const file = await FileDb.findOne({
         where: { id: Number(id) },
       });
-
+      
       if (file) {
-        const url = { url: await S3Client.getSignedUrl(file.newFilename) };
+        const bucket = new Bucket(file.service);
+        const url = { url: await bucket.getSignedUrl(file.newFilename) };
         return res.status(200).json(url);
       } else {
         return res.status(404);
@@ -50,18 +52,19 @@ export default class FileController {
     const form = new IncomingForm();
     try {
       form.parse(req, async (err, fields: any, files: any) => {
-        const url = await S3Client.uploadFile(
+        const service = (process.env.BUCKET_SERVICE as 'aws' | 'gcp' | undefined ) ?? 'aws';
+        const bucket = new Bucket(service);
+        const url = await bucket.uploadFile(
           files.filetoupload[0].newFilename,
           files.filetoupload[0].filepath,
           files.filetoupload[0].mimetype
         );
         const file = {
-          url: url,
+          url,
           originalFilename: files.filetoupload[0].originalFilename,
           newFilename: files.filetoupload[0].newFilename,
           mimeType: files.filetoupload[0].mimeType,
-          bucket: process.env.AWS_S3_BUCKET,
-          region: process.env.AWS_REGION,
+          service
         };
         const fileCreated = await FileDb.create(file);
         return res.status(202).json(fileCreated);
@@ -77,8 +80,8 @@ export default class FileController {
     try {
       let file = await FileDb.findByPk(id);
       if (file) {
-        let deleted = await S3Client.deleteFromS3(file.newFilename);
-        console.log(deleted);
+        const bucket = new Bucket(file.service);
+        await bucket.delete(file.newFilename);
       }
       await FileDb.destroy({ where: { id: Number(id) } });
       return res.status(202).json({ message: `File apagado` });

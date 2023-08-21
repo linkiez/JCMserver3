@@ -13,6 +13,7 @@ COPY . .
 
 # Expose port for container
 EXPOSE 3000
+EXPOSE 3001
 
 # Healthcheck
 # HEALTHCHECK --interval=30s CMD curl -f http://linkiez.ddns.net:2486/health || exit 1
