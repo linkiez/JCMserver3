@@ -1,4 +1,4 @@
-import e, { Request, Response } from "express";
+import { Request, Response } from "express";
 import Operador from "../models/Operador";
 import Pessoa from "../models/Pessoa";
 import Produto from "../models/Produto";
@@ -6,11 +6,10 @@ import RIR from "../models/RIR";
 import FileDb from "../models/File";
 import PedidoCompraItem from "../models/PedidoCompraItem";
 import RegistroInspecaoRecebimento_File from "../models/RIR_File";
-import { Op, Transaction } from "sequelize";
+import { Op } from "sequelize";
 import PedidoCompra from "../models/PedidoCompra";
 import Fornecedor from "../models/Fornecedor";
 import OrdemProducaoItem from "../models/OrdemProducaoItem";
-import { isNumber } from "lodash-es";
 
 export default class RIRController {
   static async findAllRIRs(req: Request, res: Response) {

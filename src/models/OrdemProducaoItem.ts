@@ -18,6 +18,7 @@ import RegistroInspecaoRecebimento from "./RIR";
 import FileDb from "./File";
 import OrdemProducao from "./OrdemProducao";
 import OrdemProducaoItemProcesso from "./OrdemProducaoItemProcesso";
+import RNC from "./RNC";
 
 export default class OrdemProducaoItem extends Model {
   declare id: number;
@@ -61,6 +62,7 @@ export default class OrdemProducaoItem extends Model {
       foreignKey: "id_ordem_producao_item",
       onDelete: "cascade",
     });
+    OrdemProducaoItem.belongsTo(RNC, { foreignKey: "id_rnc" })
   }
 }
 OrdemProducaoItem.init(

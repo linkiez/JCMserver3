@@ -2,6 +2,7 @@ import sequelize from "../config/connPostgre";
 import { Model, DataTypes, Op } from "sequelize";
 import Pessoa from "./Pessoa";
 import OrdemProducaoHistorico from "./OrdemProducaoHistorico";
+import RNC from "./RNC";
 
 export default class Usuario extends Model {
   declare id: number;
@@ -18,6 +19,7 @@ export default class Usuario extends Model {
     // define association here
     Usuario.belongsTo(Pessoa, { foreignKey: "id_pessoa" });
     Usuario.hasMany(OrdemProducaoHistorico, { foreignKey: "id_usuario" })
+    Usuario.hasMany(RNC, { foreignKey: "responsavel_analise_id" })
   }
 }
 Usuario.init(
