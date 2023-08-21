@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import FileDb from "../models/File";
 import { IncomingForm } from "formidable";
-import Bucket from "../services/Bucket";
+import Bucket from "../services/bucket/Bucket";
 
 export default class FileController {
   static async findAllFiles(req: Request, res: Response) {
@@ -9,7 +9,7 @@ export default class FileController {
       const files = await FileDb.findAll();
       return res.status(200).json(files);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -22,19 +22,19 @@ export default class FileController {
       });
       return res.status(200).json(file);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
 
   static async getUrlFile(req: Request, res: Response) {
     const { id } = req.params;
-    
+
     try {
       const file = await FileDb.findOne({
         where: { id: Number(id) },
       });
-      
+
       if (file) {
         const bucket = new Bucket(file.service);
         const url = { url: await bucket.getSignedUrl(file.newFilename) };
@@ -43,7 +43,7 @@ export default class FileController {
         return res.status(404);
       }
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -52,7 +52,8 @@ export default class FileController {
     const form = new IncomingForm();
     try {
       form.parse(req, async (err, fields: any, files: any) => {
-        const service = (process.env.BUCKET_SERVICE as 'aws' | 'gcp' | undefined ) ?? 'aws';
+        const service =
+          (process.env.BUCKET_SERVICE as "aws" | "gcp" | undefined) ?? "aws";
         const bucket = new Bucket(service);
         const url = await bucket.uploadFile(
           files.filetoupload[0].newFilename,
@@ -64,13 +65,13 @@ export default class FileController {
           originalFilename: files.filetoupload[0].originalFilename,
           newFilename: files.filetoupload[0].newFilename,
           mimeType: files.filetoupload[0].mimeType,
-          service
+          service,
         };
         const fileCreated = await FileDb.create(file);
         return res.status(202).json(fileCreated);
       });
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -86,7 +87,7 @@ export default class FileController {
       await FileDb.destroy({ where: { id: Number(id) } });
       return res.status(202).json({ message: `File apagado` });
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -96,7 +97,7 @@ export default class FileController {
       const files = await FileDb.scope("deleted").findAll({ paranoid: false });
       return res.status(200).json(files);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -108,7 +109,7 @@ export default class FileController {
       const fileUpdated = await FileDb.findOne({ where: { id: Number(id) } });
       return res.status(202).json(fileUpdated);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
