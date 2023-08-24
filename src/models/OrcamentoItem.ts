@@ -18,6 +18,7 @@ import Orcamento from "./Orcamento";
 import Produto from "./Produto";
 import FileDb from "./File";
 import RegistroInspecaoRecebimento from "./RIR";
+import OrdemProducaoItem from "./OrdemProducaoItem";
 
 export default class OrcamentoItem extends Model {
   declare id: number;
@@ -62,6 +63,7 @@ export default class OrcamentoItem extends Model {
     OrcamentoItem.belongsTo(Orcamento, { foreignKey: "id_orcamento" });
     OrcamentoItem.belongsTo(Produto, { foreignKey: "id_produto" });
     OrcamentoItem.belongsToMany(FileDb, { through: "orcamento_file" });
+    OrcamentoItem.hasMany(OrdemProducaoItem, {foreignKey: "id_orcamento_item"})
   }
 }
 OrcamentoItem.init(

@@ -23,7 +23,7 @@ export default class OrdemProducaoController {
         pageCount: Number(req.query.pageCount) || 10,
         page: Number(req.query.page) || 0,
         searchValue: req.query.searchValue,
-        status: req.query.status,
+        status: req.query.status ?? '',
         id_vendedor: req.query.id_vendedor,
         id_pessoa: req.query.id_pessoa,
         data_prazo: req.query.data_prazo,
@@ -166,7 +166,8 @@ export default class OrdemProducaoController {
                 attributes: { exclude: ["id_ordem_producao_item"] },
               },
               {model:Produto, paranoid: false},
-              RegistroInspecaoRecebimento
+              RegistroInspecaoRecebimento,
+              OrcamentoItem
             ],
             attributes: { exclude: ["id_ordem_producao", "id_produto"] },
           },

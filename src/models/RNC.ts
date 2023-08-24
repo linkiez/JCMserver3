@@ -16,6 +16,7 @@ import {
 } from "sequelize";
 import Usuario from "./Usuario";
 import OrdemProducaoItem from "./OrdemProducaoItem";
+import { RNCItem } from "./RNCItem";
 
 export default class RNC extends Model {
   declare id: number;
@@ -40,13 +41,18 @@ export default class RNC extends Model {
   declare responsavel_analise_id: number;
   declare reclamacao_cliente: boolean;
   declare ordem_producao_item: OrdemProducaoItem[];
+  declare rnc_item: RNCItem[];
 
   static associate() {
     RNC.belongsTo(Usuario, {
       foreignKey: "responsavel_analise_id",
       as: "responsavel_analise",
     });
-    RNC.hasMany(OrdemProducaoItem, { foreignKey: "id_rnc" });
+
+    RNC.hasMany(RNCItem, {
+      foreignKey: "id_rnc",
+      onDelete: "cascade",
+    });
   }
 }
 RNC.init(
@@ -116,3 +122,5 @@ RNC.init(
     },
   }
 );
+
+
