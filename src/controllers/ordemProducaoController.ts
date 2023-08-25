@@ -23,7 +23,7 @@ export default class OrdemProducaoController {
         pageCount: Number(req.query.pageCount) || 10,
         page: Number(req.query.page) || 0,
         searchValue: req.query.searchValue,
-        status: req.query.status ?? '',
+        status: req.query.status ?? "",
         id_vendedor: req.query.id_vendedor,
         id_pessoa: req.query.id_pessoa,
         data_prazo: req.query.data_prazo,
@@ -76,7 +76,7 @@ export default class OrdemProducaoController {
         {
           model: Vendedor,
           include: [{ model: Pessoa, paranoid: false }],
-          paranoid: false
+          paranoid: false,
         },
         {
           model: Orcamento,
@@ -87,11 +87,11 @@ export default class OrdemProducaoController {
                 ? { nome: { [Op.like]: "%" + consulta.searchValue + "%" } }
                 : undefined,
               required: true,
-              paranoid: false
+              paranoid: false,
             },
           ],
           required: true,
-          paranoid: false
+          paranoid: false,
         },
         VendaTiny,
         {
@@ -99,8 +99,8 @@ export default class OrdemProducaoController {
           include: [
             {
               model: Usuario,
-              include: [{model:Pessoa, paranoid: false}],
-              paranoid: false
+              include: [{ model: Pessoa, paranoid: false }],
+              paranoid: false,
             },
           ],
         },
@@ -147,15 +147,15 @@ export default class OrdemProducaoController {
         include: [
           {
             model: Vendedor,
-            include: [{model:Pessoa, paranoid: false}],
+            include: [{ model: Pessoa, paranoid: false }],
             attributes: { exclude: ["id_pessoa"] },
-            paranoid: false
+            paranoid: false,
           },
           {
             model: Orcamento,
-            include: [{model: Pessoa, paranoid: false}, OrcamentoItem],
+            include: [{ model: Pessoa, paranoid: false }, OrcamentoItem],
             attributes: { exclude: ["id_pessoa"] },
-            paranoid: false
+            paranoid: false,
           },
           {
             model: OrdemProducaoItem,
@@ -165,20 +165,23 @@ export default class OrdemProducaoController {
                 model: OrdemProducaoItemProcesso,
                 attributes: { exclude: ["id_ordem_producao_item"] },
               },
-              {model:Produto, paranoid: false},
+              { model: Produto, paranoid: false },
               RegistroInspecaoRecebimento,
-              OrcamentoItem
+              {
+                model: OrcamentoItem,
+                include: [{ model: Orcamento, include: [Pessoa] }],
+              },
             ],
-            attributes: { exclude: ["id_ordem_producao", "id_produto"] },
+            attributes: { exclude: [ "id_produto"] },
           },
           {
             model: OrdemProducaoHistorico,
             include: [
               {
                 model: Usuario,
-                include: [{model:Pessoa, paranoid: false}],
+                include: [{ model: Pessoa, paranoid: false }],
                 attributes: { exclude: ["id_pessoa"] },
-                paranoid: false
+                paranoid: false,
               },
             ],
             attributes: { exclude: ["id_ordem_producao", "id_usuario"] },
@@ -279,15 +282,15 @@ export default class OrdemProducaoController {
             include: [
               {
                 model: Vendedor,
-                include: [{model: Pessoa, paranoid: false}],
+                include: [{ model: Pessoa, paranoid: false }],
                 attributes: { exclude: ["id_pessoa"] },
-                paranoid: false
+                paranoid: false,
               },
               {
                 model: Orcamento,
-                include: [{model:Pessoa, paranoid: false}],
+                include: [{ model: Pessoa, paranoid: false }],
                 attributes: { exclude: ["id_pessoa"] },
-                paranoid: false
+                paranoid: false,
               },
               {
                 model: OrdemProducaoItem,
@@ -297,7 +300,7 @@ export default class OrdemProducaoController {
                     model: OrdemProducaoItemProcesso,
                     attributes: { exclude: ["id_ordem_producao_item"] },
                   },
-                  {model:Produto, paranoid: false},
+                  { model: Produto, paranoid: false },
                 ],
                 attributes: { exclude: ["id_ordem_producao", "id_produto"] },
               },
@@ -372,7 +375,8 @@ export default class OrdemProducaoController {
               }
 
               if (ordemProducaoItem.registro_inspecao_recebimento) {
-                ordemProducaoItem.id_rir = ordemProducaoItem.registro_inspecao_recebimento.id;
+                ordemProducaoItem.id_rir =
+                  ordemProducaoItem.registro_inspecao_recebimento.id;
                 delete ordemProducaoItem.registro_inspecao_recebimento;
               }
 
@@ -506,24 +510,24 @@ export default class OrdemProducaoController {
               include: [
                 {
                   model: Usuario,
-                  include: [{model: Pessoa, paranoid: false}],
+                  include: [{ model: Pessoa, paranoid: false }],
                   attributes: { exclude: ["id_pessoa"] },
-                  paranoid: false
+                  paranoid: false,
                 },
               ],
               attributes: { exclude: ["id_ordem_producao", "id_usuario"] },
             },
             {
               model: Vendedor,
-              include: [{model:Pessoa, paranoid: false}],
+              include: [{ model: Pessoa, paranoid: false }],
               attributes: { exclude: ["id_pessoa"] },
-              paranoid: false
+              paranoid: false,
             },
             {
               model: Orcamento,
-              include: [{model:Pessoa, paranoid: false}, OrcamentoItem],
+              include: [{ model: Pessoa, paranoid: false }, OrcamentoItem],
               attributes: { exclude: ["id_pessoa"] },
-              paranoid: false
+              paranoid: false,
             },
             {
               model: OrdemProducaoItem,
@@ -533,8 +537,8 @@ export default class OrdemProducaoController {
                   model: OrdemProducaoItemProcesso,
                   attributes: { exclude: ["id_ordem_producao_item"] },
                 },
-                {model: Produto, paranoid: false},
-                RegistroInspecaoRecebimento
+                { model: Produto, paranoid: false },
+                RegistroInspecaoRecebimento,
               ],
               attributes: { exclude: ["id_ordem_producao", "id_produto"] },
             },

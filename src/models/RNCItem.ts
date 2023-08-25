@@ -44,6 +44,10 @@ RNCItem.init(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
+    observacao: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    }
   },
   {
     sequelize,
