@@ -21,6 +21,7 @@ import { RNCItem } from "./RNCItem";
 export default class RNC extends Model {
   declare id: number;
   declare status: string;
+  declare classificacao: string;
   declare createdAt: Date;
   declare updatedAt: Date;
   declare deletedAt: Date;
@@ -71,6 +72,9 @@ RNC.init(
       type: DataTypes.DATE,
       allowNull: true,
     },
+    classificacao: {
+      type: DataTypes.STRING,
+    },
     descricao: {
       type: DataTypes.TEXT,
       allowNull: false,
@@ -89,6 +93,10 @@ RNC.init(
       ),
       allowNull: false,
     },
+    acao_contencao: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     acao_corretiva: {
       type: DataTypes.TEXT,
       allowNull: false,
@@ -97,14 +105,27 @@ RNC.init(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    acao_imediata: {
+    eficacia: {
+      type: DataTypes.ENUM("Sim", "Não"),
+      allowNull: true,
+    },
+    eficacia_motivo: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
-    reclamacao_cliente: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
+    eficacia_descricao: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
+    
+    eficacia_observacao: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    risco: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    }
   },
   {
     sequelize,
