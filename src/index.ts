@@ -21,17 +21,21 @@ const app: Express = express();
 
 const corsOptions = {
   origin: function (origin: string | undefined, callback: Function) {
-    const allowedOrigins = ['http://192.168.0.2', 'http://linkiez.ddns.net','https://linkiez.ddns.net', 'http://localhost:4200'];
+    const allowedOrigins = [
+      "http://192.168.0.2",
+      "http://linkiez.ddns.net",
+      "https://linkiez.ddns.net",
+      "http://localhost:4200",
+      "https://wwww.jcmmetais.com.br"
+    ];
 
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("Not allowed by CORS"));
     }
-  }
+  },
 };
-
-
 
 app.use(cors(corsOptions));
 app.use(helmet());
@@ -47,10 +51,13 @@ const httpServer = http.createServer(app);
 httpServer.keepAliveTimeout = 60 * 1000 + 1000;
 httpServer.headersTimeout = 60 * 1000 + 2000;
 
-const httpsServer = https.createServer({
-  key: fs.readFileSync('./ssl/linkiez_ddns_net.key'),
-  cert: fs.readFileSync('./ssl/linkiez_ddns_net.crt'),
-}, app);
+const httpsServer = https.createServer(
+  {
+    key: fs.readFileSync("./ssl/linkiez_ddns_net.key"),
+    cert: fs.readFileSync("./ssl/linkiez_ddns_net.crt"),
+  },
+  app
+);
 
 // For Master process
 if (cluster.isPrimary) {
@@ -71,10 +78,10 @@ if (cluster.isPrimary) {
     cluster.fork();
   }
 
-  cluster.on('error', (error) => {
-    console.error('Cluster error:', error);
+  cluster.on("error", (error) => {
+    console.error("Cluster error:", error);
   });
-  
+
   // This event is firs when worker died
   cluster.on("exit", (worker: any, code: any, signal: any) => {
     console.log(`worker ${worker.process.pid} died`);
