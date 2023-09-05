@@ -21,13 +21,7 @@ const app: Express = express();
 
 const corsOptions = {
   origin: function (origin: string | undefined, callback: Function) {
-    const allowedOrigins = [
-      "http://192.168.0.2",
-      "http://linkiez.ddns.net",
-      "https://linkiez.ddns.net",
-      "http://localhost:4200",
-      "https://wwww.jcmmetais.com.br"
-    ];
+    const allowedOrigins = JSON.parse(process.env.ALLOWED_ORIGINS ?? "[]");
 
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
