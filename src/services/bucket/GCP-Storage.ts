@@ -18,7 +18,8 @@ export default class GCPStorage implements IBucket {
 
         this.client = new Storage({
             projectId: process.env.GCP_PROJECT_ID,
-            keyFilename: process.env.GCP_KEY_FILE
+            keyFile: JSON.parse(process.env.GCP_KEY_FILE)
+            
         });
 
         this.bucket = this.client.bucket(process.env.GCP_BUCKET_NAME);
