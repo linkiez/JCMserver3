@@ -16,20 +16,11 @@ const numCPUs = os.cpus().length;
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
-const PORT_SSL = process.env.PORT_SSL || 3001;
+// const PORT_SSL = process.env.PORT_SSL || 3001;
 const app: Express = express();
 
 const corsOptions = {
-  origin: "https://www.jcmmetais.com.br",
-  // origin: function (origin: string | undefined, callback: Function) {
-  //   const allowedOrigins = JSON.parse(process.env.ALLOWED_ORIGINS ?? "[]");
-
-  //   if (!origin || allowedOrigins.includes(origin)) {
-  //     callback(null, true);
-  //   } else {
-  //     callback(new Error("Not allowed by CORS: " + origin));
-  //   }
-  // },
+  origin: process.env.ALLOWED_ORIGINS
 };
 
 app.use(cors(corsOptions));
