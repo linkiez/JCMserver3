@@ -51,13 +51,13 @@ const httpServer = http.createServer(app);
 httpServer.keepAliveTimeout = 60 * 1000 + 1000;
 httpServer.headersTimeout = 60 * 1000 + 2000;
 
-const httpsServer = https.createServer(
-  {
-    key: fs.readFileSync("./ssl/linkiez_ddns_net.key"),
-    cert: fs.readFileSync("./ssl/linkiez_ddns_net.crt"),
-  },
-  app
-);
+// const httpsServer = https.createServer(
+//   {
+//     key: fs.readFileSync("./ssl/linkiez_ddns_net.key"),
+//     cert: fs.readFileSync("./ssl/linkiez_ddns_net.crt"),
+//   },
+//   app
+// );
 
 // For Master process
 if (cluster.isPrimary) {
@@ -103,7 +103,7 @@ else {
   httpServer.listen(PORT, () => {
     console.log(`Worker ${process.pid} started`);
   });
-  httpsServer.listen(PORT_SSL, () => {
-    console.log(`Worker SSL ${process.pid} started`);
-  });
+  // httpsServer.listen(PORT_SSL, () => {
+  //   console.log(`Worker SSL ${process.pid} started`);
+  // });
 }
