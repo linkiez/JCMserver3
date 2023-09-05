@@ -20,15 +20,16 @@ const PORT_SSL = process.env.PORT_SSL || 3001;
 const app: Express = express();
 
 const corsOptions = {
-  origin: function (origin: string | undefined, callback: Function) {
-    const allowedOrigins = JSON.parse(process.env.ALLOWED_ORIGINS ?? "[]");
+  origin: "https://www.jcmmetais.com.br",
+  // origin: function (origin: string | undefined, callback: Function) {
+  //   const allowedOrigins = JSON.parse(process.env.ALLOWED_ORIGINS ?? "[]");
 
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS: " + origin));
-    }
-  },
+  //   if (!origin || allowedOrigins.includes(origin)) {
+  //     callback(null, true);
+  //   } else {
+  //     callback(new Error("Not allowed by CORS: " + origin));
+  //   }
+  // },
 };
 
 app.use(cors(corsOptions));
