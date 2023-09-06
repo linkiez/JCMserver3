@@ -159,9 +159,11 @@ export default class PedidoCompraController {
               "peso_entregue",
             ],
             [
-              sequelize.literal("(SUM(pedido_compra_items.peso_entregue) / SUM(pedido_compra_items.peso)) * 100"),
+              sequelize.literal(
+                `IF((SUM(pedido_compra_items.peso_entregue) / SUM(pedido_compra_items.peso)) * 100 > 100, 100, (SUM(pedido_compra_items.peso_entregue) / SUM(pedido_compra_items.peso)) * 100)`
+              ),
               "percentual_entregue",
-            ]
+            ],
           ],
         },
         group: ["pedido_compra.id", "pedido_compra_items.id"],
@@ -189,7 +191,7 @@ export default class PedidoCompraController {
 
       function filterPedidosCompra(mes: number) {
         return pedidosCompra.filter((pedidoCompra: PedidoCompra) => {
-          return new Date(pedidoCompra.data_emissao).getMonth() === (mes);
+          return new Date(pedidoCompra.data_emissao).getMonth() === mes;
         });
       }
 
