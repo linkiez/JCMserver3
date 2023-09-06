@@ -42,7 +42,7 @@ export default class EmailController {
                         <p>De: ${req.body.name}</p>
                         <p>E-mail: ${req.body.email}</p>
                         <p>Telefone: ${req.body.tel}</p>
-                        <p>Mensagem: ${req.body.mensagem}</p>
+                        <p>Mensagem: ${req.body.message}</p>
                         <br>
                         <p>E-mail enviado através do formulário de contato de https://www.jcmmetais.com.br/contato .</p>
                         `,
