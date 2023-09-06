@@ -22,17 +22,17 @@ export default class EmailController {
       }
 
       let transporter = nodemailer.createTransport({
-        name: "no-reply@jcmmetais.com.br",
-        host: "br1012.hostgator.com.br",
-        service: "br1012.hostgator.com.br",
-        port: 465,
-        secure: true,
+        // name: "no-reply@jcmmetais.com.br",
+        // host: "br1012.hostgator.com.br",
+        service: "Gmail",
+        // port: 465,
+        // secure: true,
         auth: {
           user: process.env.EMAIL_USER,
           pass: process.env.EMAIL_PASS,
         },
       });
-      transporter.sendMail({
+      const response = await transporter.sendMail({
         from: `"Formulário Contato JCM Metais " <contato@jcmmetais.com.br>`,
         to: "contato@jcmmetais.com.br",
         replyTo: req.body.email,
@@ -44,10 +44,10 @@ export default class EmailController {
                         <p>Telefone: ${req.body.tel}</p>
                         <p>Mensagem: ${req.body.mensagem}</p>
                         <br>
-                        <p>E-mail enviado através do formulário de contato de https://jcmmetais.com.br/contato .</p>
+                        <p>E-mail enviado através do formulário de contato de https://www.jcmmetais.com.br/contato .</p>
                         `,
       });
-
+      console.log(response)
       return res.status(200).json({ message: "Email enviado com sucesso" });
     } catch (error: any) {
       console.log("Resquest: ", req.body, "Erro: ", error);
@@ -70,6 +70,7 @@ async function validateCaptcha(response_key: string) {
   if (responseJson.success) {
     return true;
   } else {
+    console.log(responseJson);
     return false;
   }
 }
