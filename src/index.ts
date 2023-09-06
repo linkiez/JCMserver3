@@ -11,6 +11,14 @@ import os from "os";
 import http from "http";
 import https from "https";
 import fs from "fs";
+import AirBrake from "@airbrake/node";
+import AirBrakeExpress from "@airbrake/node/dist/instrumentation/express";
+
+const airbrake = new AirBrake.Notifier({
+  projectId: 518064,
+  projectKey: "00d8815db560752be9d60a4e724f5008",
+});
+
 const numCPUs = os.cpus().length;
 
 dotenv.config();
@@ -20,7 +28,7 @@ const PORT = process.env.PORT || 3000;
 const app: Express = express();
 
 const corsOptions = {
-  origin: process.env.ALLOWED_ORIGINS
+  origin: process.env.ALLOWED_ORIGINS,
 };
 
 app.use(cors(corsOptions));
@@ -29,9 +37,12 @@ app.use(
   express.json({ limit: "50mb" }),
   express.urlencoded({ limit: "50mb", extended: true })
 );
+app.use(AirBrakeExpress.makeMiddleware(airbrake));
 
 models();
 await routes(app);
+
+app.use(AirBrakeExpress.makeErrorHandler(airbrake));
 
 const httpServer = http.createServer(app);
 httpServer.keepAliveTimeout = 60 * 1000 + 1000;
