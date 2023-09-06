@@ -119,10 +119,10 @@ export default class PedidoCompraController {
       let queryWhere: any = {
         data_emissao: {
           [Op.gte]: consulta.ano,
-          [Op.lte]: new Date(`${consulta.ano.getFullYear() + 1}-12-31`),
+          [Op.lte]: new Date(`${consulta.ano.getFullYear()}-12-31`),
         },
         status: {
-          [Op.and]: { [Op.not]: ["Aprovado", "Orçamento"] },
+          [Op.and]: { [Op.not]: ["Aprovado", "Orçamento", "Cancelado"] },
         },
       };
 
