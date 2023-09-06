@@ -27,9 +27,10 @@ export default class EmailController {
       if (!req.body.token) {
         return res.status(400).json({ message: "Token não informado" });
       }
-      
+
       const validoCaptha = await validateCaptcha(req.body.token);
       if (!validoCaptha) {
+
         return res.status(400).json({ message: "Token inválido" });
       }
 
@@ -40,8 +41,8 @@ export default class EmailController {
         port: 465,
         secure: true,
         auth: {
-          user: "contato@novo.jcmmetais.com.br",
-          pass: "contato##@#2022",
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
         },
       });
       transporter.sendMail({
