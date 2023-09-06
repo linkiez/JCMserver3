@@ -160,7 +160,7 @@ export default class PedidoCompraController {
             ],
             [
               sequelize.literal(
-                `IF((SUM(pedido_compra_items.peso_entregue) / SUM(pedido_compra_items.peso)) * 100 > 100, 100, (SUM(pedido_compra_items.peso_entregue) / SUM(pedido_compra_items.peso)) * 100)`
+                `CASE WHEN (SUM(pedido_compra_items.peso_entregue) / SUM(pedido_compra_items.peso)) * 100 > 100 THEN 100 ELSE (SUM(pedido_compra_items.peso_entregue) / SUM(pedido_compra_items.peso)) * 100 END`
               ),
               "percentual_entregue",
             ],
