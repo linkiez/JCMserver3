@@ -45,7 +45,7 @@ export class Authentication {
     if (!email || !senha) {
       return res
         .status(400)
-        .json({ error: "Email e senha são obrigatórios." });
+        .json("Email e senha são obrigatórios.");
     }
 
     try {
@@ -56,13 +56,13 @@ export class Authentication {
       });
 
       if (!usuario) {
-        return res.status(404).json({ error: "Usuário não encontrado." });
+        return res.status(404).json("Usuário não encontrado.");
       }
 
       if(usuario.senha){
         const verificaSenha = await bcrypt.compare(senha, usuario.senha);
         if (!verificaSenha) {
-          return res.status(401).json({ error: "Email ou senha incorretos." });
+          return res.status(401).json("Email ou senha incorretos.");
         }
       }
 
@@ -79,7 +79,7 @@ export class Authentication {
 
     } catch (error) {
       console.log("Resquest: ", req.body, "Erro: ", error)
-      return res.status(500).json({ error: "Erro durante o login." });
+      return res.status(500).json("Erro durante o login.");
     }
   }
 
@@ -89,7 +89,7 @@ export class Authentication {
     if (!token) {
       return res
         .status(401)
-        .json({ auth: false, message: "Access token não fornecido." });
+        .json("Access token não fornecido.");
     }
     try {
       req.user = await TokenAccess.verifica(token);
@@ -112,7 +112,7 @@ export class Authentication {
       } else {
         return res
           .status(401)
-          .json({ auth: false, message: "Acesso não autorizado." });
+          .json("Acesso não autorizado.");
       }
     };
   };
@@ -123,17 +123,17 @@ export class Authentication {
     if (!accessToken) {
       return res
         .status(401)
-        .json({ auth: false, message: "Access token não fornecido." });
+        .json("Access token não fornecido.");
     }
     if (!refreshToken) {
       return res
         .status(401)
-        .json({ auth: false, message: "Refresh token não fornecido." });
+        .json("Refresh token não fornecido.");
     }
     try {
       TokenAccess.salva(accessToken);
       TokenRefresh.apaga(refreshToken as string);
-      return res.status(200).json({ message: "Logout realizado com sucesso." });
+      return res.status(200).json("Logout realizado com sucesso.");
     } catch (error: any) {
       return res.status(500).json(error.message);
     }
@@ -145,7 +145,7 @@ export class Authentication {
     if (!refreshToken) {
       return res
         .status(401)
-        .json({ auth: false, message: "Refresh token não fornecido." });
+        .json("Refresh token não fornecido.");
     }
 
     const id = await TokenRefresh.id(refreshToken as string);
@@ -154,7 +154,7 @@ export class Authentication {
     if (!usuario) {
       return res
         .status(401)
-        .json({ auth: false, message: "Refresh token não reconhecido." });
+        .json("Refresh token não reconhecido.");
     }
     const newAccessToken = await TokenAccess.cria(usuario);
     const newRefreshToken = await TokenRefresh.renova(refreshToken as string);
