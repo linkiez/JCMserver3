@@ -11,18 +11,18 @@ export default class TokenRefresh {
   }
 
   static async renova(token: string) {
-    if (!redis.isOpen) {
+    if (!redis.isReady) {
       await redis.connect();
     }
     let id = await redis.get(token);
     await redis.del(token);
     const response = await this.cria(id);
-    redis.disconnect();
+    if(process.env.NODE_ENV == "production")redis.disconnect();
     return response;
   }
 
   static async salva(token: any, id: number) {
-    if (!redis.isOpen) {
+    if (!redis.isReady) {
       await redis.connect();
     } 
     await redis.set(token, id);
@@ -30,32 +30,32 @@ export default class TokenRefresh {
       token,
       moment().add(Number(process.env.REFRESH_TOKEN_EXPIRE_IN || 5), "d").unix()
     );
-    redis.disconnect();
+    if(process.env.NODE_ENV == "production")redis.disconnect();
   }
 
   static async apaga(token: string) {
-    if (!redis.isOpen) {
+    if (!redis.isReady) {
       await redis.connect();
     }
     redis.del(token);
-    redis.disconnect();
+    if(process.env.NODE_ENV == "production")redis.disconnect();
   }
 
   static async existe(token: string) {
-    if (!redis.isOpen) {
+    if (!redis.isReady) {
       await redis.connect();
     }
     const response = await redis.exists(token);
-    redis.disconnect();
+    if(process.env.NODE_ENV == "production")redis.disconnect();
     return response;
   }
 
   static async id(token: string) {
-    if (!redis.isOpen) {
+    if (!redis.isReady) {
       await redis.connect();
     }
     const response = await redis.get(token);
-    redis.disconnect();
+    if(process.env.NODE_ENV == "production")redis.disconnect();
     return response;
   }
 }
