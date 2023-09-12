@@ -9,10 +9,9 @@ import { seed } from "./seed/index.js";
 import cluster from "cluster";
 import os from "os";
 import http from "http";
-import https from "https";
-import fs from "fs";
+
 import AirBrake from "@airbrake/node";
-import AirBrakeExpress from "@airbrake/node/dist/instrumentation/express";
+import AirBrakeExpress from "@airbrake/node/dist/instrumentation/express.js";
 
 const airbrake = new AirBrake.Notifier({
   projectId: 518064,
