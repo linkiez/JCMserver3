@@ -9,6 +9,7 @@ import { seed } from "./seed/index.js";
 import cluster from "cluster";
 import os from "os";
 import http from "http";
+import compression from "compression";
 
 import AirBrake from "@airbrake/node";
 import AirBrakeExpress from "@airbrake/node/dist/instrumentation/express.js";
@@ -37,6 +38,7 @@ app.use(
   express.urlencoded({ limit: "50mb", extended: true })
 );
 app.use(AirBrakeExpress.makeMiddleware(airbrake));
+app.use(compression());
 
 models();
 await routes(app);
