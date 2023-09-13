@@ -119,7 +119,7 @@ export default class PedidoCompraController {
       let queryWhere: any = {
         data_emissao: {
           [Op.gte]: consulta.ano,
-          [Op.lte]: new Date(`${consulta.ano.getFullYear()}-12-31`),
+          [Op.lte]: new Date(`${consulta.ano.getFullYear()+1}-12-31`),
         },
         status: {
           [Op.and]: { [Op.not]: ["Aprovado", "Orçamento", "Cancelado"] },
@@ -148,13 +148,14 @@ export default class PedidoCompraController {
         attributes: {
           include: [
             [
-              sequelize.fn("SUM", sequelize.col("pedido_compra_items.peso")),
+              sequelize.literal(
+                `(SELECT SUM(peso) FROM pedido_compra_item WHERE pedido_compra_item.id_pedido = pedido_compra.id AND pedido_compra_item."deletedAt" IS NULL)`
+              ),
               "peso",
             ],
             [
-              sequelize.fn(
-                "SUM",
-                sequelize.col("pedido_compra_items.peso_entregue")
+              sequelize.literal(
+                `(SELECT SUM(peso_entregue) FROM pedido_compra_item WHERE pedido_compra_item.id_pedido = pedido_compra.id AND pedido_compra_item."deletedAt" IS NULL)`
               ),
               "peso_entregue",
             ],
