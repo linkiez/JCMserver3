@@ -37,13 +37,16 @@ app.use(
   express.json({ limit: "50mb" }),
   express.urlencoded({ limit: "50mb", extended: true })
 );
-app.use(AirBrakeExpress.makeMiddleware(airbrake));
+
 app.use(compression());
+
+if (process.env.NODE_ENV === "production") {
+  app.use(AirBrakeExpress.makeMiddleware(airbrake));
+  app.use(AirBrakeExpress.makeErrorHandler(airbrake));
+}
 
 models();
 await routes(app);
-
-app.use(AirBrakeExpress.makeErrorHandler(airbrake));
 
 const httpServer = http.createServer(app);
 httpServer.keepAliveTimeout = 60 * 1000 + 1000;

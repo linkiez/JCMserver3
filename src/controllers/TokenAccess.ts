@@ -34,7 +34,7 @@ export default class TokenAccess {
   }
 
   static async salva(token: any) {
-    if (!redis.isReady) {
+    if (!redis.isOpen) {
       await redis.connect();
     }
     await redis.set(token, "");
@@ -43,7 +43,7 @@ export default class TokenAccess {
   }
 
   static async existe(token: string) {
-    if (!redis.isReady) {
+    if (!redis.isOpen) {
       await redis.connect();
     }
     const response = await redis.exists(token);
