@@ -75,7 +75,8 @@ if (cluster.isPrimary) {
     });
 
   // Fork workers.
-  for (let i = 0; i < numCPUs; i++) {
+  const WORKERS = +(process.env.WEB_CONCURRENCY??1);
+  for (let i = 0; i < WORKERS; i++) {
     cluster.fork();
   }
 
