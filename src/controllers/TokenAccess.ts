@@ -39,7 +39,7 @@ export default class TokenAccess {
     }
     await redis.set(token, "");
     redis.expire(token, Number(process.env.ACCESS_TOKEN_EXPIRE_IN || 900));
-    // redis.disconnect();
+    // if(process.env.NODE_ENV == "production")redis.disconnect();
   }
 
   static async existe(token: string) {
@@ -47,7 +47,7 @@ export default class TokenAccess {
       await redis.connect();
     }
     const response = await redis.exists(token);
-    // redis.disconnect();
+    // if(process.env.NODE_ENV == "production")redis.disconnect();
     return response;
   }
 }

@@ -5,4 +5,4 @@ LEFT JOIN pessoa p ON o.id_pessoa = p.id
 LEFT JOIN empresa e ON o.id_empresa = e.id
 LEFT JOIN pessoa p_e ON e.id_pessoa = p_e.id
 LEFT JOIN vendedor v ON o.id_vendedor = v.id
-LEFT JOIN pessoa v_p ON v.id_pessoa = v_p.id
+LEFT JOIN pessoa v_p ON v.id_pessoa = v_p.id;

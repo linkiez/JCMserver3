@@ -15,6 +15,7 @@ import pessoaRoutes from "./pessoaRoutes";
 import RIRRoutes from "./RIRRoutes";
 import vendedorRoutes from "./vendedorRoutes";
 import healthRoutes from "./healthRoutes";
+import emailRoutes from "./emailRoutes";
 
 export async function routes(app: Express) {
   app.use(
@@ -33,6 +34,7 @@ export async function routes(app: Express) {
     pessoaRoutes,
     RIRRoutes,
     vendedorRoutes,
-    healthRoutes
+    healthRoutes,
+    emailRoutes
   );
 }

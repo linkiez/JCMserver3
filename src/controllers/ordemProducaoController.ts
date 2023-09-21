@@ -28,7 +28,6 @@ export default class OrdemProducaoController {
         id_pessoa: req.query.id_pessoa,
         data_prazo: req.query.data_prazo,
       };
-      console.log(consulta);
 
       let resultado: { ordemProducao: OrdemProducao[]; totalRecords: Number } =
         {

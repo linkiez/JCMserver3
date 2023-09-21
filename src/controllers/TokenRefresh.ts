@@ -1,7 +1,6 @@
 import crypto from "crypto";
 import moment from "moment";
 import redis from "../config/connRedis";
-import { disconnect } from "process";
 
 export default class TokenRefresh {
   static async cria(id: any) {
@@ -17,7 +16,7 @@ export default class TokenRefresh {
     let id = await redis.get(token);
     await redis.del(token);
     const response = await this.cria(id);
-    // redis.disconnect();
+    // if(process.env.NODE_ENV == "production")redis.disconnect();
     return response;
   }
 
@@ -30,7 +29,7 @@ export default class TokenRefresh {
       token,
       moment().add(Number(process.env.REFRESH_TOKEN_EXPIRE_IN || 5), "d").unix()
     );
-    // redis.disconnect();
+    // if(process.env.NODE_ENV == "production")redis.disconnect();
   }
 
   static async apaga(token: string) {
@@ -38,7 +37,7 @@ export default class TokenRefresh {
       await redis.connect();
     }
     redis.del(token);
-    // redis.disconnect();
+    // if(process.env.NODE_ENV == "production")redis.disconnect();
   }
 
   static async existe(token: string) {
@@ -46,7 +45,7 @@ export default class TokenRefresh {
       await redis.connect();
     }
     const response = await redis.exists(token);
-    // redis.disconnect();
+    // if(process.env.NODE_ENV == "production")redis.disconnect();
     return response;
   }
 
@@ -55,7 +54,7 @@ export default class TokenRefresh {
       await redis.connect();
     }
     const response = await redis.get(token);
-    // redis.disconnect();
+    // if(process.env.NODE_ENV == "production")redis.disconnect();
     return response;
   }
 }
