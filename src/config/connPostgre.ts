@@ -8,7 +8,8 @@ var config: Options = {
   password: process.env.DATABASE_PASS,
   database: process.env.DATABASE_NAME,
   host: process.env.DATABASE_HOST,
-  dialect: "postgres"
+  dialect: "postgres",
+  minifyAliases:  true
 };
 
 if (process.env.NODE_ENV == "production") config.logging = false;

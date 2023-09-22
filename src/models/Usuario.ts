@@ -19,7 +19,7 @@ export default class Usuario extends Model {
     // define association here
     Usuario.belongsTo(Pessoa, { foreignKey: "id_pessoa" });
     Usuario.hasMany(OrdemProducaoHistorico, { foreignKey: "id_usuario" })
-    Usuario.hasMany(RNC, { foreignKey: "responsavel_analise_id" })
+    Usuario.hasMany(RNC, { foreignKey: "responsavel_analise_id",})
   }
 }
 Usuario.init(

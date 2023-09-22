@@ -22,6 +22,8 @@ export class RNCItem extends Model {
     RNCItem.belongsTo(OrdemProducaoItem, {
       foreignKey: "id_ordem_producao_item",
     });
+
+    RNCItem.belongsTo(Produto, { foreignKey: "id_produto" });
   }
 }
 RNCItem.init(
