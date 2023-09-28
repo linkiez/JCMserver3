@@ -271,7 +271,7 @@ export class TinyERP {
               codigo: item.produto.id_tiny,
               descricao: item.produto.nome,
               unidade: "KG",
-              quantidade: item.total_peso,
+              quantidade: item.peso,
               valor_unitario: item.total / item.total_peso,
             },
           };
