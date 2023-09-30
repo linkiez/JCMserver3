@@ -272,7 +272,7 @@ export class TinyERP {
               descricao: item.produto.nome,
               unidade: "KG",
               quantidade: item.peso,
-              valor_unitario: item.total / item.total_peso,
+              valor_unitario: item.total / item.peso,
             },
           };
         }),
