@@ -87,7 +87,12 @@ export default class RNCController {
               },
             ],
           },
-          { model: Usuario, as: "responsavel_analise", include: [Pessoa], attributes: { exclude: ["senha", "acesso"] }},
+          {
+            model: Usuario,
+            as: "responsavel_analise",
+            include: [Pessoa],
+            attributes: { exclude: ["senha", "acesso"] },
+          },
         ],
       });
       return res.status(200).json(rnc);
@@ -122,7 +127,21 @@ export default class RNCController {
 
       rnc = await RNC.findByPk(rnc.id, {
         include: [
-          { model: RNCItem, include: [Produto, OrdemProducaoItem] },
+          {
+            model: RNCItem,
+            include: [
+              Produto,
+              {
+                model: OrdemProducaoItem,
+                include: [
+                  {
+                    model: OrcamentoItem,
+                    include: [{ model: Orcamento, include: [Pessoa] }],
+                  },
+                ],
+              },
+            ],
+          },
           { model: Usuario, as: "responsavel_analise", include: [Pessoa] },
         ],
       });
@@ -153,7 +172,7 @@ export default class RNCController {
       });
 
       for (let rnc_item_old of rnc_items_old) {
-        if(!rnc_items.find((rnc_item: any) => rnc_item.id === rnc_item_old.id))
+        if (!rnc_items.find((rnc_item: any) => rnc_item.id === rnc_item_old.id))
           await RNCItem.destroy({
             where: { id: rnc_item_old.id },
             transaction,
@@ -179,7 +198,21 @@ export default class RNCController {
 
       rnc = await RNC.findByPk(id, {
         include: [
-          { model: RNCItem, include: [Produto, OrdemProducaoItem] },
+          {
+            model: RNCItem,
+            include: [
+              Produto,
+              {
+                model: OrdemProducaoItem,
+                include: [
+                  {
+                    model: OrcamentoItem,
+                    include: [{ model: Orcamento, include: [Pessoa] }],
+                  },
+                ],
+              },
+            ],
+          },
           { model: Usuario, as: "responsavel_analise", include: [Pessoa] },
         ],
       });
