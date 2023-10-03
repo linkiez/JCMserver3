@@ -10,6 +10,7 @@ import Vendedor from "../models/Vendedor";
 import { RNCItem } from "../models/RNCItem";
 import Produto from "../models/Produto";
 import OrcamentoItem from "../models/OrcamentoItem";
+import OrdemProducaoItemProcesso from "../models/OrdemProducaoItemProcesso";
 
 export default class RNCController {
   static async findAllRNC(req: Request, res: Response) {
@@ -83,6 +84,7 @@ export default class RNCController {
                     model: OrcamentoItem,
                     include: [{ model: Orcamento, include: [Pessoa] }],
                   },
+                  OrdemProducaoItemProcesso,
                 ],
               },
             ],
@@ -138,6 +140,7 @@ export default class RNCController {
                     model: OrcamentoItem,
                     include: [{ model: Orcamento, include: [Pessoa] }],
                   },
+                  OrdemProducaoItemProcesso
                 ],
               },
             ],
@@ -209,6 +212,7 @@ export default class RNCController {
                     model: OrcamentoItem,
                     include: [{ model: Orcamento, include: [Pessoa] }],
                   },
+                  OrdemProducaoItemProcesso
                 ],
               },
             ],
