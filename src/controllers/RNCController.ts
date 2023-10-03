@@ -136,14 +136,57 @@ export default class RNCController {
   }
 
   static async updateRNC(req: Request, res: Response) {
+    const transaction = await RNC.sequelize?.transaction();
     try {
       const id = req.params.id;
-      const [number, rnc] = await RNC.update(req.body, {
+      let rnc = req.body;
+      let rnc_items = rnc.rnc_items;
+
+      await RNC.update(req.body, {
         where: { id: id },
-        returning: true,
+        transaction,
       });
+
+      const rnc_items_old = await RNCItem.findAll({
+        where: { id_rnc: id },
+        transaction,
+      });
+
+      for (let rnc_item_old of rnc_items_old) {
+        if(!rnc_items.find((rnc_item: any) => rnc_item.id === rnc_item_old.id))
+          await RNCItem.destroy({
+            where: { id: rnc_item_old.id },
+            transaction,
+          });
+      }
+
+      for (let rnc_item of rnc_items) {
+        if (!rnc_item.id) {
+          rnc_item.id_rnc = rnc.id;
+          rnc_item.id_ordem_producao_item = rnc_item.ordem_producao_item.id;
+          rnc_item.id_produto = rnc_item.produto.id;
+
+          await RNCItem.create(rnc_item, { transaction });
+        } else {
+          await RNCItem.update(rnc_item, {
+            where: { id: rnc_item.id },
+            transaction,
+          });
+        }
+      }
+
+      transaction?.commit();
+
+      rnc = await RNC.findByPk(id, {
+        include: [
+          { model: RNCItem, include: [Produto, OrdemProducaoItem] },
+          { model: Usuario, as: "responsavel_analise", include: [Pessoa] },
+        ],
+      });
+
       return res.status(200).json(rnc);
     } catch (error: any) {
+      transaction?.rollback();
       console.error(error);
       return res.status(500).json(error.message);
     }
