@@ -36,18 +36,27 @@ export default class RNCController {
 
       const include = [
         {
-          model: OrdemProducaoItem,
+          model: RNCItem,
           include: [
+            Produto,
             {
-              model: OrdemProducao,
+              model: OrdemProducaoItem,
               include: [
-                { model: Orcamento, include: [Pessoa] },
-                { model: Vendedor, include: [Pessoa] },
+                {
+                  model: OrcamentoItem,
+                  include: [{ model: Orcamento, include: [Pessoa] }],
+                },
+                OrdemProducaoItemProcesso,
               ],
             },
           ],
         },
-        { model: Usuario, include: [Pessoa] },
+        {
+          model: Usuario,
+          as: "responsavel_analise",
+          include: [Pessoa],
+          attributes: { exclude: ["senha", "acesso"] },
+        },
       ];
 
       resultados.rncs = await RNC.findAll({
@@ -55,6 +64,7 @@ export default class RNCController {
         limit: consulta.pageCount,
         offset: consulta.page * consulta.pageCount,
         where,
+        order: [["id", "DESC"]],
       });
 
       resultados.totalRecords = await RNC.count({

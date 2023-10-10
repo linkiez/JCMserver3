@@ -43,6 +43,7 @@ export default class RNC extends Model {
   declare reclamacao_cliente: boolean;
   declare ordem_producao_item: OrdemProducaoItem[];
   declare rnc_item: RNCItem[];
+  declare custo: number;
 
   static associate() {
     RNC.belongsTo(Usuario, {
@@ -125,6 +126,11 @@ RNC.init(
     risco: {
       type: DataTypes.TEXT,
       allowNull: true,
+    },
+    custo: {
+      type: DataTypes.DECIMAL(13, 2),
+      defaultValue: 0,
+      allowNull: true
     }
   },
   {
