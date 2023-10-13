@@ -28,6 +28,8 @@ import Usuario from './Usuario';
 import VendaTiny from './VendaTiny';
 import Vendedor from './Vendedor';
 import Vendedor_Empresa from './Vendedor_Empresa';
+import RNC from './RNC';
+import { RNCItem } from './RNCItem';
 
 export function models() {
   Contato.associate();
@@ -60,4 +62,6 @@ export function models() {
   VendaTiny.associate();
   Vendedor.associate();
   Vendedor_Empresa.associate();
+  RNC.associate();
+  RNCItem.associate();
 }

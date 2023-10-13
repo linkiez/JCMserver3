@@ -16,10 +16,12 @@ import {
 } from "sequelize";
 import Usuario from "./Usuario";
 import OrdemProducaoItem from "./OrdemProducaoItem";
+import { RNCItem } from "./RNCItem";
 
 export default class RNC extends Model {
   declare id: number;
   declare status: string;
+  declare classificacao: string;
   declare createdAt: Date;
   declare updatedAt: Date;
   declare deletedAt: Date;
@@ -40,13 +42,19 @@ export default class RNC extends Model {
   declare responsavel_analise_id: number;
   declare reclamacao_cliente: boolean;
   declare ordem_producao_item: OrdemProducaoItem[];
+  declare rnc_item: RNCItem[];
+  declare custo: number;
 
   static associate() {
     RNC.belongsTo(Usuario, {
       foreignKey: "responsavel_analise_id",
       as: "responsavel_analise",
     });
-    RNC.hasMany(OrdemProducaoItem, { foreignKey: "id_rnc" });
+
+    RNC.hasMany(RNCItem, {
+      foreignKey: "id_rnc",
+      onDelete: "cascade",
+    });
   }
 }
 RNC.init(
@@ -64,6 +72,9 @@ RNC.init(
     data_fechamento: {
       type: DataTypes.DATE,
       allowNull: true,
+    },
+    classificacao: {
+      type: DataTypes.STRING,
     },
     descricao: {
       type: DataTypes.TEXT,
@@ -83,6 +94,10 @@ RNC.init(
       ),
       allowNull: false,
     },
+    acao_contencao: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
     acao_corretiva: {
       type: DataTypes.TEXT,
       allowNull: false,
@@ -91,14 +106,32 @@ RNC.init(
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    acao_imediata: {
+    eficacia: {
+      type: DataTypes.ENUM("Sim", "Não"),
+      allowNull: true,
+    },
+    eficacia_motivo: {
       type: DataTypes.TEXT,
-      allowNull: false,
+      allowNull: true,
     },
-    reclamacao_cliente: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
+    eficacia_descricao: {
+      type: DataTypes.TEXT,
+      allowNull: true,
     },
+    
+    eficacia_observacao: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    risco: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    custo: {
+      type: DataTypes.DECIMAL(13, 2),
+      defaultValue: 0,
+      allowNull: true
+    }
   },
   {
     sequelize,
@@ -116,3 +149,5 @@ RNC.init(
     },
   }
 );
+
+

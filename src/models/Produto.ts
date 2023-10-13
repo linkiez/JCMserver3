@@ -4,6 +4,7 @@ import PedidoCompraItem from "./PedidoCompraItem";
 import RegistroInspecaoRecebimento from "./RIR";
 import OrdemProducaoItem from "./OrdemProducaoItem";
 import FileDb from "./File";
+import { RNCItem } from "./RNCItem";
 
 export default class Produto extends Model {
   declare id: number;
@@ -24,6 +25,7 @@ export default class Produto extends Model {
     Produto.hasMany(PedidoCompraItem, { foreignKey: "id_produto" });
     Produto.hasMany(RegistroInspecaoRecebimento, { foreignKey: "id_produto" });
     Produto.hasMany(OrdemProducaoItem, { foreignKey: "id_produto" });
+    Produto.hasMany(RNCItem, { foreignKey: "id_produto" })
     Produto.belongsToMany(FileDb, { through: "produto_file" });
   }
 }
