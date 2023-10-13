@@ -193,7 +193,19 @@ export default class PessoaController {
       Promise.all(ArrayPromises).then(async () => {
         await transaction.commit();
         let pessoaCreated2 = await Pessoa.findByPk(pessoaCreated.id, {
-          include: [Contato, FileDb, Fornecedor, Vendedor, Operador, Empresa],
+          include: [
+            Contato,
+            FileDb,
+            { model: Fornecedor, paranoid: false },
+            { model: Vendedor, paranoid: false },
+            { model: Operador, paranoid: false },
+            {
+              model: Empresa,
+              include: [FileDb],
+              attributes: { exclude: ["id_file"] },
+              paranoid: false,
+            },
+          ],
         });
 
         return res.status(201).json(pessoaCreated2);
@@ -333,7 +345,19 @@ export default class PessoaController {
           await transaction.commit();
           const pessoaUpdated = await Pessoa.findOne({
             where: { id: Number(id) },
-            include: [Contato, FileDb, Fornecedor, Vendedor, Operador, Empresa],
+            include: [
+              Contato,
+              FileDb,
+              { model: Fornecedor, paranoid: false },
+              { model: Vendedor, paranoid: false },
+              { model: Operador, paranoid: false },
+              {
+                model: Empresa,
+                include: [FileDb],
+                attributes: { exclude: ["id_file"] },
+                paranoid: false,
+              },
+            ],
           });
 
           return res.status(202).json(pessoaUpdated);
