@@ -59,7 +59,7 @@ export default class PessoaController {
 
       return res.status(200).json(resultado);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -72,19 +72,20 @@ export default class PessoaController {
         include: [
           Contato,
           FileDb,
-          Fornecedor,
-          Vendedor,
-          Operador,
+          { model: Fornecedor, paranoid: false },
+          { model: Vendedor, paranoid: false },
+          { model: Operador, paranoid: false },
           {
             model: Empresa,
             include: [FileDb],
             attributes: { exclude: ["id_file"] },
+            paranoid: false,
           },
         ],
       });
       return res.status(200).json(pessoa);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -97,14 +98,14 @@ export default class PessoaController {
       });
       return res.status(200).json(pessoa);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
 
   static async createPessoa(req: Request, res: Response) {
     let pessoa = req.body;
-    console.log(pessoa)
+    console.log(pessoa);
     let contatos: Array<Contato> = pessoa.contatos;
     delete pessoa.contatos;
     let files: Array<FileDb> = pessoa.files;
@@ -199,7 +200,7 @@ export default class PessoaController {
       });
     } catch (error: any) {
       await transaction.rollback();
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -340,7 +341,7 @@ export default class PessoaController {
       });
     } catch (error: any) {
       await transaction.rollback();
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -351,7 +352,7 @@ export default class PessoaController {
       await Pessoa.destroy({ where: { id: Number(id) } });
       return res.status(202).json("Pessoa apagada");
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -363,7 +364,7 @@ export default class PessoaController {
       const pessoaUpdated = await Pessoa.findOne({ where: { id: Number(id) } });
       return res.status(202).json(pessoaUpdated);
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
@@ -383,7 +384,7 @@ export default class PessoaController {
         return res.status(200).send(true);
       }
     } catch (error: any) {
-      console.log("Resquest: ", req.body, "Erro: ", error)
+      console.log("Resquest: ", req.body, "Erro: ", error);
       return res.status(500).json(error.message);
     }
   }
