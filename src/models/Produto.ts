@@ -33,7 +33,7 @@ Produto.init(
   {
     id: {
       allowNull: false,
-      autoIncrement: true,
+      autoIncrement: false,
       primaryKey: true,
       type: DataTypes.BIGINT,
     },

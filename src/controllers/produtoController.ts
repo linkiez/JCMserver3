@@ -160,6 +160,10 @@ export default class ProdutosController {
 
       let fila: Promise<any>[] = [];
 
+      if (!produto.id)
+      produto.id =
+          ((await Produto.max("id", { paranoid: false })) as number) + 1;
+
       const produtoCreated = await Produto.create(produto, {
         transaction: transaction,
       });
