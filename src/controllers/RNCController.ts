@@ -174,6 +174,8 @@ export default class RNCController {
       let rnc = req.body;
       let rnc_items = rnc.rnc_items;
 
+      rnc.responsavel_analise_id = rnc.responsavel_analise.id;
+
       await RNC.update(req.body, {
         where: { id: id },
         transaction,
