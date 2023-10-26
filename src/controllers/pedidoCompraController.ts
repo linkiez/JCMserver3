@@ -453,6 +453,7 @@ export default class PedidoCompraController {
               paranoid: false,
             },
             { model: PedidoCompraItem, include: [Produto] },
+            File
           ],
         });
 
