@@ -356,6 +356,7 @@ export default class OrdemProducaoController {
               await OrdemProducaoItem.destroy({
                 where: { id: item.id },
                 transaction: transaction,
+                force: true,
               });
             }
           })

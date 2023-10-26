@@ -410,6 +410,7 @@ export default class PedidoCompraController {
               PedidoCompraItem.destroy({
                 where: { id: ItemToFind.id },
                 transaction: transaction,
+                force: true,
               })
             );
           }

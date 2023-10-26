@@ -139,6 +139,7 @@ export default class ListaGenericaController {
           ListaGenericaItem.destroy({
             where: { id: item.id },
             transaction: transaction,
+            force: true,
           })
         );
       });

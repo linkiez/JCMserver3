@@ -361,6 +361,7 @@ export default class OrcamentoController {
           await OrcamentoItem.destroy({
             where: { id: orcamentoItemOld.id },
             transaction: transaction,
+            force: true,
           });
         }
       }
