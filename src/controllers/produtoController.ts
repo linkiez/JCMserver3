@@ -106,7 +106,7 @@ export default class ProdutosController {
                 // [Sequelize.fn('max', Sequelize.col('pedido_compra_item.updatedAt')), 'atualizado']
               ],
             },
-            order: [["id", "DESC"]],
+            order: [["id_pedido", "DESC"]],
             limit: 10,
             separate: true,
             include: [
