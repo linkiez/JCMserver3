@@ -10,7 +10,7 @@ import cluster from "cluster";
 import os from "os";
 import http from "http";
 import compression from "compression";
-
+import { CorsOptions } from 'cors';
 import AirBrake from "@airbrake/node";
 import AirBrakeExpress from "@airbrake/node/dist/instrumentation/express.js";
 
@@ -19,16 +19,21 @@ const airbrake = new AirBrake.Notifier({
   projectKey: "00d8815db560752be9d60a4e724f5008",
 });
 
-const numCPUs = os.cpus().length;
-
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 // const PORT_SSL = process.env.PORT_SSL || 3001;
 const app: Express = express();
 
-const corsOptions = {
-  origin: process.env.ALLOWED_ORIGINS,
+const corsOptions: CorsOptions = {
+  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',');
+    if (!origin || (allowedOrigins && allowedOrigins.indexOf(origin) !== -1)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
 };
 
 app.use(cors(corsOptions));
@@ -75,7 +80,8 @@ if (cluster.isPrimary) {
     });
 
   // Fork workers.
-  const WORKERS = +(process.env.WEB_CONCURRENCY??1);
+  const WORKERS = Number(process.env.WEB_CONCURRENCY) || os.cpus().length;
+
   for (let i = 0; i < WORKERS; i++) {
     cluster.fork();
   }
