@@ -13,6 +13,7 @@ import compression from "compression";
 import { CorsOptions } from 'cors';
 import AirBrake from "@airbrake/node";
 import AirBrakeExpress from "@airbrake/node/dist/instrumentation/express.js";
+import { dropViews, upViews } from "./config/syncViews.js";
 
 const airbrake = new AirBrake.Notifier({
   projectId: 518064,
@@ -68,7 +69,9 @@ httpServer.headersTimeout = 60 * 1000 + 2000;
 // For Master process
 if (cluster.isPrimary) {
   console.log(`Master ${process.pid} is running`);
-  sequelize
+  await dropViews(sequelize);
+
+  await sequelize
     .sync({
       alter: JSON.parse(process.env.SEQUELIZE_ALTER ?? "false"),
       force: JSON.parse(process.env.SEQUELIZE_FORCE ?? "false"),
@@ -79,6 +82,7 @@ if (cluster.isPrimary) {
       }
     });
 
+    await upViews(sequelize);
   // Fork workers.
   const WORKERS = Number(process.env.WEB_CONCURRENCY) || os.cpus().length;
 
