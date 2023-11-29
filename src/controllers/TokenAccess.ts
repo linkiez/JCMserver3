@@ -37,9 +37,14 @@ export default class TokenAccess {
     if (!redis.isOpen) {
       await redis.connect();
     }
-    await redis.set(token, "");
-    redis.expire(token, Number(process.env.ACCESS_TOKEN_EXPIRE_IN || 900));
-    // if(process.env.NODE_ENV == "production")redis.disconnect();
+    await redis.set(token, "").catch((error) => {
+      console.error("Erro ao salvar access token no redis: ", error, " token: ", token);
+      throw new Error("Erro ao salvar access token no redis");
+    });
+    redis.expire(token, Number(process.env.ACCESS_TOKEN_EXPIRE_IN || 900)).catch((error) => {
+      console.error("Erro ao setar expiração do access token no redis: ", error, " token: ", token);
+      throw new Error("Erro ao setar expiração do token no redis");
+    });
   }
 
   static async existe(token: string) {
@@ -47,7 +52,6 @@ export default class TokenAccess {
       await redis.connect();
     }
     const response = await redis.exists(token);
-    // if(process.env.NODE_ENV == "production")redis.disconnect();
     return response;
   }
 }

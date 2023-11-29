@@ -23,13 +23,20 @@ export default class TokenRefresh {
   static async salva(token: any, id: number) {
     if (!redis.isOpen) {
       await redis.connect();
-    } 
-    await redis.set(token, id);
+    }
+    await redis.set(token, id).catch((error) => {
+      console.error("Erro ao salvar refresh token no redis: ", error, " token: ", token, " id: ", id);
+      throw new Error("Erro ao salvar refresh token no redis");
+    });
     redis.expireAt(
       token,
-      moment().add(Number(process.env.REFRESH_TOKEN_EXPIRE_IN || 5), "d").unix()
-    );
-    // if(process.env.NODE_ENV == "production")redis.disconnect();
+      moment()
+        .add(Number(process.env.REFRESH_TOKEN_EXPIRE_IN || 5), "d")
+        .unix()
+    ).catch((error) => {
+      console.error("Erro ao setar expiração do refresh token no redis: ", error, " token: ", token, " id: ", id);
+      throw new Error("Erro ao setar expiração do refresh token no redis");
+    });
   }
 
   static async apaga(token: string) {
@@ -37,7 +44,6 @@ export default class TokenRefresh {
       await redis.connect();
     }
     redis.del(token);
-    // if(process.env.NODE_ENV == "production")redis.disconnect();
   }
 
   static async existe(token: string) {
@@ -45,7 +51,6 @@ export default class TokenRefresh {
       await redis.connect();
     }
     const response = await redis.exists(token);
-    // if(process.env.NODE_ENV == "production")redis.disconnect();
     return response;
   }
 
@@ -54,7 +59,6 @@ export default class TokenRefresh {
       await redis.connect();
     }
     const response = await redis.get(token);
-    // if(process.env.NODE_ENV == "production")redis.disconnect();
     return response;
   }
 }
