@@ -168,7 +168,7 @@ export default class OrdemProducaoController {
               RegistroInspecaoRecebimento,
               {
                 model: OrcamentoItem,
-                include: [{ model: Orcamento, include: [Pessoa] }],
+                // include: [{ model: Orcamento, include: [Pessoa] }],
               },
             ],
             attributes: { exclude: [ "id_produto"] },
