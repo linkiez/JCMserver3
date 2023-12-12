@@ -17,6 +17,7 @@ export default class Produto extends Model {
   declare deletedAt: Date;
   declare files: Array<FileDb>;
   declare id_tiny: string;
+  declare preco: number;
 
   declare setFiles: HasManySetAssociationsMixin<File, number>;
 
@@ -43,6 +44,7 @@ Produto.init(
     peso: DataTypes.FLOAT,
     deletedAt: DataTypes.DATE,
     id_tiny: DataTypes.STRING,
+    preco: DataTypes.FLOAT,
   },
   {
     sequelize,
