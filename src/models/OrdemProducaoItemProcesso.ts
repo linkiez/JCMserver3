@@ -9,6 +9,7 @@ export default class OrdemProducaoItemProcesso extends Model {
   declare operador: Operador;
   declare id_operador: number;
   declare fabricado: Date;
+  declare id_ordem_producao_item?: number;
 
   static associate() {
     OrdemProducaoItemProcesso.belongsTo(Operador, {

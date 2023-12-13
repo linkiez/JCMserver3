@@ -15,6 +15,7 @@ import Usuario from "../models/Usuario";
 import OrcamentoItem from "../models/OrcamentoItem";
 import OrdemProducaoItem_File from "../models/OrdemProducaoItem_File";
 import RegistroInspecaoRecebimento from "../models/RIR";
+import { off } from "process";
 
 export default class OrdemProducaoController {
   static async findAllOrdemProducao(req: Request, res: Response) {
@@ -142,8 +143,7 @@ export default class OrdemProducaoController {
   static async findOneOrdemProducao(req: Request, res: Response) {
     const { id } = req.params;
     try {
-      let ordemProducao = await findOrdemProducaoById(Number(id))
-      
+      let ordemProducao = await findOrdemProducaoById(Number(id));
 
       return res.status(201).json(ordemProducao);
     } catch (error: any) {
@@ -155,10 +155,11 @@ export default class OrdemProducaoController {
   static async createOrdemProducao(req: Request, res: Response) {
     const transaction = await sequelize.transaction();
     try {
-      let ordemProducao = req.body;
-      let ordemProducaoItens: any = ordemProducao.ordem_producao_items;
-      delete ordemProducao.ordem_producao_items;
+      let ordemProducao: OrdemProducao = req.body;
+      let ordemProducaoItens: OrdemProducaoItem[] = [];
 
+      if (ordemProducao.ordem_producao_items)
+        ordemProducaoItens = ordemProducao.ordem_producao_items;
       if (ordemProducao.orcamento)
         ordemProducao.id_orcamento = ordemProducao.orcamento.id;
       if (ordemProducao.vendedor)
@@ -166,14 +167,15 @@ export default class OrdemProducaoController {
 
       delete ordemProducao.orcamento;
       delete ordemProducao.vendedor;
+      delete ordemProducao.ordem_producao_items;
 
       let ordemProducaoCreated: OrdemProducao = await OrdemProducao.create(
-        ordemProducao,
+        ordemProducao as any,
         { transaction: transaction }
       );
 
-      ordemProducaoItens = ordemProducaoItens.map(
-        async (ordemProducaoItem: any) => {
+      if (ordemProducaoItens.length > 0)
+        for (let ordemProducaoItem of ordemProducaoItens) {
           let files = ordemProducaoItem.files;
           delete ordemProducaoItem.files;
 
@@ -194,7 +196,7 @@ export default class OrdemProducaoController {
           delete ordemProducaoItem.ordem_producao_item_processos;
 
           let ordemProducaoItemCreated = await OrdemProducaoItem.create(
-            ordemProducaoItem,
+            ordemProducaoItem as any,
             { transaction: transaction }
           );
 
@@ -205,66 +207,24 @@ export default class OrdemProducaoController {
             );
           }
 
-          OrdemProducaoItemProcessos = OrdemProducaoItemProcessos.map(
-            async (ordemProducaoItemProcesso: any) => {
+          if (OrdemProducaoItemProcessos)
+            for (let ordemProducaoItemProcesso of OrdemProducaoItemProcessos) {
               ordemProducaoItemProcesso.id_ordem_producao_item =
                 ordemProducaoItemCreated.id;
 
-              let OrdemProducaoItemProcessoCreated =
-                await OrdemProducaoItemProcesso.create(
-                  ordemProducaoItemProcesso,
+              await OrdemProducaoItemProcesso.create(
+                  ordemProducaoItemProcesso as any,
                   { transaction: transaction }
                 );
-
-              return OrdemProducaoItemProcessoCreated;
             }
-          );
-
-          return ordemProducaoItemCreated;
         }
-      );
 
-      Promise.all(ordemProducaoItens).then(async () => {
-        let ordemProducaoCreated2 = await OrdemProducao.findByPk(
-          ordemProducaoCreated.id
-        );
+      await transaction.commit();
 
-        await transaction.commit();
-
-        ordemProducaoCreated2 = await OrdemProducao.findByPk(
-          ordemProducaoCreated.id,
-          {
-            include: [
-              {
-                model: Vendedor,
-                include: [{ model: Pessoa, paranoid: false }],
-                attributes: { exclude: ["id_pessoa"] },
-                paranoid: false,
-              },
-              {
-                model: Orcamento,
-                include: [{ model: Pessoa, paranoid: false }],
-                attributes: { exclude: ["id_pessoa"] },
-                paranoid: false,
-              },
-              {
-                model: OrdemProducaoItem,
-                include: [
-                  FileDb,
-                  {
-                    model: OrdemProducaoItemProcesso,
-                    attributes: { exclude: ["id_ordem_producao_item"] },
-                  },
-                  { model: Produto, paranoid: false },
-                ],
-                attributes: { exclude: ["id_ordem_producao", "id_produto"] },
-              },
-            ],
-            attributes: { exclude: ["id_vendedor", "id_orcamento"] },
-          }
-        );
-        return res.status(201).json(ordemProducaoCreated2);
-      });
+      ordemProducaoCreated =
+        (await findOrdemProducaoById(Number(ordemProducaoCreated.id))) ??
+        ordemProducaoCreated;
+      return res.status(201).json(ordemProducaoCreated);
     } catch (error: any) {
       await transaction.rollback;
       console.log("Resquest: ", req.body, "Erro: ", error);
@@ -276,22 +236,20 @@ export default class OrdemProducaoController {
     const transaction = await sequelize.transaction();
     try {
       const { id } = req.params;
-      let ordemProducao = req.body;
+      let ordemProducao: OrdemProducao = req.body;
 
       if (ordemProducao.orcamento)
         ordemProducao.id_orcamento = ordemProducao.orcamento.id;
+      delete ordemProducao.orcamento;
+
       if (ordemProducao.vendedor)
         ordemProducao.id_vendedor = ordemProducao.vendedor.id;
+      delete ordemProducao.vendedor;
 
       let ordemProducaoHistoricos = ordemProducao.ordem_producao_historicos;
       delete ordemProducao.ordem_producao_historicos;
       let ordemProducaoItens = ordemProducao.ordem_producao_items;
       delete ordemProducao.ordem_producao_items;
-
-      let updatePromises: Promise<any>[] = [];
-
-      delete ordemProducao.orcamento;
-      delete ordemProducao.vendedor;
 
       await OrdemProducao.update(ordemProducao, {
         where: { id: Number(id) },
@@ -302,130 +260,116 @@ export default class OrdemProducaoController {
         where: { id_ordem_producao: Number(id) },
       });
 
-      if (ordemProducaoItens)
-        updatePromises = updatePromises.concat(
-          oldItens.map(async (item) => {
-            let search = ordemProducaoItens.find(
-              (item: OrdemProducaoItem) => item.id == item.id
+      if (ordemProducaoItens) {
+        for (let item of oldItens) {
+          let search = ordemProducaoItens.find(
+            (item: OrdemProducaoItem) => item.id == item.id
+          );
+          if (!search) {
+            await OrdemProducaoItem.destroy({
+              where: { id: item.id },
+              transaction: transaction,
+              force: true,
+            });
+          }
+        }
+
+        for (let ordemProducaoItem of ordemProducaoItens) {
+          let files = ordemProducaoItem.files;
+          delete ordemProducaoItem.files;
+
+          if (ordemProducaoItem.produto) {
+            ordemProducaoItem.id_produto = ordemProducaoItem.produto.id;
+            delete ordemProducaoItem.produto;
+          }
+
+          if (ordemProducaoItem.registro_inspecao_recebimento) {
+            ordemProducaoItem.id_rir =
+              ordemProducaoItem.registro_inspecao_recebimento.id;
+            delete ordemProducaoItem.registro_inspecao_recebimento;
+          }
+
+          ordemProducaoItem.id_ordem_producao = Number(id);
+
+          let ordemProducaoItemProcessos: OrdemProducaoItemProcesso[] = [];
+          if (ordemProducaoItem.ordem_producao_item_processos) {
+            ordemProducaoItemProcessos =
+              ordemProducaoItem.ordem_producao_item_processos;
+            delete ordemProducaoItem.ordem_producao_item_processos;
+          }
+
+          if (ordemProducaoItem.id) {
+            await OrdemProducaoItem.update(ordemProducaoItem, {
+              where: { id: ordemProducaoItem.id },
+              transaction: transaction,
+            });
+          } else {
+            ordemProducaoItem = await OrdemProducaoItem.create(
+              ordemProducaoItem as any,
+              { transaction: transaction }
             );
-            if (!search) {
-              await OrdemProducaoItem.destroy({
-                where: { id: item.id },
-                transaction: transaction,
-                force: true,
-              });
-            }
-          })
-        );
+          }
 
-      if (ordemProducaoItens)
-        updatePromises = updatePromises.concat(
-          ordemProducaoItens.map(
-            async (ordemProducaoItem: OrdemProducaoItem) => {
-              let files = ordemProducaoItem.files;
-              delete ordemProducaoItem.files;
+          if (files) {
+            const oldFiles = await OrdemProducaoItem_File.findAll({
+              where: { ordemProducaoItemId: ordemProducaoItem.id },
+            });
 
-              if (ordemProducaoItem.produto) {
-                ordemProducaoItem.id_produto = ordemProducaoItem.produto.id;
-                delete ordemProducaoItem.produto;
-              }
-
-              if (ordemProducaoItem.registro_inspecao_recebimento) {
-                ordemProducaoItem.id_rir =
-                  ordemProducaoItem.registro_inspecao_recebimento.id;
-                delete ordemProducaoItem.registro_inspecao_recebimento;
-              }
-
-              ordemProducaoItem.id_ordem_producao = Number(id);
-
-              let ordemProducaoItemProcessos:
-                | OrdemProducaoItemProcesso[]
-                | Promise<any>[] = [];
-              if (ordemProducaoItem.ordem_producao_item_processos) {
-                ordemProducaoItemProcessos =
-                  ordemProducaoItem.ordem_producao_item_processos;
-                delete ordemProducaoItem.ordem_producao_item_processos;
-              }
-
-              if (ordemProducaoItem.id) {
-                await OrdemProducaoItem.update(ordemProducaoItem, {
-                  where: { id: ordemProducaoItem.id },
+            for (let oldFile of oldFiles) {
+              let search = files.find((file: any) => file.id == oldFile.fileId);
+              if (!search) {
+                await OrdemProducaoItem_File.destroy({
+                  where: { id: oldFile.fileId },
                   transaction: transaction,
                 });
-              } else {
-                ordemProducaoItem = await OrdemProducaoItem.create(
-                  ordemProducaoItem as any,
+              }
+            }
+
+            for (let file of files) {
+              let search = oldFiles.find(
+                (oldFile: any) => oldFile.fileId == file.id
+              );
+              if (!search) {
+                await OrdemProducaoItem_File.create(
+                  {
+                    ordemProducaoItemId: ordemProducaoItem.id,
+                    fileId: file.id,
+                  },
                   { transaction: transaction }
                 );
               }
+            }
+          }
 
-              if (files) {
-                const oldFiles = await OrdemProducaoItem_File.findAll({
-                  where: { ordemProducaoItemId: ordemProducaoItem.id },
-                });
+          for (let ordemProducaoItemProcesso of ordemProducaoItemProcessos) {
+            ordemProducaoItemProcesso.id_ordem_producao_item =
+              ordemProducaoItem.id;
 
-                for (let oldFile of oldFiles) {
-                  let search = files.find(
-                    (file: any) => file.id == oldFile.fileId
-                  );
-                  if (!search) {
-                    await OrdemProducaoItem_File.destroy({
-                      where: { id: oldFile.fileId },
-                      // transaction: transaction,
-                    });
-                  }
-                }
-
-                for (let file of files) {
-                  let search = oldFiles.find(
-                    (oldFile: any) => oldFile.fileId == file.id
-                  );
-                  if (!search) {
-                    await OrdemProducaoItem_File.create(
-                      {
-                        ordemProducaoItemId: ordemProducaoItem.id,
-                        fileId: file.id,
-                      }
-                      // { transaction: transaction }
-                    );
-                  }
-                }
-              }
-
-              ordemProducaoItemProcessos = ordemProducaoItemProcessos.map(
-                async (ordemProducaoItemProcesso: any) => {
-                  ordemProducaoItemProcesso.id_ordem_producao_item =
-                    ordemProducaoItem.id;
-
-                  if (ordemProducaoItemProcesso.id) {
-                    await OrdemProducaoItemProcesso.update(
-                      ordemProducaoItemProcesso,
-                      {
-                        where: { id: ordemProducaoItemProcesso.id },
-                        // transaction: transaction,
-                      }
-                    );
-                  } else {
-                    ordemProducaoItemProcesso =
-                      await OrdemProducaoItemProcesso.create(
-                        ordemProducaoItemProcesso
-                        // { transaction: transaction }
-                      );
-                    return ordemProducaoItemProcesso;
-                  }
+            if (ordemProducaoItemProcesso.id) {
+              await OrdemProducaoItemProcesso.update(
+                ordemProducaoItemProcesso,
+                {
+                  where: { id: ordemProducaoItemProcesso.id },
+                  transaction: transaction,
                 }
               );
-              return ordemProducaoItem;
+            } else {
+              ordemProducaoItemProcesso =
+                await OrdemProducaoItemProcesso.create(
+                  ordemProducaoItemProcesso as any,
+                  { transaction: transaction }
+                );
             }
-          )
-        );
+          }
+        }
+      }
 
-      let oldHistoricos = await OrdemProducaoHistorico.findAll({
-        where: { id_ordem_producao: Number(id) },
-      });
+      if (ordemProducaoHistoricos) {
+        let oldHistoricos = await OrdemProducaoHistorico.findAll({
+          where: { id_ordem_producao: Number(id) },
+        });
 
-      updatePromises = updatePromises.concat(
-        oldHistoricos.map(async (historico) => {
+        for (let historico of oldHistoricos) {
           let search = ordemProducaoHistoricos.find(
             (item: OrdemProducaoHistorico) => item.id == historico.id
           );
@@ -435,33 +379,34 @@ export default class OrdemProducaoController {
               transaction: transaction,
             });
           }
-        })
-      );
+        }
 
-      updatePromises = updatePromises.concat(
-        ordemProducaoHistoricos.map(async (ordemProducaoHistorico: any) => {
+        for (let ordemProducaoHistorico of ordemProducaoHistoricos) {
           ordemProducaoHistorico.id_ordem_producao = Number(id);
-          ordemProducaoHistorico.id_usuario = ordemProducaoHistorico.usuario.id;
-          delete ordemProducaoHistorico.usuario;
+
+          if (ordemProducaoHistorico.usuario?.id) {
+            ordemProducaoHistorico.id_usuario =
+              ordemProducaoHistorico.usuario.id;
+            delete ordemProducaoHistorico.usuario;
+          }
+
           if (ordemProducaoHistorico.id) {
             await OrdemProducaoHistorico.update(ordemProducaoHistorico, {
               where: { id: ordemProducaoHistorico.id },
               transaction: transaction,
             });
           } else {
-            await OrdemProducaoHistorico.create(ordemProducaoHistorico, {
+            await OrdemProducaoHistorico.create(ordemProducaoHistorico as any, {
               transaction: transaction,
             });
           }
-        })
-      );
+        }
+      }
 
-      Promise.all(updatePromises).then(async () => {
-        await transaction.commit();
+      await transaction.commit();
 
-        let ordemProducaoUpdated = await findOrdemProducaoById(Number(id));
-        return res.status(202).json(ordemProducaoUpdated);
-      });
+      let ordemProducaoUpdated = await findOrdemProducaoById(Number(id));
+      return res.status(202).json(ordemProducaoUpdated);
     } catch (error: any) {
       transaction.rollback();
       console.log("Resquest: ", req.body, "Erro: ", error);

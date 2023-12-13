@@ -8,9 +8,9 @@ import OrdemProducaoHistorico from "./OrdemProducaoHistorico";
 
 export default class OrdemProducao extends Model {
   declare id: number;
-  declare orcamento: Orcamento;
+  declare orcamento?: Orcamento;
   declare id_orcamento: number;
-  declare vendedor: Vendedor;
+  declare vendedor?: Vendedor;
   declare id_vendedor: number;
   declare data_prazo: Date;
   declare data_finalizacao: Date;
@@ -20,6 +20,8 @@ export default class OrdemProducao extends Model {
   declare deletedAt: Date;
   declare updatedAt: Date;
   declare createdAt: Date;
+  declare ordem_producao_items?: OrdemProducaoItem[];
+  declare ordem_producao_historicos?: OrdemProducaoHistorico[];
 
   static associate() {
     OrdemProducao.belongsTo(Orcamento, { foreignKey: "id_orcamento" });
