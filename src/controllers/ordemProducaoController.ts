@@ -213,9 +213,9 @@ export default class OrdemProducaoController {
                 ordemProducaoItemCreated.id;
 
               await OrdemProducaoItemProcesso.create(
-                  ordemProducaoItemProcesso as any,
-                  { transaction: transaction }
-                );
+                ordemProducaoItemProcesso as any,
+                { transaction: transaction }
+              );
             }
         }
 
@@ -469,7 +469,13 @@ async function findOrdemProducaoById(
           RegistroInspecaoRecebimento,
           {
             model: OrcamentoItem,
-            // include: [{ model: Orcamento, include: [Pessoa] }],
+            include: [
+              {
+                model: Orcamento,
+                include: [{ model: Pessoa, attributes: ["nome"] }],
+                attributes: ["id"],
+              },
+            ],
           },
         ],
         attributes: { exclude: ["id_produto"] },
