@@ -142,52 +142,8 @@ export default class OrdemProducaoController {
   static async findOneOrdemProducao(req: Request, res: Response) {
     const { id } = req.params;
     try {
-      let ordemProducao = await OrdemProducao.findByPk(id, {
-        include: [
-          {
-            model: Vendedor,
-            include: [{ model: Pessoa, paranoid: false }],
-            attributes: { exclude: ["id_pessoa"] },
-            paranoid: false,
-          },
-          {
-            model: Orcamento,
-            include: [{ model: Pessoa, paranoid: false }, OrcamentoItem],
-            attributes: { exclude: ["id_pessoa"] },
-            paranoid: false,
-          },
-          {
-            model: OrdemProducaoItem,
-            include: [
-              FileDb,
-              {
-                model: OrdemProducaoItemProcesso,
-                attributes: { exclude: ["id_ordem_producao_item"] },
-              },
-              { model: Produto, paranoid: false },
-              RegistroInspecaoRecebimento,
-              {
-                model: OrcamentoItem,
-                // include: [{ model: Orcamento, include: [Pessoa] }],
-              },
-            ],
-            attributes: { exclude: [ "id_produto"] },
-          },
-          {
-            model: OrdemProducaoHistorico,
-            include: [
-              {
-                model: Usuario,
-                include: [{ model: Pessoa, paranoid: false }],
-                attributes: { exclude: ["id_pessoa"] },
-                paranoid: false,
-              },
-            ],
-            attributes: { exclude: ["id_ordem_producao", "id_usuario"] },
-          },
-        ],
-        attributes: { exclude: ["id_vendedor", "id_orcamento"] },
-      });
+      let ordemProducao = await findOrdemProducaoById(Number(id))
+      
 
       return res.status(201).json(ordemProducao);
     } catch (error: any) {
@@ -503,48 +459,7 @@ export default class OrdemProducaoController {
       Promise.all(updatePromises).then(async () => {
         await transaction.commit();
 
-        let ordemProducaoUpdated = await OrdemProducao.findByPk(id, {
-          include: [
-            {
-              model: OrdemProducaoHistorico,
-              include: [
-                {
-                  model: Usuario,
-                  include: [{ model: Pessoa, paranoid: false }],
-                  attributes: { exclude: ["id_pessoa"] },
-                  paranoid: false,
-                },
-              ],
-              attributes: { exclude: ["id_ordem_producao", "id_usuario"] },
-            },
-            {
-              model: Vendedor,
-              include: [{ model: Pessoa, paranoid: false }],
-              attributes: { exclude: ["id_pessoa"] },
-              paranoid: false,
-            },
-            {
-              model: Orcamento,
-              include: [{ model: Pessoa, paranoid: false }, OrcamentoItem],
-              attributes: { exclude: ["id_pessoa"] },
-              paranoid: false,
-            },
-            {
-              model: OrdemProducaoItem,
-              include: [
-                FileDb,
-                {
-                  model: OrdemProducaoItemProcesso,
-                  attributes: { exclude: ["id_ordem_producao_item"] },
-                },
-                { model: Produto, paranoid: false },
-                RegistroInspecaoRecebimento,
-              ],
-              attributes: { exclude: ["id_ordem_producao", "id_produto"] },
-            },
-          ],
-          attributes: { exclude: ["id_vendedor", "id_orcamento"] },
-        });
+        let ordemProducaoUpdated = await findOrdemProducaoById(Number(id));
         return res.status(202).json(ordemProducaoUpdated);
       });
     } catch (error: any) {
@@ -578,4 +493,55 @@ export default class OrdemProducaoController {
       return res.status(500).json(error.message);
     }
   }
+}
+
+async function findOrdemProducaoById(
+  id: number
+): Promise<OrdemProducao | null> {
+  return await OrdemProducao.findByPk(id, {
+    include: [
+      {
+        model: Vendedor,
+        include: [{ model: Pessoa, paranoid: false }],
+        attributes: { exclude: ["id_pessoa"] },
+        paranoid: false,
+      },
+      {
+        model: Orcamento,
+        include: [{ model: Pessoa, paranoid: false }, OrcamentoItem],
+        attributes: { exclude: ["id_pessoa"] },
+        paranoid: false,
+      },
+      {
+        model: OrdemProducaoItem,
+        include: [
+          FileDb,
+          {
+            model: OrdemProducaoItemProcesso,
+            attributes: { exclude: ["id_ordem_producao_item"] },
+          },
+          { model: Produto, paranoid: false },
+          RegistroInspecaoRecebimento,
+          {
+            model: OrcamentoItem,
+            // include: [{ model: Orcamento, include: [Pessoa] }],
+          },
+        ],
+        attributes: { exclude: ["id_produto"] },
+      },
+      {
+        model: OrdemProducaoHistorico,
+        include: [
+          {
+            model: Usuario,
+            include: [{ model: Pessoa, paranoid: false }],
+            attributes: { exclude: ["id_pessoa"] },
+            paranoid: false,
+          },
+        ],
+        attributes: { exclude: ["id_ordem_producao", "id_usuario"] },
+      },
+    ],
+    attributes: { exclude: ["id_vendedor", "id_orcamento"] },
+  });
 }
