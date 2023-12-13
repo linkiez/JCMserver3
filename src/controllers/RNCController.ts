@@ -11,6 +11,7 @@ import { RNCItem } from "../models/RNCItem";
 import Produto from "../models/Produto";
 import OrcamentoItem from "../models/OrcamentoItem";
 import OrdemProducaoItemProcesso from "../models/OrdemProducaoItemProcesso";
+import sequelize from "../config/connPostgre";
 
 export default class RNCController {
   static async findAllRNC(req: Request, res: Response) {
@@ -81,32 +82,8 @@ export default class RNCController {
   static async findOneRNC(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const rnc = await RNC.findByPk(id, {
-        include: [
-          {
-            model: RNCItem,
-            include: [
-              Produto,
-              {
-                model: OrdemProducaoItem,
-                include: [
-                  {
-                    model: OrcamentoItem,
-                    include: [{ model: Orcamento, include: [Pessoa] }],
-                  },
-                  OrdemProducaoItemProcesso,
-                ],
-              },
-            ],
-          },
-          {
-            model: Usuario,
-            as: "responsavel_analise",
-            include: [Pessoa],
-            attributes: { exclude: ["senha", "acesso"] },
-          },
-        ],
-      });
+      const rnc = findRNCById(Number(id));
+
       return res.status(200).json(rnc);
     } catch (error: any) {
       console.error(error);
@@ -115,7 +92,7 @@ export default class RNCController {
   }
 
   static async createRNC(req: Request, res: Response) {
-    const transaction = await RNC.sequelize?.transaction();
+    const transaction = await sequelize.transaction();
     try {
       let rnc = req.body;
       let rnc_items = rnc.rnc_items;
@@ -135,29 +112,9 @@ export default class RNCController {
         await RNCItem.create(rnc_item, { transaction });
       }
 
-      transaction?.commit();
+      transaction.commit();
 
-      rnc = await RNC.findByPk(rnc.id, {
-        include: [
-          {
-            model: RNCItem,
-            include: [
-              Produto,
-              {
-                model: OrdemProducaoItem,
-                include: [
-                  {
-                    model: OrcamentoItem,
-                    include: [{ model: Orcamento, include: [Pessoa] }],
-                  },
-                  OrdemProducaoItemProcesso
-                ],
-              },
-            ],
-          },
-          { model: Usuario, as: "responsavel_analise", include: [Pessoa] },
-        ],
-      });
+      rnc = findRNCById(Number(rnc.id));
 
       return res.status(201).json(rnc);
     } catch (error: any) {
@@ -168,7 +125,7 @@ export default class RNCController {
   }
 
   static async updateRNC(req: Request, res: Response) {
-    const transaction = await RNC.sequelize?.transaction();
+    const transaction = await sequelize.transaction();
     try {
       const id = req.params.id;
       let rnc = req.body;
@@ -209,29 +166,9 @@ export default class RNCController {
         }
       }
 
-      transaction?.commit();
+      transaction.commit();
 
-      rnc = await RNC.findByPk(id, {
-        include: [
-          {
-            model: RNCItem,
-            include: [
-              Produto,
-              {
-                model: OrdemProducaoItem,
-                include: [
-                  {
-                    model: OrcamentoItem,
-                    include: [{ model: Orcamento, include: [Pessoa] }],
-                  },
-                  OrdemProducaoItemProcesso
-                ],
-              },
-            ],
-          },
-          { model: Usuario, as: "responsavel_analise", include: [Pessoa] },
-        ],
-      });
+      rnc = findRNCById(Number(id));
 
       return res.status(200).json(rnc);
     } catch (error: any) {
@@ -262,4 +199,40 @@ export default class RNCController {
       return res.status(500).json(error.message);
     }
   }
+}
+
+async function findRNCById(id: number): Promise<RNC | null> {
+  return await RNC.findByPk(id, {
+    include: [
+      {
+        model: RNCItem,
+        include: [
+          Produto,
+          {
+            model: OrdemProducaoItem,
+            attributes: ["id", "descricao", "id_rir"],
+            include: [
+              {
+                model: OrcamentoItem,
+                attributes: ["id"],
+                include: [
+                  {
+                    model: Orcamento,
+                    include: [{ model: Pessoa, attributes: ["nome"] }],
+                  },
+                ],
+              },
+              OrdemProducaoItemProcesso,
+            ],
+          },
+        ],
+      },
+      {
+        model: Usuario,
+        as: "responsavel_analise",
+        include: [Pessoa],
+        attributes: { exclude: ["senha", "acesso"] },
+      },
+    ],
+  });
 }
