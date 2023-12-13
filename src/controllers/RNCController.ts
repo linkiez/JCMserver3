@@ -210,7 +210,7 @@ async function findRNCById(id: number): Promise<RNC | null> {
           Produto,
           {
             model: OrdemProducaoItem,
-            attributes: ["id", "descricao", "id_rir"],
+            attributes: ["id", "descricao", "id_rir", "id_ordem_producao"],
             include: [
               {
                 model: OrcamentoItem,
