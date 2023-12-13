@@ -82,7 +82,7 @@ export default class RNCController {
   static async findOneRNC(req: Request, res: Response) {
     try {
       const id = req.params.id;
-      const rnc = findRNCById(Number(id));
+      const rnc = await findRNCById(Number(id));
 
       return res.status(200).json(rnc);
     } catch (error: any) {
@@ -219,6 +219,7 @@ async function findRNCById(id: number): Promise<RNC | null> {
                   {
                     model: Orcamento,
                     include: [{ model: Pessoa, attributes: ["nome"] }],
+                    attributes: ["id"],
                   },
                 ],
               },
