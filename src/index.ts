@@ -9,6 +9,8 @@ import { seed } from "./seed/index.js";
 import cluster from "cluster";
 import os from "os";
 import http from "http";
+import https from "https";
+import fs from "fs";
 import compression from "compression";
 import { CorsOptions } from 'cors';
 import AirBrake from "@airbrake/node";
@@ -23,7 +25,7 @@ const airbrake = new AirBrake.Notifier({
 dotenv.config();
 
 const PORT = process.env.PORT || 3000;
-// const PORT_SSL = process.env.PORT_SSL || 3001;
+const PORT_SSL = process.env.PORT_SSL || 3001;
 const app: Express = express();
 
 const corsOptions: CorsOptions = {
@@ -58,13 +60,15 @@ const httpServer = http.createServer(app);
 httpServer.keepAliveTimeout = 60 * 1000 + 1000;
 httpServer.headersTimeout = 60 * 1000 + 2000;
 
-// const httpsServer = https.createServer(
-//   {
-//     key: fs.readFileSync("./ssl/linkiez_ddns_net.key"),
-//     cert: fs.readFileSync("./ssl/linkiez_ddns_net.crt"),
-//   },
-//   app
-// );
+const httpsServer = https.createServer(
+  {
+    key: fs.readFileSync("./ssl/jcmmetais.ddns.net-PrivateKey.key"),
+    cert: fs.readFileSync("./ssl/jcmmetais_ddns_net.crt"),
+  },
+  app
+);
+httpsServer.keepAliveTimeout = 60 * 1000 + 1000;
+httpsServer.headersTimeout = 60 * 1000 + 2000;
 
 // For Master process
 if (cluster.isPrimary) {
@@ -115,7 +119,7 @@ else {
   httpServer.listen(PORT, () => {
     console.log(`Worker ${process.pid} started`);
   });
-  // httpsServer.listen(PORT_SSL, () => {
-  //   console.log(`Worker SSL ${process.pid} started`);
-  // });
+  httpsServer.listen(PORT_SSL, () => {
+    console.log(`Worker SSL ${process.pid} started`);
+  });
 }
