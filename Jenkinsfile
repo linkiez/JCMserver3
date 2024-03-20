@@ -22,11 +22,25 @@ pipeline {
                         REV_LIST = sh(script: 'git rev-list --tags --max-count=1', returnStdout: true).trim()
                         LATEST_TAG = sh(script: 'git describe --tags ' + REV_LIST, returnStdout: true).trim()
                     }
-                    def containerImage = sh(script: 'docker inspect -f "{{.Config.Image}}" JCMBackend', returnStdout: true).trim()
-                    def containerTag = containerImage.tokenize(':')[1]
+                    def containerExists = true // Assume container exists initially
+                    try {
+                        sh(script: "docker inspect --format='{{.State.Running}}' JCMBackend", returnStdout: true).trim()
+            } catch (Exception e) {
+                        containerExists = false // If docker inspect command fails, container doesn't exist
+                    }
+                    if (containerExists) {
+                        def containerImage = sh(script: 'docker inspect -f "{{.Config.Image}}" JCMBackend', returnStdout: true).trim()
+                        def containerTag = containerImage.tokenize(':')[1]
                         if (containerTag == LATEST_TAG) {
-                        error "Container with tag ${LATEST_TAG} already exists. Stopping pipeline."
+                            error "Container with tag ${LATEST_TAG} already exists and is running. Stopping pipeline."
+                } else {
+                            echo 'Container exists but with a different tag. Proceeding.'
+                        // Any further actions like stopping/removing the existing container can be scripted here.
                         }
+            } else {
+                        echo 'No existing container found. Proceeding with deployment.'
+                    // Proceed with the pipeline as the container doesn't exist.
+                    }
                 }
             }
         }
