@@ -45,7 +45,14 @@ pipeline {
                 }
             }
         }
-
+        stage('Build') {
+            steps {
+                dir('JCMserver3') {
+                    // Build your application/Docker image here using the latest tag
+                    sh "docker build . -t linkiez/jcmbackend:${LATEST_TAG}"
+                }
+            }
+        }
         stage('Deploy Test') {
             steps {
                 script {
