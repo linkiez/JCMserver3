@@ -10,7 +10,7 @@ WORKDIR /app
 COPY . .
 
 # Install dependencies
-RUN npm install --verbose
+RUN npm install
 
 # Build app
 RUN npm run build
