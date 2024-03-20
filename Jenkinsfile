@@ -3,6 +3,7 @@ pipeline {
     environment {
         REV_LIST = ''
         LATEST_TAG = ''
+        BASE_IMAGE = 'linkiez/jcmbackend'
     }
     stages {
         stage('Preparation') {
@@ -45,24 +46,42 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Deploy Test') {
             steps {
-                dir('JCMserver3') {
-                    // Build your application/Docker image here using the latest tag
-                    sh "docker build . -t linkiez/jcmbackend:${LATEST_TAG}"
+                script {
+                    // Remove Test Container as it may have been left running from a previous run
+                    sh 'docker rm -f JCMBackendTest'
+                    // Deploy Test Container
+                    withCredentials([string(credentialsId: 'SSL', variable: 'urlSSL'), file(credentialsId: '4e981c16-e24f-4f72-b6b9-8f2d8306ea2c', variable: 'envFile')]) {
+                        sh "docker run -d --name JCMBackendTest --volume ${urlSSL}:/ssl --env-file ${env.envFile} --network NW_JCMMETAIS --ip 172.19.0.5 -p 3001:3001 --restart always ${BASE_IMAGE}:${LATEST_TAG}"
+                    }
+                    // Wait for 60 seconds to ensure container starts properly
+                    sleep 60
+                    withCredentials([usernamePassword(credentialsId: 'a449d81c-0bdd-4c1a-b256-96f6910a696c', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                        try {
+                            // Make POST request to test the application inside the container
+                            sh "curl -X POST localhost:3001/login -H 'Content-Type: application/json' -d '{\"email\": \"${env.USERNAME}\", \"senha\": \"${env.PASSWORD}\"}'"
+                        } catch (Exception e) {
+                            // If there's an error, remove the test container and abort the pipeline
+                            //sh 'docker rm -f JCMBackendTest'
+                            error 'Test container responded with an error. Halting deployment.'
+                        }
+                    }
                 }
             }
         }
-        stage('Deploy') {
+        stage('Deploy Production') {
             steps {
-                    withCredentials([string(credentialsId: 'SSL', variable: 'urlSSL'), file(credentialsId: '    4e981c16-e24f-4f72-b6b9-8f2d8306ea2c', variable: 'envFile')]) {
-                    // You can reference the secret as an environment variable
-                    dir('JCMserver3') {
-                        // Replace the current running container with the new one
-                        sh "docker rm -f JCMBackend || true"
-                        sh "docker run -d --name JCMBackend --volume /home/linkiez/ssl:/ssl --env-file ${env.envFile} --network NW_JCMMETAIS --ip 172.19.0.3 -p 57339:3001 --restart always linkiez/jcmbackend:" + LATEST_TAG
+                script {
+                    // Remove Test Container as it passed the test
+                    sh 'docker rm -f JCMBackendTest'
+                    // Remove Production Container if it exists
+                    sh 'docker rm -f JCMBackend || true'
+                    // Proceed with deployment of the main container
+                    withCredentials([string(credentialsId: 'SSL', variable: 'urlSSL'), file(credentialsId: '4e981c16-e24f-4f72-b6b9-8f2d8306ea2c', variable: 'envFile')]) {
+                            sh "docker run -d --name JCMBackend --volume ${urlSSL}:/ssl --env-file ${env.envFile} --network NW_JCMMETAIS --ip 172.19.0.3 -p 57339:3001 --restart always ${BASE_IMAGE}:${LATEST_TAG}"
                     }
-                    }
+                }
             }
         }
     }
