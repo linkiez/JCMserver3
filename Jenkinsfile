@@ -45,8 +45,8 @@ pipeline {
                     // You can reference the secret as an environment variable
                     dir('JCMserver3') {
                         // Replace the current running container with the new one
-                        sh 'docker rm -f JCMBackend || true'
-                        sh 'docker run -d --name JCMBackend --volume ${env.urlSSL}:/app/ssl --env-file ${env.envFile} --network NW_JCMMETAIS --ip 172.19.0.3 -p 57339:3001 --restart always linkiez/jcmbackend:' + LATEST_TAG
+                        sh "docker rm -f JCMBackend || true"
+                        sh "docker run -d --name JCMBackend --volume ${env.urlSSL}:/app/ssl --env-file ${env.envFile} --network NW_JCMMETAIS --ip 172.19.0.3 -p 57339:3001 --restart always linkiez/jcmbackend:" + LATEST_TAG
                     }
                     }
             }
