@@ -12,29 +12,29 @@ import http from "http";
 import https from "https";
 import fs from "fs";
 import compression from "compression";
-import { CorsOptions } from 'cors';
+import { CorsOptions } from "cors";
 import AirBrake from "@airbrake/node";
 import AirBrakeExpress from "@airbrake/node/dist/instrumentation/express.js";
 import { dropViews, upViews } from "./config/syncViews.js";
 
-const airbrake = new AirBrake.Notifier({
-  projectId: 518064,
-  projectKey: "00d8815db560752be9d60a4e724f5008",
-});
-
 dotenv.config();
 
-const PORT = process.env.PORT || 3000;
-const PORT_SSL = process.env.PORT_SSL || 3001;
 const app: Express = express();
 
 const corsOptions: CorsOptions = {
-  origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-    const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',');
-    if (!origin || (allowedOrigins && allowedOrigins.indexOf(origin) !== -1) || allowedOrigins?.includes('*')) {
+  origin: function (
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void
+  ) {
+    const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",");
+    if (
+      !origin ||
+      (allowedOrigins && allowedOrigins.indexOf(origin) !== -1) ||
+      allowedOrigins?.includes("*")
+    ) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error("Not allowed by CORS"));
     }
   },
 };
@@ -48,7 +48,11 @@ app.use(
 
 app.use(compression());
 
-if (process.env.NODE_ENV === "production") {
+if (process.env.AIRBRAKE_PROJECT_ID && process.env.AIRBRAKE_API_KEY) {
+  const airbrake = new AirBrake.Notifier({
+    projectId: 518064,
+    projectKey: "00d8815db560752be9d60a4e724f5008",
+  });
   app.use(AirBrakeExpress.makeMiddleware(airbrake));
   app.use(AirBrakeExpress.makeErrorHandler(airbrake));
 }
@@ -86,7 +90,7 @@ if (cluster.isPrimary) {
       }
     });
 
-    await upViews(sequelize);
+  await upViews(sequelize);
   // Fork workers.
   const WORKERS = Number(process.env.WEB_CONCURRENCY) || os.cpus().length;
 
@@ -114,12 +118,14 @@ if (cluster.isPrimary) {
 
 // For Worker
 else {
+  const PORT = process.env.PORT || 3000;
+  const PORT_SSL = process.env.PORT_SSL || 3001;
   // Workers can share any TCP connection
   // In this case it is an HTTP server
   httpServer.listen(PORT, () => {
-    console.log(`Worker ${process.pid} started`);
+    console.log(`Worker ${process.pid} started on port ${PORT}`);
   });
   httpsServer.listen(PORT_SSL, () => {
-    console.log(`Worker SSL ${process.pid} started`);
+    console.log(`Worker SSL ${process.pid} started on port ${PORT_SSL}`);
   });
 }
