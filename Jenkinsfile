@@ -48,8 +48,34 @@ pipeline {
         stage('Build') {
             steps {
                 dir('JCMserver3') {
-                    // Build your application/Docker image here using the latest tag
-                    sh "docker build . -t linkiez/jcmbackend:${LATEST_TAG}"
+                    script {
+                        // Initialize the attempt counter
+                        def attempts = 0
+                        def maxAttempts = 3
+                        def success = false
+
+                        // Loop to attempt the build up to maxAttempts times
+                        while (!success && attempts < maxAttempts) {
+                            // Increment the attempt counter at the beginning of each iteration
+                            attempts++
+                            try {
+                                // Build the Docker image
+                                sh "docker build . -t ${BASE_IMAGE}:${LATEST_TAG}"
+                                // If the command succeeds, set success to true to exit the loop
+                                success = true
+                    } catch (Exception e) {
+                                // If an exception is caught, print an error message
+                                println("Attempt ${attempts} failed.")
+                                // Sleep for a brief period before retrying
+                                sleep(time: 10, unit: 'SECONDS')
+                            }
+                        }
+
+                        // Check if the build was unsuccessful after maxAttempts
+                        if (!success) {
+                            error "Build failed after ${maxAttempts} attempts."
+                        }
+                    }
                 }
             }
         }
@@ -60,7 +86,6 @@ pipeline {
                         sh "docker login -u $USERNAME --password-stdin $PASSWORD"
                         sh "docker push linkiez/jcmbackend:${LATEST_TAG}"
                     }
-                    
                 }
             }
         }
