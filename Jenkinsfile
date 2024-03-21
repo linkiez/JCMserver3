@@ -79,13 +79,6 @@ pipeline {
                 }
             }
         }
-        stage('Push to Registry') {
-            steps {
-                dir('JCMserver3') {
-                        sh "docker push linkiez/jcmbackend:${LATEST_TAG}"
-                }
-            }
-        }
         stage('Deploy Test') {
             steps {
                 script {
@@ -124,6 +117,13 @@ pipeline {
                     withCredentials([string(credentialsId: 'SSL', variable: 'urlSSL'), file(credentialsId: '4e981c16-e24f-4f72-b6b9-8f2d8306ea2c', variable: 'envFile')]) {
                             sh "docker run -d --name JCMBackend --volume ${urlSSL}:/ssl --env-file ${env.envFile} --network NW_JCMMETAIS --ip 172.19.0.3 -p 57339:3001 --restart always ${BASE_IMAGE}:${LATEST_TAG}"
                     }
+                }
+            }
+        }
+        stage('Push to Registry') {
+            steps {
+                dir('JCMserver3') {
+                        sh "docker push linkiez/jcmbackend:${LATEST_TAG}"
                 }
             }
         }
