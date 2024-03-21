@@ -69,8 +69,11 @@ pipeline {
                             // Make POST request to test the application inside the container
                             sh "curl -X POST localhost:3001/login -H 'Content-Type: application/json' -d '{\"email\": \"${env.USERNAME}\", \"senha\": \"${env.PASSWORD}\"}'"
                         } catch (Exception e) {
-                            // If there's an error, remove the test container and abort the pipeline
-                            //sh 'docker rm -f JCMBackendTest'
+                            // Print the log of the container before removing it
+                            echo 'Fetching container logs...'
+                            sh 'docker logs JCMBackendTest'
+                            echo 'Removing the test container...'
+                            sh 'docker rm -f JCMBackendTest'
                             error 'Test container responded with an error. Halting deployment.'
                         }
                     }
