@@ -56,7 +56,11 @@ pipeline {
         stage('Push to Registry') {
             steps {
                 dir('JCMserver3') {
-                    sh "docker push linkiez/jcmbackend:${LATEST_TAG}"
+                    withCredentials([usernamePassword(credentialsId: 'a449d81c-0bdd-4c1a-b256-96f6910a696c', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                        sh "docker login -u $USERNAME --password-stdin $PASSWORD"
+                        sh "docker push linkiez/jcmbackend:${LATEST_TAG}"
+                    }
+                    
                 }
             }
         }
