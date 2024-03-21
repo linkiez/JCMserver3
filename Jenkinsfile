@@ -53,6 +53,14 @@ pipeline {
                 }
             }
         }
+        stage('Push to Registry') {
+            steps {
+                dir('JCMserver3') {
+                    sh "docker push linkiez/jcmbackend:${LATEST_TAG}"
+                }
+            }
+        }
+        }
         stage('Deploy Test') {
             steps {
                 script {
