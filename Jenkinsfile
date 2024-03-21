@@ -60,7 +60,6 @@ pipeline {
                 }
             }
         }
-        }
         stage('Deploy Test') {
             steps {
                 script {
