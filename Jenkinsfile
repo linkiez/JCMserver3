@@ -63,7 +63,7 @@ pipeline {
                                 sh "docker build . -t ${BASE_IMAGE}:${LATEST_TAG}"
                                 // If the command succeeds, set success to true to exit the loop
                                 success = true
-                    } catch (Exception e) {
+                            } catch (Exception e) {
                                 // If an exception is caught, print an error message
                                 println("Attempt ${attempts} failed.")
                                 // Sleep for a brief period before retrying
@@ -82,9 +82,8 @@ pipeline {
         stage('Push to Registry') {
             steps {
                 script {
-                    dir('JCMserver3') {
+                    docker.withRegistry('https://index.docker.io/v1/', '902264b9-7caf-4364-872d-0148f17a72e7') {
                         docker.image("${BASE_IMAGE}:${LATEST_TAG}").push()
-                    //sh "docker push linkiez/jcmbackend:${LATEST_TAG}"
                     }
                 }
             }
