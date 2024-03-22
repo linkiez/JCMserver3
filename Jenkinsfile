@@ -5,7 +5,7 @@ pipeline {
         LATEST_TAG = ''
         BASE_IMAGE = 'linkiez/jcmbackend'
     }
-    stages {
+        stages {
         stage('Preparation') {
             steps {
                 script {
@@ -93,12 +93,14 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'a449d81c-0bdd-4c1a-b256-96f6910a696c', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                         try {
                             // Make POST request to test the application inside the container
-                            sh '''
-                                curl -X POST localhost:3001/login -H 'Content-Type: application/json' -d '{
-                                "email": "'${env.USERNAME}'",
-                                "senha": "'${env.PASSWORD}'"
-                                }'
-                               '''
+                            sh """
+                               curl -X POST localhost:3001/login -H 'Content-Type: application/json' -d @- <<EOF
+                                {
+                                     "email": "${env.USERNAME}",
+                                     "senha": "${PASSWORD}"
+                                 }
+                                 EOF
+                               """
                         } catch (Exception e) {
                             // Print the log of the container before removing it
                             echo 'Fetching container logs...'
@@ -135,4 +137,5 @@ pipeline {
             }
         }
     }
+}
 }
