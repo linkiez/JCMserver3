@@ -19,8 +19,7 @@ RUN npm run build
 RUN rm -rf src
 
 # Remove dev dependencies
-RUN npm prune --production
-
+RUN npm prune --omit=dev
 # Expose port for container
 EXPOSE 3000
 EXPOSE 3001

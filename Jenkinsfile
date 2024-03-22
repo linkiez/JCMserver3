@@ -93,10 +93,11 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'a449d81c-0bdd-4c1a-b256-96f6910a696c', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                         try {
                             // Make POST request to test the application inside the container
+
                             def inspect = sh(script: "docker inspect --format='{{.State.Health.Status}}' JCMBackendTest", returnStdout: true).trim()
                             if (inspect != "healthy") { error "Container failed to start properly." }
                             sh """
-                               curl -X POST localhost:3001/login -H 'Content-Type: application/json' --cacert /home/linkiez/ssl/jcmmetais_ddns_net.crt -d @- <<EOF
+                               curl -X POST localhost:3000/login -H 'Content-Type: application/json' -d @- <<EOF
                                 {
                                      "email": "${env.USERNAME}",
                                      "senha": "${PASSWORD}"
