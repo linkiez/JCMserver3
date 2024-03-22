@@ -92,10 +92,10 @@ pipeline {
             steps {
                 script {
                     // Remove Test Container as it may have been left running from a previous run
-                    sh 'docker rm -f JCMBackendTest'
+                    sh 'docker rm -f JCMBackendTest || true'
                     // Deploy Test Container
                     withCredentials([string(credentialsId: 'SSL', variable: 'urlSSL'), file(credentialsId: '4e981c16-e24f-4f72-b6b9-8f2d8306ea2c', variable: 'envFile')]) {
-                        sh "docker run -d --name JCMBackendTest --volume ${urlSSL}:/ssl --env-file ${env.envFile} --network NW_JCMMETAIS --ip 172.19.0.5 -p 3001:3001 --restart always ${BASE_IMAGE}:${LATEST_TAG}"
+                        sh "docker run -d --name JCMBackendTest --volume ${urlSSL}:/app/ssl --env-file ${env.envFile} --network NW_JCMMETAIS --ip 172.19.0.5 -p 3001:3001 --restart always ${BASE_IMAGE}:${LATEST_TAG}"
                     }
                     // Wait for 60 seconds to ensure container starts properly
                     sleep 60
@@ -119,7 +119,7 @@ pipeline {
             steps {
                 script {
                     // Remove Test Container as it passed the test
-                    sh 'docker rm -f JCMBackendTest'
+                    sh 'docker rm -f JCMBackendTest || true'
                     // Remove Production Container if it exists
                     sh 'docker rm -f JCMBackend || true'
                     // Proceed with deployment of the main container
