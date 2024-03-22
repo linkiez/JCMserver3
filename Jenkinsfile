@@ -83,7 +83,7 @@ pipeline {
             steps {
                 script {
                     dir('JCMserver3') {
-                        docker.push(BASE_IMAGE + ':' + LATEST_TAG)
+                        docker.image("${BASE_IMAGE}:${LATEST_TAG}").push()
                     //sh "docker push linkiez/jcmbackend:${LATEST_TAG}"
                     }
                 }
