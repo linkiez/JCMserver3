@@ -21,6 +21,9 @@ dotenv.config();
 
 const app: Express = express();
 
+console.log(fs.readdirSync("./"));
+console.log(fs.readdirSync("./ssl"));
+
 const corsOptions: CorsOptions = {
   origin: function (
     origin: string | undefined,
