@@ -94,7 +94,7 @@ pipeline {
                         try {
                             // Make POST request to test the application inside the container
                             sh """
-                               curl -X POST localhost:3001/login -H 'Content-Type: application/json' -d @- <<EOF
+                               curl -X POST localhost:3000/login -H 'Content-Type: application/json' -d @- <<EOF
                                 {
                                      "email": "${env.USERNAME}",
                                      "senha": "${PASSWORD}"
