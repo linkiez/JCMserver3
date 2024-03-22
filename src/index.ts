@@ -13,8 +13,6 @@ import https from "https";
 import fs from "fs";
 import compression from "compression";
 import { CorsOptions } from "cors";
-import AirBrake from "@airbrake/node";
-import AirBrakeExpress from "@airbrake/node/dist/instrumentation/express.js";
 import { dropViews, upViews } from "./config/syncViews.js";
 
 dotenv.config();
@@ -47,15 +45,6 @@ app.use(
 );
 
 app.use(compression());
-
-if (process.env.AIRBRAKE_PROJECT_ID && process.env.AIRBRAKE_API_KEY) {
-  const airbrake = new AirBrake.Notifier({
-    projectId: 518064,
-    projectKey: "00d8815db560752be9d60a4e724f5008",
-  });
-  app.use(AirBrakeExpress.makeMiddleware(airbrake));
-  app.use(AirBrakeExpress.makeErrorHandler(airbrake));
-}
 
 models();
 await routes(app);

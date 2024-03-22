@@ -23,7 +23,6 @@
   },
   "homepage": "https://github.com/linkiez/JCMserver3#readme",
   "dependencies": {
-    "@airbrake/node": "^2",
     "@aws-sdk/client-s3": "^3",
     "@aws-sdk/s3-request-presigner": "^3",
     "@google-cloud/storage": "^7.4.0",

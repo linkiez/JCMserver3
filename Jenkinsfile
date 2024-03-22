@@ -79,15 +79,6 @@ pipeline {
                 }
             }
         }
-        stage('Push to Registry') {
-            steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', '902264b9-7caf-4364-872d-0148f17a72e7') {
-                        docker.image("${BASE_IMAGE}:${LATEST_TAG}").push()
-                    }
-                }
-            }
-        }
         stage('Deploy Test') {
             steps {
                 script {
@@ -125,6 +116,15 @@ pipeline {
                     // Proceed with deployment of the main container
                     withCredentials([string(credentialsId: 'SSL', variable: 'urlSSL'), file(credentialsId: '4e981c16-e24f-4f72-b6b9-8f2d8306ea2c', variable: 'envFile')]) {
                             sh "docker run -d --name JCMBackend --volume ${urlSSL}:/ssl --env-file ${env.envFile} --network NW_JCMMETAIS --ip 172.19.0.3 -p 57339:3001 --restart always ${BASE_IMAGE}:${LATEST_TAG}"
+                    }
+                }
+            }
+        }
+        stage('Push to Registry') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', '902264b9-7caf-4364-872d-0148f17a72e7') {
+                        docker.image("${BASE_IMAGE}:${LATEST_TAG}").push()
                     }
                 }
             }
