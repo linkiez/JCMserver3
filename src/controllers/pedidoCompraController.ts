@@ -510,7 +510,7 @@ export default class PedidoCompraController {
         offset: consulta.pageCount * consulta.page,
         paranoid: req.query.deleted === "true" ? false : true,
         include: include,
-        order: [["id", "DESC"]],
+        order: [[PedidoCompra, "id", "DESC"]],
       });
 
       resultado.totalRecords = await PedidoCompraItem.count({
