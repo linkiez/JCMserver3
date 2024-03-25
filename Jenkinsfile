@@ -97,7 +97,10 @@ pipeline {
                             def inspect = sh(script: "docker inspect --format='{{.State.Health.Status}}' JCMBackendTest", returnStdout: true).trim()
                             if (inspect != "healthy") { error "Container failed to start properly." }
                             sh """
-                               curl -X POST localhost:3000/login -H 'Content-Type: application/json' -d @- <<EOF
+                               curl -X POST localhost:3000/login
+                               -H 'Content-Type: application/json'
+                               -H 'Origin: http://localhost/'
+                               -d @- <<EOF
                                 {
                                      "email": "${env.USERNAME}",
                                      "senha": "${PASSWORD}"
