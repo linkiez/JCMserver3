@@ -25,6 +25,10 @@ const corsOptions: CorsOptions = {
     callback: (err: Error | null, allow?: boolean) => void
   ) {
     const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",");
+    console.log("Origin: ", origin);
+    console.log("Allowed Origins: ", allowedOrigins);
+    console.log("Node Env: ", process.env.NODE_ENV);
+    console.log("some: ", allowedOrigins?.some((originItem) => origin?.includes(originItem)));
     if (
       (origin || process.env.NODE_ENV == "test") &&
       allowedOrigins &&
