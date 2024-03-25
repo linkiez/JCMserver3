@@ -26,9 +26,10 @@ const corsOptions: CorsOptions = {
   ) {
     const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",");
     if (
-      !origin ||
-      (allowedOrigins && allowedOrigins.indexOf(origin) !== -1) ||
-      allowedOrigins?.includes("*")
+      origin &&
+      allowedOrigins &&
+      (allowedOrigins.some((originItem) => origin.includes(originItem)) ||
+        allowedOrigins.includes("*"))
     ) {
       callback(null, true);
     } else {
