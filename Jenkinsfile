@@ -86,7 +86,7 @@ pipeline {
                     sh 'docker rm -f JCMBackendTest || true'
                     // Deploy Test Container
                     withCredentials([string(credentialsId: 'SSL', variable: 'urlSSL'), file(credentialsId: '1853bd4a-082c-46b1-9acc-4c8c12684574', variable: 'envFile')]) {
-                        docker.image("${BASE_IMAGE}:${LATEST_TAG}").withRun("--name JCMBackendTest --volume ${urlSSL}:/app/ssl --env-file ${envFile} --network NW_JCMMETAIS --ip 172.19.0.5 -p 3000:3000 -p 3001:3001 ${BASE_IMAGE}:${LATEST_TAG}")
+                        docker.image("${BASE_IMAGE}:${LATEST_TAG}").run("--name JCMBackendTest --volume ${urlSSL}:/app/ssl --env-file ${envFile} --network NW_JCMMETAIS --ip 172.19.0.5 -p 3000:3000 -p 3001:3001 ${BASE_IMAGE}:${LATEST_TAG}")
                     }
                     // Wait for 60 seconds to ensure container starts properly
                     sleep 60
@@ -129,7 +129,7 @@ pipeline {
                     sh 'docker rm -f JCMBackend || true'
                     // Proceed with deployment of the main container
                     withCredentials([string(credentialsId: 'SSL', variable: 'urlSSL'), file(credentialsId: '4e981c16-e24f-4f72-b6b9-8f2d8306ea2c', variable: 'envFile')]) {
-                        docker.image("${BASE_IMAGE}:${LATEST_TAG}").withRun("--name JCMBackend --volume ${urlSSL}:/app/ssl --env-file ${envFile} --network NW_JCMMETAIS --ip 172.19.0.3 -p 57339:3001 ${BASE_IMAGE}:${LATEST_TAG}")
+                        docker.image("${BASE_IMAGE}:${LATEST_TAG}").run("--name JCMBackend --volume ${urlSSL}:/app/ssl --env-file ${envFile} --network NW_JCMMETAIS --ip 172.19.0.3 -p 57339:3001 ${BASE_IMAGE}:${LATEST_TAG}")
                     }
                 }
             }
