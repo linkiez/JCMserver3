@@ -273,6 +273,7 @@ export class TinyERP {
               unidade: "KG",
               quantidade: item.peso,
               valor_unitario: item.total / item.peso,
+              informacao_adicional: `${item.descricao} - ${item.largura}x${item.altura}mm ${item.quantidade}PC`
             },
           };
         }),
