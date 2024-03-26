@@ -95,18 +95,18 @@ pipeline {
                             // Make POST request to test the application inside the container
 
                             def inspect = sh(script: "docker inspect --format='{{.State.Health.Status}}' JCMBackendTest", returnStdout: true).trim()
-                            if (inspect != "healthy") { error "Container failed to start properly." }
+                            if (inspect != 'healthy') { error 'Container failed to start properly.' }
                             sh """
-                               curl -X POST localhost:3000/login
-                               -H 'Content-Type: application/json'
-                               -H 'Origin: http://localhost/'
-                               -d @- <<EOF
-                                {
-                                     "email": "${env.USERNAME}",
-                                     "senha": "${PASSWORD}"
-                                 }
-                                 EOF
-                               """
+                              curl -X POST localhost:3000/login \\
+                             -H 'Content-Type: application/json' \\
+                             -H 'Origin: http://localhost/' \\
+                             -d @- <<EOF
+                                  {
+                                      \"email\": \"${env.USERNAME}\",
+                                      \"password\": \"${env.PASSWORD}\"
+                                   }
+                                EOF
+                            """
                         } catch (Exception e) {
                             // Print the log of the container before removing it
                             echo 'Fetching container logs...'
@@ -142,6 +142,6 @@ pipeline {
                 }
             }
         }
-    }
+        }
 }
 
