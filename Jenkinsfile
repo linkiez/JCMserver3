@@ -59,6 +59,13 @@ pipeline {
                             // Increment the attempt counter at the beginning of each iteration
                             attempts++
                             try {
+                                // Check if the Docker image already exists
+                                def imageExists = sh(script: "docker images -q ${BASE_IMAGE}:${LATEST_TAG}", returnStdout: true).trim()
+                                // If the image exists, remove it
+                                if (imageExists) {
+                                    sh "docker rmi ${BASE_IMAGE}:${LATEST_TAG}"
+                                    println("Existing Docker image ${BASE_IMAGE}:${LATEST_TAG} removed.")
+                                }
                                 // Build the Docker image
                                 sh "docker build . -t ${BASE_IMAGE}:${LATEST_TAG}"
                                 // If the command succeeds, set success to true to exit the loop
