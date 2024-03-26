@@ -99,7 +99,8 @@ pipeline {
                             sh """
                               curl -X POST localhost:3000/login \\
                              -H 'Content-Type: application/json' \\
-                             -H 'Origin: http://localhost/' \\
+                             -H 'Origin: http://127.0.0.1/' \\
+                             -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \\
                              -d @- <<EOF
                                   {
                                       'email': '${env.USERNAME}',
