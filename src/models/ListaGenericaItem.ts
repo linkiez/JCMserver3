@@ -5,6 +5,7 @@ import ListaGenerica from "./ListaGenerica";
 export default class ListaGenericaItem extends Model {
   declare id: number;
   declare valor: string;
+  declare valor2: string;
   declare deletedAt: Date;
   declare updatedAt: Date;
   declare createdAt: Date;

@@ -5,6 +5,8 @@ import momentBussiness from "moment-business-days";
 import Pessoa_Empresa from "../models/Pessoa_Empresa";
 import Produto from "../models/Produto";
 import Vendedor_Empresa from "../models/Vendedor_Empresa";
+import { InvertextoAPI } from "./invertextoAPI";
+import ListaGenericaItem from "../models/ListaGenericaItem";
 export class TinyERP {
   constructor() {}
 
@@ -92,7 +94,17 @@ export class TinyERP {
   }
 
   static async createVenda(orcamento: Orcamento, token: string) {
-    momentBussiness.updateLocale("pt-BR", { workingWeekdays: [1, 2, 3, 4, 5] });
+    let feriados: ListaGenericaItem[] | string[] =
+      await InvertextoAPI.getFeriados();
+
+      feriados = feriados.map((data: ListaGenericaItem) => data.valor2);
+
+      momentBussiness.updateLocale("pt-BR", {
+        workingWeekdays: [1, 2, 3, 4, 5],
+        holidays: feriados,
+        holidayFormat: "YYYY-MM-DD",
+      });
+      
     const codigoCliente = await Pessoa_Empresa.findOne({
       where: { pessoaId: orcamento.pessoa.id, empresaId: orcamento.empresa.id },
     });
@@ -194,7 +206,17 @@ export class TinyERP {
   }
 
   static async createVendaFmoreno(orcamento: Orcamento, token: string) {
-    momentBussiness.updateLocale("pt-BR", { workingWeekdays: [1, 2, 3, 4, 5] });
+    let feriados: ListaGenericaItem[] | string[] =
+      await InvertextoAPI.getFeriados();
+
+    feriados = feriados.map((data: ListaGenericaItem) => data.valor2);
+
+    momentBussiness.updateLocale("pt-BR", {
+      workingWeekdays: [1, 2, 3, 4, 5],
+      holidays: feriados,
+      holidayFormat: "YYYY-MM-DD",
+    });
+    
     const codigoCliente = await Pessoa_Empresa.findOne({
       where: { pessoaId: orcamento.pessoa.id, empresaId: orcamento.empresa.id },
     });
@@ -273,7 +295,7 @@ export class TinyERP {
               unidade: "KG",
               quantidade: item.peso,
               valor_unitario: item.total / item.peso,
-              informacao_adicional: `${item.descricao} - ${item.largura}x${item.altura}mm ${item.quantidade}PC`
+              informacao_adicional: `${item.descricao} - ${item.largura}x${item.altura}mm ${item.quantidade}PC`,
             },
           };
         }),
