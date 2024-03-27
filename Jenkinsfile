@@ -28,17 +28,17 @@ pipeline {
                         LATEST_TAG = sh(script: 'git describe --tags ' + REV_LIST, returnStdout: true).trim()
                     }
 
+                    def dockerContainer = docker.container('JCMBackend')
                     def containerExists = true // Assume container exists initially
                     try {
-                        docker.inspect('JCMBackend')
+                        dockerContainer.inspect()
                     } catch (Exception e) {
                         containerExists = false // If docker inspect command fails, container doesn't exist
                     }
                     
                     if (containerExists) {
                         // Inspecting the Docker container to get the image tag
-                        def dockerImage = docker.image('JCMBackend')
-                        def containerDetails = dockerImage.inspect()
+                        def containerDetails = dockerContainer.inspect()
                         def containerTag = containerDetails.object.Config.Image.tokenize(':')[1]
 
                         if (containerTag == LATEST_TAG) {
