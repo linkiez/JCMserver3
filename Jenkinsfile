@@ -33,7 +33,8 @@ pipeline {
                         def containerImage = sh(script: 'docker inspect -f "{{.Config.Image}}" JCMBackend', returnStdout: true).trim()
                         def containerTag = containerImage.tokenize(':')[1]
                         if (containerTag == LATEST_TAG) {
-                            error "Container with tag ${LATEST_TAG} already exists and is running. Stopping pipeline."
+                            echo "Container with tag ${LATEST_TAG} already exists and is running. Stopping pipeline."
+                            return
                 } else {
                             echo 'Container exists but with a different tag. Proceeding.'
                         // Any further actions like stopping/removing the existing container can be scripted here.
