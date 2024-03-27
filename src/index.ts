@@ -14,6 +14,7 @@ import fs from "fs";
 import compression from "compression";
 import { CorsOptions } from "cors";
 import { dropViews, upViews } from "./config/syncViews.js";
+import { InvertextoAPI } from "./services/invertextoAPI.js";
 
 dotenv.config();
 
@@ -80,6 +81,9 @@ if (cluster.isPrimary) {
     });
 
   await upViews(sequelize);
+
+  InvertextoAPI.syncFeriados();
+  
   // Fork workers.
   const WORKERS = Number(process.env.WEB_CONCURRENCY) || os.cpus().length;
 
