@@ -16,31 +16,40 @@ pipeline {
         stage('Verify Tag') {
             steps {
                 script {
-                    // Clone your repository and fetch tags
-                    sh 'git clone https://github.com/linkiez/JCMserver3 && cd JCMserver3 && git fetch --tags'
+                    // Cloning the repository
+                    checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/linkiez/JCMserver3']]])
+
+                    // Fetching tags
+                    git url: 'https://github.com/linkiez/JCMserver3', branch: 'main', poll: false, changelog: false, tags: true
+
                     // Fetch the latest tag
                     dir('JCMserver3') {
                         REV_LIST = sh(script: 'git rev-list --tags --max-count=1', returnStdout: true).trim()
                         LATEST_TAG = sh(script: 'git describe --tags ' + REV_LIST, returnStdout: true).trim()
                     }
+
                     def containerExists = true // Assume container exists initially
                     try {
-                        sh(script: "docker inspect --format='{{.State.Running}}' JCMBackend", returnStdout: true).trim()
-            } catch (Exception e) {
+                        docker.inspect('JCMBackend')
+                    } catch (Exception e) {
                         containerExists = false // If docker inspect command fails, container doesn't exist
                     }
+                    
                     if (containerExists) {
-                        def containerImage = sh(script: 'docker inspect -f "{{.Config.Image}}" JCMBackend', returnStdout: true).trim()
-                        def containerTag = containerImage.tokenize(':')[1]
+                        // Inspecting the Docker container to get the image tag
+                        def dockerImage = docker.image('JCMBackend')
+                        def containerDetails = dockerImage.inspect()
+                        def containerTag = containerDetails.object.Config.Image.tokenize(':')[1]
+
                         if (containerTag == LATEST_TAG) {
                             error "Container with tag ${LATEST_TAG} already exists and is running. Stopping pipeline."
-                } else {
+                        } else {
                             echo 'Container exists but with a different tag. Proceeding.'
-                        // Any further actions like stopping/removing the existing container can be scripted here.
+                            // Further actions like stopping/removing the existing container can be scripted here.
                         }
-            } else {
+                    } else {
                         echo 'No existing container found. Proceeding with deployment.'
-                    // Proceed with the pipeline as the container doesn't exist.
+                        // Proceed with the pipeline as the container doesn't exist.
                     }
                 }
             }
