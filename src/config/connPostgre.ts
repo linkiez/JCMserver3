@@ -26,9 +26,9 @@ if (process.env.NODE_ENV == "production") {
     ssl: {
       require: true,
       rejectUnauthorized: false,
-      ca: fs.readFileSync("/ssl/jcmapp-db-server-ca.pem"),
-      cert: fs.readFileSync("/ssl/jcmapp-db-client-cert.pem"),
-      key: fs.readFileSync("/ssl/jcmapp-db-client-key.pem"),
+      ca: fs.readFileSync("../ssl/jcmapp-db-server-ca.pem"),
+      cert: fs.readFileSync("../ssl/jcmapp-db-client-cert.pem"),
+      key: fs.readFileSync("../ssl/jcmapp-db-client-key.pem"),
     },
   };
 }
